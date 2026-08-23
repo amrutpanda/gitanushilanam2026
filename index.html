@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#07111f" />
+<title>GA 26 Operational Blueprint — Web Presentation</title>
+<style>
+  :root{
+    --bg:#07111f;
+    --bg2:#11172a;
+    --panel:rgba(15,25,45,.72);
+    --panel-strong:rgba(12,20,38,.94);
+    --gold:#efb44f;
+    --gold2:#ffd77d;
+    --amber:#ff9b30;
+    --cream:#f7f0df;
+    --muted:#c6c1b7;
+    --line:rgba(239,180,79,.34);
+    --soft:rgba(255,255,255,.06);
+    --ok:#8fd7bd;
+    --shadow:0 30px 90px rgba(0,0,0,.42);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;width:100%;height:100%;background:#040a12;color:var(--cream);overflow:hidden}
+  body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  button{font:inherit}
+
+  .app{position:relative;width:100vw;height:100vh;background:
+      radial-gradient(circle at 12% 15%, rgba(83,53,135,.22), transparent 30%),
+      radial-gradient(circle at 88% 80%, rgba(255,155,48,.10), transparent 32%),
+      linear-gradient(145deg,#050b14,#0c1323 48%,#070d18);}
+
+  .app::before,.app::after{content:"";position:absolute;pointer-events:none;opacity:.2;border:1px solid var(--line);border-radius:50%;}
+  .app::before{width:44vw;height:44vw;right:-17vw;top:-18vw;box-shadow:0 0 0 28px rgba(239,180,79,.03),0 0 0 70px rgba(239,180,79,.02)}
+  .app::after{width:35vw;height:35vw;left:-16vw;bottom:-17vw;box-shadow:0 0 0 24px rgba(239,180,79,.03),0 0 0 58px rgba(239,180,79,.02)}
+
+  .deck{position:absolute;inset:0}
+  .slide{position:absolute;inset:0;padding:5.4vh 5.5vw 6.2vh;display:grid;grid-template-rows:auto 1fr auto;opacity:0;pointer-events:none;transform:translateX(2.2%);transition:opacity .42s ease,transform .42s ease;overflow:hidden;background:
+    linear-gradient(120deg,rgba(8,18,32,.96),rgba(14,19,36,.94)),
+    radial-gradient(circle at 82% 22%, rgba(239,180,79,.08), transparent 26%);
+  }
+  .slide::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:
+      linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:52px 52px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.7),transparent 82%)}
+  .slide::after{content:"";position:absolute;right:-8vw;top:10vh;width:27vw;height:27vw;border-radius:50%;border:1px solid rgba(239,180,79,.18);box-shadow:0 0 0 22px rgba(239,180,79,.022),0 0 0 48px rgba(239,180,79,.016),0 0 0 76px rgba(239,180,79,.012);pointer-events:none}
+  .slide.active{opacity:1;pointer-events:auto;transform:translateX(0)}
+  .slide.past{transform:translateX(-2.2%)}
+
+  .topline{display:flex;align-items:center;justify-content:space-between;gap:2rem;position:relative;z-index:2}
+  .kicker{font-size:clamp(11px,1vw,16px);letter-spacing:.18em;text-transform:uppercase;color:var(--gold2);font-weight:800}
+  .section-tag{font-size:clamp(10px,.9vw,14px);letter-spacing:.08em;text-transform:uppercase;color:rgba(247,240,223,.58)}
+
+  .slide-main{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:center;min-height:0}
+  h1,h2,h3,h4,p{margin:0}
+  .display{font-family:Georgia,"Times New Roman",serif;font-weight:600;line-height:.98;letter-spacing:-.035em;font-size:clamp(52px,6.4vw,112px);max-width:1150px;text-shadow:0 10px 40px rgba(0,0,0,.28)}
+  .display .gold,.gold{color:var(--gold2)}
+  .title{font-family:Georgia,"Times New Roman",serif;font-size:clamp(34px,4.25vw,72px);line-height:1.04;letter-spacing:-.025em;max-width:1220px}
+  .subtitle{font-size:clamp(17px,1.55vw,28px);line-height:1.45;color:var(--muted);max-width:980px;margin-top:2.2vh}
+  .small{font-size:clamp(12px,.9vw,16px);line-height:1.45;color:var(--muted)}
+  .tiny{font-size:clamp(10px,.72vw,13px);line-height:1.35;color:rgba(247,240,223,.62)}
+
+  .footer{position:relative;z-index:2;display:flex;align-items:end;justify-content:space-between;gap:2rem;font-size:clamp(10px,.8vw,13px);color:rgba(247,240,223,.48)}
+  .brand{display:inline-flex;align-items:center;gap:.65rem;font-weight:800;color:var(--gold2);letter-spacing:.05em}
+  .brand i{width:23px;height:1px;background:var(--gold);display:inline-block}
+  .slide-no{font-variant-numeric:tabular-nums}
+
+  .hero-wrap{display:grid;grid-template-columns:1.05fr .75fr;gap:6vw;align-items:center}
+  .hero-orbit{position:relative;width:min(37vw,580px);aspect-ratio:1;justify-self:end;display:grid;place-items:center}
+  .hero-orbit .ring{position:absolute;border-radius:50%;border:1px solid rgba(239,180,79,.27);inset:8%;animation:drift 18s linear infinite}
+  .hero-orbit .ring:nth-child(2){inset:18%;transform:rotate(35deg);animation-duration:24s;border-style:dashed}
+  .hero-orbit .ring:nth-child(3){inset:30%;animation-direction:reverse;animation-duration:30s}
+  .hero-orbit .core{width:48%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;text-align:center;padding:2rem;background:radial-gradient(circle at 45% 35%,#ffc35b 0,#f0a52d 36%,#a94912 100%);box-shadow:0 0 80px rgba(255,171,55,.28),inset 0 0 40px rgba(255,255,255,.15);color:#1a1320}
+  .hero-orbit .core strong{font-family:Georgia,serif;font-size:clamp(20px,2.2vw,38px);line-height:1.05}
+  .hero-orbit .node{position:absolute;width:9px;height:9px;background:var(--gold2);border-radius:50%;box-shadow:0 0 16px var(--gold)}
+  .hero-orbit .n1{top:12%;left:50%}.hero-orbit .n2{right:12%;top:50%}.hero-orbit .n3{bottom:12%;left:50%}.hero-orbit .n4{left:12%;top:50%}
+  @keyframes drift{to{transform:rotate(360deg)}}
+
+  .cards{display:grid;gap:1.15vw}
+  .cards.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cards.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .cards.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .card{position:relative;padding:1.45vw 1.45vw 1.3vw;border:1px solid rgba(239,180,79,.25);background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018));border-radius:22px;box-shadow:0 15px 50px rgba(0,0,0,.2);backdrop-filter:blur(10px);overflow:hidden}
+  .card::after{content:"";position:absolute;left:0;top:0;width:3px;height:100%;background:linear-gradient(var(--gold2),transparent)}
+  .card h3{font-family:Georgia,serif;font-size:clamp(19px,1.75vw,30px);line-height:1.06;margin-bottom:.7vh}
+  .card .meta{font-size:clamp(10px,.78vw,13px);color:var(--gold2);font-weight:800;letter-spacing:.035em;margin-bottom:1.1vh}
+  .card p,.card li{font-size:clamp(11px,.88vw,15px);line-height:1.42;color:#d6d1c7}
+  .card ul{margin:.4rem 0 0 1rem;padding:0}
+  .card li+li{margin-top:.42rem}
+  .card .num{position:absolute;right:1.2vw;top:.8vw;font-family:Georgia,serif;font-size:clamp(38px,4vw,72px);color:rgba(239,180,79,.13);font-weight:700}
+
+  .metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2vw;margin-top:3vh}
+  .metric{padding:1.1vw 1.35vw;border-top:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.04),transparent)}
+  .metric strong{display:block;font-family:Georgia,serif;color:var(--gold2);font-size:clamp(28px,3vw,50px)}
+  .metric span{display:block;color:var(--muted);font-size:clamp(11px,.9vw,15px);margin-top:.3rem}
+
+  .matrix-wrap{border:1px solid rgba(239,180,79,.28);border-radius:22px;overflow:hidden;background:rgba(4,11,22,.44);box-shadow:var(--shadow)}
+  table{width:100%;border-collapse:collapse;font-size:clamp(12px,1vw,17px)}
+  th,td{padding:1.25vh 1vw;border-right:1px solid rgba(239,180,79,.15);border-bottom:1px solid rgba(239,180,79,.13);text-align:center}
+  th:first-child,td:first-child{text-align:left}
+  thead th{color:var(--gold2);font-weight:800;background:rgba(239,180,79,.06)}
+  tbody th{font-weight:750;color:var(--cream)}
+  tr:last-child td,tr:last-child th{border-bottom:none}
+  th:last-child,td:last-child{border-right:none}
+  .check{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;border:1px solid rgba(239,180,79,.45);color:var(--gold2);font-weight:900;background:rgba(239,180,79,.08)}
+  .dim{color:rgba(247,240,223,.28)}
+
+  .pillar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2vw;margin-top:3vh}
+  .pillar{border-radius:26px;padding:1.8vw;border:1px solid rgba(239,180,79,.28);background:linear-gradient(180deg,rgba(239,180,79,.06),rgba(255,255,255,.018));min-height:46vh;display:flex;flex-direction:column}
+  .pillar h3{font-family:Georgia,serif;font-size:clamp(22px,2.2vw,38px);margin:.55rem 0 .35rem}
+  .pillar .focus{font-size:clamp(10px,.8vw,13px);text-transform:uppercase;letter-spacing:.11em;color:var(--gold2);margin-bottom:1.4vh}
+  .block-stack{display:grid;gap:1vh;margin-top:auto}
+  .block{border:1px solid rgba(255,255,255,.09);border-radius:14px;background:rgba(8,15,29,.72);padding:1.15vh 1vw;font-size:clamp(12px,1vw,17px);font-weight:720}
+
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25vw;align-items:stretch;margin-top:3vh}
+  .step{position:relative;border:1px solid rgba(239,180,79,.28);background:linear-gradient(160deg,rgba(239,180,79,.08),rgba(255,255,255,.02));border-radius:20px;padding:1.5vw 1.35vw 1.35vw;min-height:40vh}
+  .step .stepno{display:inline-flex;align-items:center;gap:.55rem;color:var(--gold2);font-size:clamp(10px,.8vw,13px);text-transform:uppercase;font-weight:900;letter-spacing:.08em;margin-bottom:1vh}
+  .step .stepno b{display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:var(--gold);color:#15101a}
+  .step h3{font-family:Georgia,serif;font-size:clamp(21px,1.8vw,31px);line-height:1.08;margin-bottom:.7rem}
+  .step p{font-size:clamp(11px,.9vw,15px);line-height:1.48;color:#d3cec5}
+  .step .people{font-size:clamp(10px,.75vw,13px);color:var(--gold2);margin:1vh 0 1.1vh;line-height:1.35}
+
+  .journey{display:grid;grid-template-columns:repeat(5,1fr);gap:1vw;margin-top:3vh;position:relative}
+  .journey::before{content:"";position:absolute;left:4%;right:4%;top:21%;height:2px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold),transparent);opacity:.45}
+  .stage{position:relative;padding:1.4vw 1.15vw;border-radius:22px;border:1px solid rgba(239,180,79,.25);background:linear-gradient(170deg,rgba(255,255,255,.05),rgba(255,255,255,.015));min-height:42vh}
+  .stage .badge{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:#16101c;font-weight:900;margin-bottom:1.5vh;box-shadow:0 0 0 7px rgba(239,180,79,.08)}
+  .stage h3{font-family:Georgia,serif;font-size:clamp(19px,1.55vw,27px);line-height:1.06;margin-bottom:.75rem}
+  .stage p{font-size:clamp(11px,.83vw,14px);line-height:1.45;color:#d4cfc5}
+  .stage .date{margin-top:1.3vh;padding-top:1vh;border-top:1px solid rgba(239,180,79,.16);font-size:clamp(10px,.75vw,13px);color:var(--gold2);font-weight:800}
+
+  .handoff{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1vw;margin-top:2.7vh}
+  .handoff .node-card{position:relative;padding:1.7vw 1.3vw;border-radius:22px;border:1px solid rgba(239,180,79,.25);background:rgba(255,255,255,.035);min-height:31vh}
+  .handoff .node-card:not(:last-child)::after{content:"→";position:absolute;right:-1.05vw;top:45%;font-size:clamp(26px,2.4vw,42px);color:var(--gold2);z-index:3;text-shadow:0 0 16px rgba(239,180,79,.45)}
+  .node-card .bubble{display:inline-grid;place-items:center;width:38px;height:38px;border:1px solid rgba(239,180,79,.48);border-radius:50%;color:var(--gold2);font-weight:900;background:rgba(239,180,79,.06)}
+  .node-card h3{font-family:Georgia,serif;font-size:clamp(20px,1.65vw,29px);line-height:1.1;margin:1vh 0}
+  .node-card .output{margin-top:1.2vh;padding:1vh .85vw;border-radius:12px;background:rgba(239,180,79,.08);font-size:clamp(10px,.78vw,13px);color:var(--gold2);font-weight:750}
+  .support-bar{display:grid;grid-template-columns:1fr 1fr;gap:1vw;margin-top:1.1vw}
+  .support-chip{border-radius:14px;border:1px solid rgba(255,255,255,.08);padding:1vh 1vw;background:rgba(255,255,255,.025);text-align:center;font-size:clamp(10px,.8vw,13px);color:#cfcac1}
+
+  .quiz-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:2vw;margin-top:2.6vh;align-items:start}
+  .rounds{display:grid;grid-template-columns:repeat(3,1fr);gap:1vw}
+  .round{padding:1.35vw;border-radius:18px;border:1px solid rgba(239,180,79,.25);background:rgba(255,255,255,.035);min-height:38vh}
+  .round .label{color:var(--gold2);font-size:clamp(10px,.75vw,13px);font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+  .round h3{font-family:Georgia,serif;font-size:clamp(18px,1.45vw,25px);margin:.7rem 0 .65rem}
+  .round p,.round li{font-size:clamp(10px,.75vw,13px);line-height:1.42;color:#d4cfc5}
+  .round ul{margin:.4rem 0 0 .9rem;padding:0}
+  .side-panel{padding:1.4vw;border-radius:20px;border:1px solid rgba(239,180,79,.22);background:linear-gradient(180deg,rgba(239,180,79,.06),rgba(255,255,255,.02))}
+  .side-panel h3{font-family:Georgia,serif;font-size:clamp(20px,1.7vw,29px);margin-bottom:1vh}
+  .side-panel .fact{padding:.85vh 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:clamp(10px,.78vw,13px);line-height:1.4;color:#d8d2c7}
+  .side-panel .fact:last-child{border-bottom:none}
+  .side-panel .fact b{color:var(--gold2)}
+
+  .verse-grid{display:grid;grid-template-columns:.78fr 1.22fr;gap:2.5vw;margin-top:3vh;align-items:center}
+  .round-visual{position:relative;height:48vh;border-radius:28px;border:1px solid rgba(239,180,79,.24);display:grid;place-items:center;background:radial-gradient(circle at 50% 50%,rgba(239,180,79,.12),transparent 48%),rgba(255,255,255,.025)}
+  .round-visual::before,.round-visual::after{content:"";position:absolute;border:1px solid rgba(239,180,79,.24);border-radius:50%}
+  .round-visual::before{width:30vh;height:30vh}.round-visual::after{width:40vh;height:40vh;border-style:dashed}
+  .round-visual .r1,.round-visual .r2{position:absolute;width:17vh;height:17vh;border-radius:50%;display:grid;place-items:center;text-align:center;padding:1rem;font-weight:850;line-height:1.15}
+  .round-visual .r1{transform:translateY(-7vh);background:linear-gradient(145deg,#ffc860,#d98225);color:#1b1220}
+  .round-visual .r2{transform:translateY(7vh);background:linear-gradient(145deg,#251b43,#0e172b);border:1px solid rgba(239,180,79,.35);color:var(--cream)}
+  .syllabus-grid{display:grid;grid-template-columns:1fr 1fr;gap:1vw}
+  .syllabus-item{padding:1.05vw 1.1vw;border-radius:16px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025)}
+  .syllabus-item strong{display:block;color:var(--gold2);font-size:clamp(11px,.9vw,15px);margin-bottom:.35rem}
+  .syllabus-item span{font-size:clamp(12px,.92vw,16px);color:#d8d3c8}
+
+  .timeline{display:grid;grid-template-columns:repeat(7,1fr);gap:.9vw;margin-top:4vh;align-items:stretch}
+  .milestone{position:relative;border-radius:18px;border:1px solid rgba(239,180,79,.23);background:rgba(255,255,255,.03);padding:1.3vw .9vw 1vw;min-height:39vh}
+  .milestone::before{content:"";position:absolute;top:-11px;left:50%;width:20px;height:20px;border-radius:50%;background:var(--gold);transform:translateX(-50%);box-shadow:0 0 0 7px rgba(239,180,79,.08)}
+  .milestone .date{font-size:clamp(10px,.73vw,12px);font-weight:900;color:var(--gold2);text-transform:uppercase;letter-spacing:.05em;min-height:3.4em}
+  .milestone h3{font-family:Georgia,serif;font-size:clamp(17px,1.25vw,22px);line-height:1.08;margin:1.1vh 0 .6vh}
+  .milestone p{font-size:clamp(10px,.72vw,12px);line-height:1.4;color:#d1ccc3}
+
+  .awards-layout{display:grid;grid-template-columns:.82fr 1.18fr;gap:3vw;align-items:center;margin-top:2vh}
+  .big-number{font-family:Georgia,serif;font-size:clamp(110px,16vw,260px);line-height:.8;color:var(--gold2);text-shadow:0 0 44px rgba(239,180,79,.2)}
+  .big-number-label{font-family:Georgia,serif;font-size:clamp(22px,2.3vw,42px);line-height:1.05;margin-top:1vh}
+  .award-stack{display:grid;gap:1vh}
+  .award-tier{display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center;border-radius:16px;padding:1.25vw 1.35vw;border:1px solid rgba(239,180,79,.24);background:linear-gradient(90deg,rgba(239,180,79,.08),rgba(255,255,255,.025))}
+  .award-tier strong{font-family:Georgia,serif;font-size:clamp(18px,1.45vw,25px)}
+  .award-tier span{font-size:clamp(14px,1.1vw,19px);font-weight:900;color:var(--gold2)}
+
+  .budget-layout{display:grid;grid-template-columns:.7fr 1.3fr;gap:3vw;margin-top:2.8vh;align-items:start}
+  .budget-hero{padding:2vw;border-radius:26px;border:1px solid rgba(239,180,79,.28);background:radial-gradient(circle at 50% 30%,rgba(239,180,79,.13),transparent 55%),rgba(255,255,255,.025)}
+  .budget-hero .estimate{font-family:Georgia,serif;font-size:clamp(48px,6vw,96px);color:var(--gold2);line-height:.9}
+  .budget-hero p{font-size:clamp(12px,.95vw,16px);line-height:1.45;color:var(--muted);margin-top:1.2vh}
+  .budget-list{display:grid;grid-template-columns:1fr 1fr;gap:.8vw}
+  .budget-item{display:flex;justify-content:space-between;gap:1rem;padding:.85vw 1vw;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.065);font-size:clamp(10px,.78vw,13px)}
+  .budget-item strong{color:var(--gold2);white-space:nowrap}
+
+  .priority-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5vw;margin-top:4vh}
+  .priority{padding:1.7vw;border-radius:24px;border:1px solid rgba(239,180,79,.27);background:linear-gradient(145deg,rgba(239,180,79,.07),rgba(255,255,255,.02));min-height:40vh}
+  .priority .box{width:42px;height:42px;border:2px solid var(--gold);box-shadow:0 0 16px rgba(239,180,79,.18);margin-bottom:1.6vh}
+  .priority h3{font-family:Georgia,serif;font-size:clamp(21px,1.8vw,31px);line-height:1.08;margin-bottom:.8rem}
+  .priority p{font-size:clamp(12px,.93vw,16px);line-height:1.5;color:#d4cfc5}
+
+  .controls{position:fixed;right:20px;bottom:18px;z-index:30;display:flex;gap:8px;align-items:center;padding:8px;border-radius:16px;background:rgba(6,12,22,.72);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(14px);box-shadow:0 15px 45px rgba(0,0,0,.28);transition:opacity .3s ease,transform .3s ease}
+  .controls.hidden{opacity:0;transform:translateY(10px);pointer-events:none}
+  .ctl{width:38px;height:38px;border-radius:11px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.045);color:var(--cream);display:grid;place-items:center;cursor:pointer;transition:.2s}
+  .ctl:hover{background:rgba(239,180,79,.12);border-color:rgba(239,180,79,.35)}
+  .ctl.active{background:var(--gold);color:#17101b;border-color:var(--gold)}
+  .ctl.wide{width:auto;padding:0 12px;font-size:12px;font-weight:800;letter-spacing:.02em}
+  .progress{position:fixed;left:0;bottom:0;height:3px;background:linear-gradient(90deg,var(--amber),var(--gold2));z-index:31;transition:width .35s ease;box-shadow:0 0 20px rgba(239,180,79,.4)}
+  .dots{position:fixed;left:18px;top:50%;transform:translateY(-50%);z-index:25;display:grid;gap:7px}
+  .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.22);transition:.25s;cursor:pointer;border:0;padding:0}
+  .dot.active{height:22px;border-radius:6px;background:var(--gold2)}
+
+  .edit-banner{position:fixed;left:50%;top:15px;transform:translateX(-50%) translateY(-120%);z-index:50;padding:9px 14px;border-radius:999px;background:var(--gold);color:#1b1320;font-size:12px;font-weight:900;box-shadow:0 10px 30px rgba(0,0,0,.3);transition:.3s}
+  body.editing .edit-banner{transform:translateX(-50%) translateY(0)}
+  body.editing .slide.active [contenteditable="true"]{outline:1px dashed rgba(255,215,125,.44);outline-offset:4px;border-radius:4px;cursor:text}
+  body.editing .slide.active [contenteditable="true"]:focus{outline:2px solid var(--gold2);background:rgba(239,180,79,.05)}
+
+  .overview{position:fixed;inset:0;z-index:60;background:rgba(3,7,13,.96);backdrop-filter:blur(16px);padding:5vh 5vw;display:none;overflow:auto}
+  .overview.open{display:block}
+  .overview-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:3vh;position:sticky;top:0;background:rgba(3,7,13,.84);padding:1vh 0;z-index:2}
+  .overview-head h2{font-family:Georgia,serif;font-size:clamp(28px,3vw,48px)}
+  .overview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2vw}
+  .thumb{aspect-ratio:16/9;border-radius:16px;border:1px solid rgba(239,180,79,.2);background:linear-gradient(145deg,#0a1425,#17182b);padding:1.25vw;text-align:left;color:var(--cream);cursor:pointer;position:relative;overflow:hidden}
+  .thumb::after{content:"";position:absolute;right:-20%;bottom:-45%;width:60%;aspect-ratio:1;border-radius:50%;border:1px solid rgba(239,180,79,.18)}
+  .thumb .tn{color:var(--gold2);font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+  .thumb h3{font-family:Georgia,serif;font-size:clamp(18px,1.6vw,28px);line-height:1.05;margin-top:1.5vh;max-width:90%}
+  .thumb:hover{border-color:rgba(239,180,79,.55);transform:translateY(-2px)}
+
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);z-index:80;background:#181d2c;border:1px solid rgba(255,255,255,.1);color:var(--cream);padding:10px 14px;border-radius:12px;font-size:12px;opacity:0;pointer-events:none;transition:.25s}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media (max-width:900px){
+    .slide{padding:5vh 5.5vw 7vh}
+    .cards.three,.pillar-grid,.priority-grid{grid-template-columns:1fr 1fr}
+    .cards.four,.steps{grid-template-columns:1fr 1fr}
+    .journey{grid-template-columns:repeat(3,1fr)}
+    .handoff{grid-template-columns:1fr 1fr}
+    .handoff .node-card::after{display:none}
+    .timeline{grid-template-columns:repeat(4,1fr)}
+    .overview-grid{grid-template-columns:1fr 1fr}
+    .dots{display:none}
+  }
+
+  @media print{
+    html,body{overflow:visible;background:white}
+    .app{background:white;height:auto}
+    .slide{position:relative;opacity:1!important;transform:none!important;page-break-after:always;width:100vw;height:56.25vw;max-height:100vh;pointer-events:auto}
+    .controls,.dots,.progress,.edit-banner,.overview,.toast{display:none!important}
+  }
+</style>
+</head>
+<body data-deck-id="ga26-web-2026-v1">
+<div class="app">
+  <div class="deck" id="deck">
+
+    <section class="slide active" data-title="The GA 26 Operational Blueprint">
+      <div class="topline"><div class="kicker">Gitanushilanam 2026</div><div class="section-tag">Operational Blueprint</div></div>
+      <div class="slide-main">
+        <div class="hero-wrap">
+          <div>
+            <h1 class="display">The GA 26 <span class="gold">Operational Blueprint</span></h1>
+            <p class="subtitle">Organizing teams, timelines, competitions and resources for the ultimate Vrindavan retreat.</p>
+            <div class="metric-row">
+              <div class="metric"><strong>10</strong><span>specialized operating teams</span></div>
+              <div class="metric"><strong>15</strong><span>competition categories</span></div>
+              <div class="metric"><strong>30–31 Jan</strong><span>Vrindavan retreat · 2027</span></div>
+            </div>
+          </div>
+          <div class="hero-orbit" aria-hidden="true">
+            <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+            <span class="node n1"></span><span class="node n2"></span><span class="node n3"></span><span class="node n4"></span>
+            <div class="core"><strong>Learn<br/>Compete<br/>Celebrate</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="footer"><span class="brand"><i></i> Gitanushilanam</span><span class="slide-no">01</span></div>
+    </section>
+
+    <section class="slide" data-title="One North Star">
+      <div class="topline"><div class="kicker">The North Star</div><div class="section-tag">Destination + Directive</div></div>
+      <div class="slide-main">
+        <h2 class="title">Every operational pathway leads to <span class="gold">one destination.</span></h2>
+        <div class="cards two" style="margin-top:4vh">
+          <div class="card">
+            <span class="num">01</span>
+            <h3>The Journey</h3>
+            <div class="meta">REGIONAL PARTICIPATION → FINALISTS</div>
+            <p>Bring together state-level and district-level winners from across the globe into one coordinated participant journey, supported by structured content, competitions and evaluation.</p>
+          </div>
+          <div class="card">
+            <span class="num">02</span>
+            <h3>The Ultimate Destination</h3>
+            <div class="meta">30–31 JANUARY 2027 · VRINDAVAN</div>
+            <p>A two-day physical retreat in Vrindavan for selected winners, preceded by online learning, competition rounds and a final online ceremony.</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer"><span class="brand"><i></i> Gitanushilanam</span><span class="slide-no">02</span></div>
+    </section>
+
+    <section class="slide" data-title="Participants & Competitions">
+      <div class="topline"><div class="kicker">Participation Architecture</div><div class="section-tag">Age Group × Competition</div></div>
+      <div class="slide-main">
+        <h2 class="title">Five participant demographics mapped to the <span class="gold">four core competitions.</span></h2>
+        <div class="matrix-wrap" style="margin-top:3.2vh">
+          <table>
+            <thead><tr><th>Participant Group</th><th>Shloka Recitation</th><th>Quiz</th><th>Art in Shloka</th><th>Treasure Hunt</th></tr></thead>
+            <tbody>
+              <tr><th>Subjunior <span class="tiny">(3rd–5th class)</span></th><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td class="dim">—</td><td class="dim">—</td></tr>
+              <tr><th>Junior <span class="tiny">(5th–8th class)</span></th><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td class="dim">—</td></tr>
+              <tr><th>Senior <span class="tiny">(9th–12th class)</span></th><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+              <tr><th>Youth / Working <span class="tiny">(till 35 years)</span></th><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+              <tr><th>Seniormost <span class="tiny">(above 35 years)</span></th><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td class="dim">—</td><td class="dim">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="footer"><span class="brand"><i></i> Gitanushilanam</span><span class="slide-no">03</span></div>
+    </section>
+
+    <section class="slide" data-title="Three Operational Pillars">
+      <div class="topline"><div class="kicker">Operating Model</div><div class="section-tag">Simple Block Architecture</div></div>
+      <div class="slide-main">
+        <h2 class="title">Ten specialized teams organized into <span class="gold">three operational pillars.</span></h2>
+        <div class="pillar-grid">
+          <div class="pillar">
+            <div class="kicker">Pillar 1</div><h3>Growth & Outreach</h3><div class="focus">Focus: driving registrations</div>
+            <div class="block-stack"><div class="block">PR Team</div><div class="block">International Outreach</div><div class="block">Online Publicity</div></div>
+          </div>
+          <div class="pillar">
+            <div class="kicker">Pillar 2</div><h3>Content & Experience</h3><div class="focus">Focus: participant journey</div>
+            <div class="block-stack"><div class="block">Content Creation</div><div class="block">Online Lecture</div><div class="block">Evaluation & Assessment</div><div class="block">Final Celebration</div></div>
+          </div>
+          <div class="pillar">
+            <div class="kicker">Pillar 3</div><h3>Systems & Support</h3><div class="focus">Focus: infrastructure</div>
+            <div class="block-stack"><div class="block">Technical & Database</div><div class="block">Student / Volunteer Coordination</div><div class="block">Fundraising & CSR</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="footer"><span class="brand"><i></i> Gitanushilanam</span><span class="slide-no">04</span></div>
+    </section>
+
+    <section class="slide" data-title="Pillar 1 — Growth & Outreach">
+      <div class="topline"><div class="kicker">Pillar 1</div><div class="section-tag">Growth & Outreach</div></div>
+      <div class="slide-main">
+        <h2 class="title">Build the <span class="gold">registration engine</span> across national and international channels.</h2>
+        <div class="cards three" style="margin-top:3.2vh">
+          <div class="card"><span class="num">01</span><h3>PR Team</h3><div class="meta">Vijaya Keshavi M · Neha M · Padmanetra Nitai Pr · Sreedevi M</div><p>Identify offline venues, reach schools and colleges, obtain permissions, and deploy posters, letters and legal materials.</p></div>
+          <div class="card"><span class="num">02</span><h3>International Outreach</h3><div class="meta">Alpa Jani M · Hari Madhav Pr · Chaitanya Bhava Pr</div><p>Boost international registrations and funding, popularize GA 26 in congregations, and leverage IITK and overseas contacts.</p></div>
+          <div class="card"><span class="num">03</span><h3>Online Publicity</h3><div class="meta">Tanmay Govind Pr · Ravi Nitai Chandra Pr</div><p>Create and deploy the website, collect ad videos and brochures, and run publicity across online channels including Facebook and Instagram.</p></div>
+        </div>
+      </div>
+      <div class="footer"><span class="brand"><i></i> Gitanushilanam</span><span class="slide-no">05</span></div>
+    </section>
+
+    <section class="slide" data-title="Pillar 2 — Content & Experience">
+      <div class="topline"><div class="kicker">Pillar 2</div><div class="section-tag">Content & Experience</div></div>
+      <div class="slide-main">
+        <h2 class="title">Craft the core participant journey <span class="gold">from syllabus to celebration.</span></h2>
+        <div class="steps">
+          <div class="step"><div class="stepno"><b>1</b> Content</div><h3>Content Creation</h3><div class="people">Sugato Pr · Lilagovind Pr · Amrut Panda · Vijay Paul Pr</div><p>Get syllabus and age groups, determine modules, prepare PPTs and lecture material, verify content, and coordinate speakers.</p></div>
+          <div class="step"><div class="stepno"><b>2</b> Learning</div><h3>Online Lectures</h3><div class="people">Vijaya Keshavi M · Abhaya Chaitanya Pr · Vijay Paul Pr</div><p>Identify speakers, build the lecture schedule around syllabus and age group, and ensure sessions are delivered as planned.</p></div>
+          <div class="step"><div class="stepno"><b>3</b> Evaluation</div><h3>Assessment</h3><div class="people">Kalyani M · Sreedevi M · Sangeeta M</div><p>Create competition schedules, build judging teams, and complete final evaluations before the ceremony.</p></div>
+          <div class="step"><div class="stepno"><b>4</b> Celebration</div><h3>Finale</h3><div class="people">Ravi Nitai Chandra Pr · Sri Guru Gauranga Pr</div><p>Conduct the online final round and host the end-of-January two-day Vrindavan retreat for selected winners.</p></div>
+        </div>
+      </div>
+      <div class="footer"><span class="brand"><i></i> Gitanushilanam</span><span class="slide-no">06</span></div>
+    </section>
+
+    <section class="slide" data-title="Pillar 3 — Systems & Support">
+      <div class="topline"><div class="kicker">Pillar 3</div><div class="section-tag">Systems & Support</div></div>
+      <div class="slide-main">
+        <h2 class="title">Provide the technical, human and financial infrastructure <span class="gold">behind every participant.</span></h2>
+        <div class="cards three" style="margin-top:3.5vh">
+          <div class="card"><span class="num">01</span><h3>Tech & Database</h3><div class="meta">Praveen Pr · Ravi Nitai Chandra Pr</div><ul><li>Create participant database from Google Form.</li><li>Follow up for answers, audio and video uploads.</li><li>Support screening infrastructure.</li></ul></div>
+          <div class="card"><span class="num">02</span><h3>Student & Volunteer Coordination</h3><div class="meta">Rakesh Pr</div><ul><li>Identify budding leaders and alumni.</li><li>Assign volunteers by strengths.</li><li>Operate helpline and student reminders.</li></ul></div>
+          <div class="card"><span class="num">03</span><h3>Fundraising & CSR</h3><div class="meta">Prashant Goklani Pr · Sugato Pr · Neha M</div><ul><li>Create fundraising proposal.</li><li>Prepare marketing and CSR budgets.</li><li>Approach companies for support.</li></ul></div>
+        </div>
+      </div>
+      <div class="footer"><span class="brand"><i></i> Gitanushilanam</span><span class="slide-no">07</span></div>
+    </section>
+
+    <section class="slide" data-title="Participant Journey">
+      <div class="topline"><div class="kicker">Participant Journey</div><div class="section-tag">From Reach to Retreat</div></div>
+      <div class="slide-main">
+        <h2 class="title">A clear, block-based journey from <span class="gold">mass outreach to the final retreat.</span></h2>
+        <div class="journey">
+          <div class="stage"><div class="badge">1</div><h3>Discover & Register</h3><p>Schools, colleges, congregations, offline venues and social channels create awareness and drive registrations.</p><div class="date">Registration window: through 30 Sep</div></div>
+          <div class="stage"><div class="badge">2</div><h3>Screen & Organize</h3><p>Paper tests, Google Forms or a screening platform capture performance while the database team organizes participant data.</p><div class="date">Infrastructure ready before rounds</div></div>
+          <div class="stage"><div class="badge">3</div><h3>Learn & Compete</h3><p>Online classes prepare participants for quiz, shloka recitation and the other category competitions.</p><div class="date">Classes: 1–20 Oct</div></div>
+          <div class="stage"><div class="badge">4</div><h3>Evaluate & Select</h3><p>Competition-specific judging and online rounds identify top performers across age groups and categories.</p><div class="date">Rounds: 23 Oct–30 Nov</div></div>
+          <div class="stage"><div class="badge">5</div><h3>Celebrate</h3><p>Final online ceremony recognizes winners, followed by the two-day Vrindavan retreat for selected winners.</p><div class="date">19 Dec · 30–31 Jan</div></div>
+        </div>
+      </div>
+      <div class="footer"><span class="brand"><i></i> Gitanushilanam</span><span class="slide-no">08</span></div>
+    </section>
+
+    <section class="slide" data-title="Operational Handoffs">
+      <div class="topline"><div class="kicker">Execution Flow</div><div class="section-tag">Simple Handoffs</div></div>
+      <div class="slide-main">
+        <h2 class="title">A simple left-to-right operating flow keeps <span class="gold">ownership and handoffs obvious.</span></h2>
+        <div class="handoff">
+          <div class="node-card"><span class="bubble">1</span><h3>Growth & Outreach</h3><p class="small">Drive awareness and registrations across offline, online and international channels.</p><div class="output">Output: registered participants</div></div>
+          <div class="node-card"><span class="bubble">2</span><h3>Infrastructure & Database</h3><p class="small">Capture, structure and maintain participant information and submission records.</p><div class="output">Output: organized participant data</div></div>
+          <div class="node-card"><span class="bubble">3</span><h3>Content & Evaluation</h3><p class="small">Deliver learning, run competition rounds, evaluate submissions and identify finalists.</p><div class="output">Output: finalists + results</div></div>
+          <div class="node-card"><span class="bubble">4</span><h3>Final Celebration</h3><p class="small">Conduct the final online ceremony and prepare the Vrindavan retreat experience.</p><div class="output">Output: recognition + retreat</div></div>
+        </div>
+        <div class="support-bar"><div class="support-chip">Student / Volunteer Coordination supports participants across every stage.</div><div class="support-chip">Fundraising & CSR supports the program financially across every stage.</div></div>
+      </div>
+      <div class="footer"><span class="brand"><i></i> Gitanushilanam</span><span class="slide-no">09</span></div>
+    </section>
+
+    <section class="slide" data-title="Bhagavad Gita Quiz">
+      <div class="topline"><div class="kicker">Competition Detail</div><div class="section-tag">Bhagavad Gita Quiz</div></div>
+      <div class="slide-main">
+        <h2 class="title">A multi-round quiz designed to combine <span class="gold">knowledge, speed and reflection.</span></h2>
+        <div class="quiz-layout">
+          <div class="rounds">
+            <div class="round"><div class="label">Round 1</div><h3>Written Screening</h3><ul><li>30 minutes · 30 marks</li><li>MCQ + subjective</li><li>Offline: paper based</li><li>Online: timed Google Form / screening platform</li><li>Offline top 3–5 per age group advance</li></ul></div>
+            <div class="round"><div class="label">Round 2</div><h3>Kahoot Quiz</h3><ul><li>Completely online</li><li>Individual participation</li><li>Qualifiers from Round 1</li><li>Judged by maximum marks scored</li></ul></div>
+            <div class="round"><div class="label">Round 3</div><h3>3-Minute Video</h3><ul><li>Shortlisted candidates upload a video</li><li>Topic to be finalized</li><li>Round 2 + Round 3 marks combine to decide winners</li></ul></div>
+          </div>
+          <div class="side-panel">
+            <h3>Syllabus & Format</h3>
+            <div class="fact"><b>Syllabus:</b> Bhagavad Gita As It Is — Chapters 1 and 2.</div>
+            <div class="fact"><b>Study material:</b> age-group slides and material based on Sir’s lectures and Bhagavad Gita As It Is.</div>
+            <div class="fact"><b>Reference:</b> Bhagavad-Gita As It Is; Chapter 2 of Five Aspects of Absolute Truth.</div>
+            <div class="fact"><b>Medium:</b> English.</div>
+            <div class="fact"><b>Quiz age bands:</b> Grades 3–5, 6–8, 9–12, Young Adult and Senior Adult.</div>
+          </div>
+        </div>
+      </div>
+      <div class="footer"><span class="brand"><i></i> Gitanushilanam</span><span class="slide-no">10</span></div>
+    </section>
+
+    <section class="slide" data-title="Shloka Recitation">
+      <div class="topline"><div class="kicker">Competition Detail</div><div class="section-tag">Shloka Recitation</div></div>
+      <div class="slide-main">
+        <h2 class="title">Two rounds, one focused syllabus — <span class="gold">recitation by age group.</span></h2>
+        <div class="verse-grid">
+          <div class="round-visual">
+            <div class="r1">Round 1<br/>Video Submission</div>
+            <div class="r2">Round 2<br/>Top 10 · Zoom Live</div>
+          </div>
+          <div>
+            <div class="syllabus-grid">
+              <div class="syllabus-item"><strong>Grades 3–5</strong><span>Chapter 2 · Verses 1–30</span></div>
+              <div class="syllabus-item"><strong>Grades 6–8</strong><span>Chapter 2 · Verses 10–38</span></div>
+              <div class="syllabus-item"><strong>Grades 9–12</strong><span>Chapter 2 · Verses 10–30</span></div>
+              <div class="syllabus-item"><strong>Young Adult</strong><span>Chapter 2 · Verses 54–72</span></div>
+              <div class="syllabus-item" style="grid-column:1/-1"><strong>Senior Adult</strong><span>Chapter 2 · Verses 39–53</span></div>
+            </div>
+            <p class="subtitle" style="font-size:clamp(13px,1vw,17px);margin-top:2vh">First round is a video submission. Selected top 10 candidates from the first round proceed to a live Zoom round.</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer"><span class="brand"><i></i> Gitanushilanam</span><span class="slide-no">11</span></div>
+    </section>
+
+    <section class="slide" data-title="Program Timeline">
+      <div class="topline"><div class="kicker">Milestones</div><div class="section-tag">Aug 2026 → Jan 2027</div></div>
+      <div class="slide-main">
+        <h2 class="title">The operating cadence from <span class="gold">launch assets to Vrindavan.</span></h2>
+        <div class="timeline">
+          <div class="milestone"><div class="date">By 31 Aug</div><h3>Launch Assets</h3><p>Brochure, website, poster, video and forms.</p></div>
+          <div class="milestone"><div class="date">By 30 Sep</div><h3>Registrations</h3><p>Complete the primary registration phase.</p></div>
+          <div class="milestone"><div class="date">1–20 Oct</div><h3>Online Classes</h3><p>Deliver age-group learning modules and lectures.</p></div>
+          <div class="milestone"><div class="date">23 Oct–7 Nov</div><h3>First Round</h3><p>Run first-stage competition screening.</p></div>
+          <div class="milestone"><div class="date">8–30 Nov</div><h3>Second Round</h3><p>Run second-stage competitive rounds.</p></div>
+          <div class="milestone"><div class="date">19 Dec</div><h3>Online Ceremony</h3><p>Final online celebration and recognition.</p></div>
+          <div class="milestone"><div class="date">30–31 Jan 2027</div><h3>Vrindavan Trip</h3><p>Two-day physical retreat for selected winners.</p></div>
+        </div>
+      </div>
+      <div class="footer"><span class="brand"><i></i> Gitanushilanam</span><span class="slide-no">12</span></div>
+    </section>
+
+    <section class="slide" data-title="Recognition Architecture">
+      <div class="topline"><div class="kicker">Recognition</div><div class="section-tag">15 Categories · 75 Awards</div></div>
+      <div class="slide-main">
+        <h2 class="title">Distribute high-value recognition across <span class="gold">fifteen competition groups.</span></h2>
+        <div class="awards-layout">
+          <div><div class="big-number">15</div><div class="big-number-label">Distinct competition categories</div><p class="subtitle" style="font-size:clamp(13px,1vw,17px)">Derived from the age-group × competition matrix.</p></div>
+          <div class="award-stack">
+            <div class="award-tier"><strong>First Prizes</strong><span>15 winners</span></div>
+            <div class="award-tier"><strong>Second Prizes</strong><span>15 winners</span></div>
+            <div class="award-tier"><strong>Third Prizes</strong><span>15 winners</span></div>
+            <div class="award-tier"><strong>Consolation Prizes</strong><span>30 winners</span></div>
+            <div class="award-tier" style="border-color:rgba(239,180,79,.5);background:rgba(239,180,79,.11)"><strong>Total Recognition</strong><span>75 awards</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="footer"><span class="brand"><i></i> Gitanushilanam</span><span class="slide-no">13</span></div>
+    </section>
+
+    <section class="slide" data-title="Preliminary Budget">
+      <div class="topline"><div class="kicker">Resources</div><div class="section-tag">Preliminary Budget</div></div>
+      <div class="slide-main">
+        <h2 class="title">Budget the program across <span class="gold">rewards, event logistics and growth.</span></h2>
+        <div class="budget-layout">
+          <div class="budget-hero"><div class="estimate">₹20–25L</div><p>Overall preliminary estimate recorded in the meeting minutes.</p><div style="height:1px;background:var(--line);margin:2vh 0"></div><div class="kicker" style="font-size:clamp(10px,.8vw,13px)">Listed line items total</div><div style="font-family:Georgia,serif;font-size:clamp(34px,3.5vw,60px);color:var(--cream);margin-top:.4rem">₹17.1L</div></div>
+          <div class="budget-list">
+            <div class="budget-item"><span>Battery-powered bicycles</span><strong>₹3.0L</strong></div>
+            <div class="budget-item"><span>Samsung iPads</span><strong>₹2.0L</strong></div>
+            <div class="budget-item"><span>Smart watches</span><strong>₹1.0L</strong></div>
+            <div class="budget-item"><span>Consolation prizes</span><strong>₹0.6L</strong></div>
+            <div class="budget-item"><span>Auditorium</span><strong>₹3.0L</strong></div>
+            <div class="budget-item"><span>Transport</span><strong>₹1.0L</strong></div>
+            <div class="budget-item"><span>Refreshments</span><strong>₹1.0L</strong></div>
+            <div class="budget-item"><span>Stationery & pamphlets</span><strong>₹0.5L</strong></div>
+            <div class="budget-item"><span>Online promotion</span><strong>₹3.0L</strong></div>
+            <div class="budget-item"><span>Accommodation</span><strong>₹2.0L</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="footer"><span class="brand"><i></i> Gitanushilanam</span><span class="slide-no">14</span></div>
+    </section>
+
+    <section class="slide" data-title="Immediate Priorities">
+      <div class="topline"><div class="kicker">Immediate Action</div><div class="section-tag">Start the Operational Engine</div></div>
+      <div class="slide-main">
+        <h2 class="title">Three priorities to move GA 26 <span class="gold">from plan to execution.</span></h2>
+        <div class="priority-grid">
+          <div class="priority"><div class="box"></div><h3>Finalize the Proposal</h3><p>Sugato Pr and Prashant Pr to urgently draft the core fundraising and CSR proposal to unlock the broader program budget.</p></div>
+          <div class="priority"><div class="box"></div><h3>Activate the Network</h3><p>Rakesh Pr to identify and assign scattered LGLG and IITK alumni into operating teams based on strengths and interests.</p></div>
+          <div class="priority"><div class="box"></div><h3>Finalize the Infrastructure</h3><p>Deploy the participant database, evaluate the proposed screening platform, and lock in physical venues beginning with UP State.</p></div>
+        </div>
+      </div>
+      <div class="footer"><span class="brand"><i></i> Gitanushilanam</span><span class="slide-no">15</span></div>
+    </section>
+  </div>
+
+  <div class="dots" id="dots"></div>
+  <div class="progress" id="progress"></div>
+  <div class="edit-banner">EDIT MODE · click any text to modify · changes autosave in this browser</div>
+
+  <div class="controls" id="controls">
+    <button class="ctl" id="prev" title="Previous slide (←)">←</button>
+    <button class="ctl" id="next" title="Next slide (→ / Space)">→</button>
+    <button class="ctl wide" id="overviewBtn" title="Slide overview (O)">Overview</button>
+    <button class="ctl wide" id="editBtn" title="Edit text (E)">Edit</button>
+    <button class="ctl wide" id="exportBtn" title="Export edited deck as HTML">Export</button>
+    <button class="ctl" id="fullBtn" title="Fullscreen (F)">⛶</button>
+  </div>
+
+  <div class="overview" id="overview">
+    <div class="overview-head"><h2>Slide overview</h2><button class="ctl wide" id="closeOverview">Close</button></div>
+    <div class="overview-grid" id="overviewGrid"></div>
+  </div>
+  <div class="toast" id="toast">Saved</div>
+</div>
+<script>
+(function(){
+  const deck = document.getElementById('deck');
+  const dots = document.getElementById('dots');
+  const progress = document.getElementById('progress');
+  const controls = document.getElementById('controls');
+  const overview = document.getElementById('overview');
+  const overviewGrid = document.getElementById('overviewGrid');
+  const toast = document.getElementById('toast');
+  const storageKey = () => 'ga26-deck-markup:' + document.body.dataset.deckId;
+  let index = 0;
+  let slides = [];
+  let editing = false;
+  let saveTimer = null;
+  let hideTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(()=>toast.classList.remove('show'),1300);
+  }
+
+  function refresh(){
+    slides = [...document.querySelectorAll('.slide')];
+    index = Math.max(0, Math.min(index, slides.length-1));
+    dots.innerHTML='';
+    overviewGrid.innerHTML='';
+    slides.forEach((s,i)=>{
+      const d=document.createElement('button'); d.className='dot'; d.title=s.dataset.title||('Slide '+(i+1)); d.addEventListener('click',()=>go(i)); dots.appendChild(d);
+      const t=document.createElement('button'); t.className='thumb';
+      t.innerHTML='<div class="tn">Slide '+String(i+1).padStart(2,'0')+'</div><h3>'+escapeHtml(s.dataset.title||('Slide '+(i+1)))+'</h3>';
+      t.addEventListener('click',()=>{overview.classList.remove('open');go(i)}); overviewGrid.appendChild(t);
+    });
+    applyEditable(editing);
+    render();
+  }
+
+  function escapeHtml(s){return s.replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+
+  function render(){
+    slides.forEach((s,i)=>{
+      s.classList.toggle('active',i===index);
+      s.classList.toggle('past',i<index);
+    });
+    [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===index));
+    progress.style.width=((index+1)/slides.length*100)+'%';
+    document.title=(slides[index]?.dataset.title||'GA 26')+' — GA 26';
+  }
+  function go(i){ index=(i+slides.length)%slides.length; render(); }
+  function next(){ if(!editing) go(Math.min(index+1,slides.length-1)); }
+  function prev(){ if(!editing) go(Math.max(index-1,0)); }
+
+  function editableTargets(){
+    return document.querySelectorAll('.slide h1,.slide h2,.slide h3,.slide h4,.slide p,.slide li,.slide td,.slide th,.slide .block,.slide .meta,.slide .focus,.slide .kicker,.slide .section-tag,.slide .date,.slide .output,.slide .support-chip,.slide .estimate,.slide .award-tier span,.slide .award-tier strong,.slide .brand,.slide .fact,.slide .syllabus-item span,.slide .syllabus-item strong');
+  }
+  function applyEditable(on){ editableTargets().forEach(el=>el.setAttribute('contenteditable',on?'true':'false')); }
+  function toggleEdit(force){
+    editing = typeof force==='boolean'?force:!editing;
+    document.body.classList.toggle('editing',editing);
+    document.getElementById('editBtn').classList.toggle('active',editing);
+    document.getElementById('editBtn').textContent=editing?'Done':'Edit';
+    applyEditable(editing);
+    showControls();
+    if(!editing) save();
+  }
+  function save(){
+    const clone=deck.cloneNode(true);
+    clone.querySelectorAll('[contenteditable]').forEach(el=>el.removeAttribute('contenteditable'));
+    localStorage.setItem(storageKey(),clone.innerHTML);
+    showToast('Saved');
+  }
+  function scheduleSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(save,500); }
+  deck.addEventListener('input',()=>{ if(editing) scheduleSave(); });
+
+  function exportHtml(){
+    const clone=document.documentElement.cloneNode(true);
+    clone.querySelector('body').classList.remove('editing');
+    clone.querySelectorAll('[contenteditable]').forEach(el=>el.removeAttribute('contenteditable'));
+    clone.querySelector('body').dataset.deckId='ga26-export-'+Date.now();
+    const html='<!DOCTYPE html>\n'+clone.outerHTML;
+    const blob=new Blob([html],{type:'text/html'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='GA26_Web_Presentation_Edited.html';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    showToast('Edited HTML exported');
+  }
+
+  function showControls(){
+    controls.classList.remove('hidden'); clearTimeout(hideTimer);
+    if(!editing) hideTimer=setTimeout(()=>controls.classList.add('hidden'),3800);
+  }
+  ['mousemove','touchstart'].forEach(ev=>document.addEventListener(ev,showControls,{passive:true}));
+
+  document.getElementById('next').onclick=next;
+  document.getElementById('prev').onclick=prev;
+  document.getElementById('editBtn').onclick=()=>toggleEdit();
+  document.getElementById('exportBtn').onclick=exportHtml;
+  document.getElementById('overviewBtn').onclick=()=>overview.classList.add('open');
+  document.getElementById('closeOverview').onclick=()=>overview.classList.remove('open');
+  document.getElementById('fullBtn').onclick=()=>{
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.();
+  };
+
+  document.addEventListener('keydown',e=>{
+    if(editing && (e.target?.isContentEditable)){
+      if(e.key==='Escape'){ e.target.blur(); toggleEdit(false); }
+      return;
+    }
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();next();}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev();}
+    else if(e.key.toLowerCase()==='e') toggleEdit();
+    else if(e.key.toLowerCase()==='o') overview.classList.toggle('open');
+    else if(e.key.toLowerCase()==='f') document.getElementById('fullBtn').click();
+    else if(e.key==='Escape') overview.classList.remove('open');
+    else if(e.key==='Home') go(0);
+    else if(e.key==='End') go(slides.length-1);
+  });
+
+  // Restore local edits made in this browser.
+  try{
+    const saved=localStorage.getItem(storageKey());
+    if(saved) deck.innerHTML=saved;
+  }catch(err){}
+  refresh();
+  showControls();
+})();
+</script>
+</body>
+</html>
