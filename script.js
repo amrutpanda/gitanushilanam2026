@@ -1,230 +1,28 @@
 (() => {
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
   const menuToggle = document.querySelector('.menu-toggle');
-  const menu = document.querySelector('.nav-links');
-  menuToggle?.addEventListener('click', () => {
-    const open = menu.classList.toggle('is-open');
-    menuToggle.setAttribute('aria-expanded', String(open));
-  });
-  menu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => {
-    menu.classList.remove('is-open');
-    menuToggle?.setAttribute('aria-expanded', 'false');
-  }));
+  const navLinks = document.querySelector('.nav-links');
 
-  const timedSlider = ({ root, slideSelector, dotSelector, prevSelector, nextSelector, currentSelector, delay = 5000, render }) => {
-    const scope = document.querySelector(root);
-    if (!scope) return;
-    const slides = [...scope.querySelectorAll(slideSelector)];
-    const dots = dotSelector ? [...scope.querySelectorAll(dotSelector)] : [];
-    const prev = prevSelector ? scope.querySelector(prevSelector) : null;
-    const next = nextSelector ? scope.querySelector(nextSelector) : null;
-    const current = currentSelector ? scope.querySelector(currentSelector) : null;
-    let index = 0;
-    let timer = null;
-    let paused = false;
-
-    const paint = (nextIndex, direction = 1) => {
-      const old = index;
-      index = (nextIndex + slides.length) % slides.length;
-      if (typeof render === 'function') render({ slides, old, index, direction, scope });
-      else slides.forEach((slide, i) => slide.classList.toggle('is-active', i === index));
-      dots.forEach((dot, i) => {
-        dot.classList.toggle('is-active', i === index);
-        dot.setAttribute('aria-selected', String(i === index));
-      });
-      if (current) current.textContent = String(index + 1).padStart(2, '0');
-    };
-
-    const cancel = () => {
-      if (timer) window.clearTimeout(timer);
-      timer = null;
-    };
-    const schedule = () => {
-      cancel();
-      if (paused || reduceMotion.matches) return;
-      timer = window.setTimeout(() => {
-        paint(index + 1, 1);
-        schedule();
-      }, delay);
-    };
-    const go = (nextIndex, direction) => {
-      paint(nextIndex, direction);
-      schedule();
-    };
-    const pause = () => { paused = true; cancel(); };
-    const resume = () => { paused = false; schedule(); };
-
-    prev?.addEventListener('click', () => go(index - 1, -1));
-    next?.addEventListener('click', () => go(index + 1, 1));
-    dots.forEach((dot, i) => dot.addEventListener('click', () => go(i, i < index ? -1 : 1)));
-    scope.addEventListener('pointerenter', pause);
-    scope.addEventListener('pointerleave', resume);
-    scope.addEventListener('focusin', pause);
-    scope.addEventListener('focusout', (event) => {
-      if (!scope.contains(event.relatedTarget)) resume();
+  if (menuToggle && navLinks) {
+    menuToggle.addEventListener('click', () => {
+      const open = navLinks.classList.toggle('is-open');
+      menuToggle.setAttribute('aria-expanded', String(open));
     });
+    navLinks.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => {
+      navLinks.classList.remove('is-open');
+      menuToggle.setAttribute('aria-expanded', 'false');
+    }));
+  }
 
-    paint(0, 1);
-    schedule();
-    return { paint, schedule, pause, resume };
+  const progress = document.querySelector('[data-page-progress]');
+  const updateProgress = () => {
+    if (!progress) return;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = max > 0 ? Math.min(100, Math.max(0, (window.scrollY / max) * 100)) : 0;
+    progress.style.width = `${pct}%`;
   };
-
-  timedSlider({
-    root: '[data-hero-gallery]',
-    slideSelector: '[data-hero-slide]',
-    dotSelector: '[data-hero-dot]',
-    currentSelector: '[data-hero-current]',
-    delay: 6500,
-    render: ({ slides, old, index }) => {
-      slides.forEach((slide, i) => {
-        slide.classList.remove('is-active', 'is-exiting');
-        if (i === index) slide.classList.add('is-active');
-        else if (i === old && old !== index) slide.classList.add('is-exiting');
-      });
-    }
-  });
-
-  timedSlider({
-    root: '[data-announcement-slider]',
-    slideSelector: '[data-announcement-slide]',
-    dotSelector: '[data-announcement-dot]',
-    prevSelector: '[data-announcement-prev]',
-    nextSelector: '[data-announcement-next]',
-    delay: 5200
-  });
-
-  const setupCinemaTeam = () => {
-    const section = document.querySelector('#team');
-    const stage = document.querySelector('[data-team-stage]');
-    if (!section || !stage) return;
-    const cards = [...stage.querySelectorAll('[data-team-card]')];
-    const current = stage.querySelector('[data-team-current]');
-    const prev = stage.querySelector('[data-team-prev]');
-    const next = stage.querySelector('[data-team-next]');
-    let index = 0;
-    let timer = null;
-    let paused = false;
-
-    const deltaFor = (i) => {
-      let d = i - index;
-      const half = cards.length / 2;
-      if (d > half) d -= cards.length;
-      if (d < -half) d += cards.length;
-      return d;
-    };
-
-    const render = () => {
-      const mobile = window.innerWidth <= 560;
-      cards.forEach((card, i) => {
-        const d = deltaFor(i);
-        const a = Math.abs(d);
-        const side = Math.sign(d || 1);
-        const visible = a <= (mobile ? 2 : 3);
-        let x, y, z, rotate, scale, opacity, blur;
-
-        if (d === 0) {
-          x = 0; y = 0; z = 80; rotate = 0; scale = 1; opacity = 1; blur = 0;
-        } else if (a === 1) {
-          x = side * (mobile ? 185 : 325); y = 20; z = -130; rotate = side * -18; scale = .88; opacity = .58; blur = .6;
-        } else if (a === 2) {
-          x = side * (mobile ? 245 : 500); y = 34; z = -300; rotate = side * -27; scale = .73; opacity = .22; blur = 2.2;
-        } else {
-          x = side * (mobile ? 310 : 610); y = 46; z = -460; rotate = side * -34; scale = .63; opacity = visible ? .08 : 0; blur = 5;
-        }
-
-        card.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, ${z}px) rotateY(${rotate}deg) scale(${scale})`;
-        card.style.opacity = String(opacity);
-        card.style.filter = `blur(${blur}px) saturate(${d === 0 ? 1 : .78})`;
-        card.style.zIndex = String(20 - a);
-        card.style.pointerEvents = a <= 1 ? 'auto' : 'none';
-        card.classList.toggle('is-current', d === 0);
-        card.setAttribute('aria-current', d === 0 ? 'true' : 'false');
-      });
-      if (current) current.textContent = String(index + 1).padStart(2, '0');
-    };
-
-    const cancel = () => { if (timer) clearTimeout(timer); timer = null; };
-    const schedule = () => {
-      cancel();
-      if (paused || reduceMotion.matches) return;
-      timer = setTimeout(() => { index = (index + 1) % cards.length; render(); schedule(); }, 4300);
-    };
-    const move = (step) => { index = (index + step + cards.length) % cards.length; render(); schedule(); };
-    const pause = () => { paused = true; cancel(); };
-    const resume = () => { paused = false; schedule(); };
-
-    prev?.addEventListener('click', () => move(-1));
-    next?.addEventListener('click', () => move(1));
-    cards.forEach((card, i) => card.addEventListener('click', () => { if (i !== index) { index = i; render(); schedule(); } }));
-    section.addEventListener('pointerenter', pause);
-    section.addEventListener('pointerleave', resume);
-    section.addEventListener('focusin', pause);
-    section.addEventListener('focusout', (event) => { if (!section.contains(event.relatedTarget)) resume(); });
-    window.addEventListener('resize', () => requestAnimationFrame(render));
-    render();
-    schedule();
-  };
-
-  const setupVoices = () => {
-    const section = document.querySelector('#voices');
-    const stage = document.querySelector('[data-voice-stage]');
-    if (!section || !stage) return;
-    const cards = [...stage.querySelectorAll('[data-voice-card]')];
-    const current = stage.querySelector('[data-voice-current]');
-    const prev = stage.querySelector('[data-voice-prev]');
-    const next = stage.querySelector('[data-voice-next]');
-    let index = 0;
-    let timer = null;
-    let paused = false;
-
-    const render = (old = index) => {
-      cards.forEach((card, i) => {
-        card.classList.remove('is-current', 'is-exiting');
-        if (i === index) card.classList.add('is-current');
-        else if (i === old && old !== index) card.classList.add('is-exiting');
-      });
-      if (current) current.textContent = String(index + 1).padStart(2, '0');
-    };
-    const cancel = () => { if (timer) clearTimeout(timer); timer = null; };
-    const schedule = () => {
-      cancel();
-      if (paused || reduceMotion.matches) return;
-      timer = setTimeout(() => {
-        const old = index;
-        index = (index + 1) % cards.length;
-        render(old);
-        schedule();
-      }, 7600);
-    };
-    const move = (step) => { const old = index; index = (index + step + cards.length) % cards.length; render(old); schedule(); };
-    const pause = () => { paused = true; cancel(); };
-    const resume = () => { paused = false; schedule(); };
-
-    prev?.addEventListener('click', () => move(-1));
-    next?.addEventListener('click', () => move(1));
-    section.addEventListener('pointerenter', pause);
-    section.addEventListener('pointerleave', resume);
-    section.addEventListener('focusin', pause);
-    section.addEventListener('focusout', (event) => { if (!section.contains(event.relatedTarget)) resume(); });
-    render();
-    schedule();
-  };
-
-  setupCinemaTeam();
-  setupVoices();
-
-  document.querySelectorAll('[data-dialog-open]').forEach((button) => {
-    button.addEventListener('click', () => document.getElementById(button.dataset.dialogOpen)?.showModal?.());
-  });
-  document.querySelectorAll('.detail-dialog').forEach((dialog) => {
-    dialog.querySelector('[data-dialog-close]')?.addEventListener('click', () => dialog.close());
-    dialog.addEventListener('click', (event) => {
-      const box = dialog.getBoundingClientRect();
-      const outside = event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom;
-      if (outside) dialog.close();
-    });
-  });
+  updateProgress();
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  window.addEventListener('resize', updateProgress);
 
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -233,7 +31,206 @@
         revealObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: .12 });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px' });
   document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
-  document.getElementById('year').textContent = String(new Date().getFullYear());
+
+  const heroSlides = [...document.querySelectorAll('[data-hero-slide]')];
+  const heroDots = [...document.querySelectorAll('[data-hero-dot]')];
+  const heroCurrent = document.querySelector('[data-hero-current]');
+  let heroIndex = 0;
+  let heroTimer;
+
+  const showHero = (index) => {
+    if (!heroSlides.length) return;
+    heroIndex = (index + heroSlides.length) % heroSlides.length;
+    heroSlides.forEach((slide, i) => slide.classList.toggle('is-active', i === heroIndex));
+    heroDots.forEach((dot, i) => dot.classList.toggle('is-active', i === heroIndex));
+    if (heroCurrent) heroCurrent.textContent = String(heroIndex + 1).padStart(2, '0');
+  };
+  const scheduleHero = () => {
+    window.clearInterval(heroTimer);
+    heroTimer = window.setInterval(() => showHero(heroIndex + 1), 6200);
+  };
+  heroDots.forEach((dot, i) => dot.addEventListener('click', () => { showHero(i); scheduleHero(); }));
+  showHero(0);
+  scheduleHero();
+
+  const announcementSlides = [...document.querySelectorAll('[data-announcement-slide]')];
+  const announcementDots = [...document.querySelectorAll('[data-announcement-dot]')];
+  const announcementPrev = document.querySelector('[data-announcement-prev]');
+  const announcementNext = document.querySelector('[data-announcement-next]');
+  let announcementIndex = 0;
+  let announcementTimer;
+
+  const showAnnouncement = (index) => {
+    if (!announcementSlides.length) return;
+    announcementIndex = (index + announcementSlides.length) % announcementSlides.length;
+    announcementSlides.forEach((slide, i) => slide.classList.toggle('is-active', i === announcementIndex));
+    announcementDots.forEach((dot, i) => dot.classList.toggle('is-active', i === announcementIndex));
+  };
+  const scheduleAnnouncement = () => {
+    window.clearInterval(announcementTimer);
+    announcementTimer = window.setInterval(() => showAnnouncement(announcementIndex + 1), 5200);
+  };
+  announcementPrev?.addEventListener('click', () => { showAnnouncement(announcementIndex - 1); scheduleAnnouncement(); });
+  announcementNext?.addEventListener('click', () => { showAnnouncement(announcementIndex + 1); scheduleAnnouncement(); });
+  announcementDots.forEach((dot, i) => dot.addEventListener('click', () => { showAnnouncement(i); scheduleAnnouncement(); }));
+  showAnnouncement(0);
+  scheduleAnnouncement();
+
+  const detailTabs = [...document.querySelectorAll('[data-detail-tab]')];
+  const detailPanels = [...document.querySelectorAll('[data-detail-panel]')];
+  const detailsOverlay = document.querySelector('#details');
+  let detailReturnFocus = null;
+
+  const activateDetail = (name) => {
+    const panel = detailPanels.find((item) => item.dataset.detailPanel === name);
+    if (!panel) return;
+    detailTabs.forEach((tab) => {
+      const active = tab.dataset.detailTab === name;
+      tab.classList.toggle('is-active', active);
+      tab.setAttribute('aria-selected', String(active));
+    });
+    detailPanels.forEach((item) => {
+      const active = item.dataset.detailPanel === name;
+      item.classList.toggle('is-active', active);
+      item.hidden = !active;
+    });
+  };
+
+  const openDetails = (name = 'quiz', trigger = null) => {
+    if (!detailsOverlay) return;
+    activateDetail(name);
+    detailReturnFocus = trigger || document.activeElement;
+    detailsOverlay.classList.add('is-open');
+    detailsOverlay.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('detail-open');
+    detailsOverlay.scrollTop = 0;
+    window.setTimeout(() => detailsOverlay.querySelector('[data-close-details]')?.focus(), 360);
+  };
+
+  const closeDetails = () => {
+    if (!detailsOverlay?.classList.contains('is-open')) return;
+    detailsOverlay.classList.remove('is-open');
+    detailsOverlay.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('detail-open');
+    window.setTimeout(() => {
+      if (detailReturnFocus && typeof detailReturnFocus.focus === 'function') detailReturnFocus.focus();
+      detailReturnFocus = null;
+    }, 420);
+  };
+
+  detailTabs.forEach((tab) => tab.addEventListener('click', () => activateDetail(tab.dataset.detailTab)));
+
+  document.querySelectorAll('[data-select-detail]').forEach((link) => link.addEventListener('click', (event) => {
+    event.preventDefault();
+    openDetails(link.dataset.selectDetail || 'quiz', link);
+  }));
+
+  document.querySelectorAll('[data-open-details]').forEach((trigger) => trigger.addEventListener('click', (event) => {
+    event.preventDefault();
+    openDetails(trigger.dataset.openDetails || 'quiz', trigger);
+  }));
+
+  document.querySelectorAll('[data-close-details]').forEach((button) => button.addEventListener('click', closeDetails));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && detailsOverlay?.classList.contains('is-open')) closeDetails();
+  });
+
+  activateDetail('quiz');
+
+  const createTimedCarousel = ({ cardSelector, currentSelector, prevSelector, nextSelector, stageSelector, interval = 5000, render }) => {
+    const cards = [...document.querySelectorAll(cardSelector)];
+    const currentLabel = document.querySelector(currentSelector);
+    const prev = document.querySelector(prevSelector);
+    const next = document.querySelector(nextSelector);
+    const stage = document.querySelector(stageSelector);
+    if (!cards.length) return;
+
+    let index = 0;
+    let timer;
+    let paused = false;
+
+    const draw = () => {
+      cards.forEach((card, i) => render(card, i, index, cards.length));
+      if (currentLabel) currentLabel.textContent = String(index + 1).padStart(2, '0');
+    };
+    const move = (delta) => {
+      index = (index + delta + cards.length) % cards.length;
+      draw();
+      schedule();
+    };
+    const schedule = () => {
+      window.clearTimeout(timer);
+      if (!paused) timer = window.setTimeout(() => move(1), interval);
+    };
+
+    prev?.addEventListener('click', () => move(-1));
+    next?.addEventListener('click', () => move(1));
+    stage?.addEventListener('mouseenter', () => { paused = true; window.clearTimeout(timer); });
+    stage?.addEventListener('mouseleave', () => { paused = false; schedule(); });
+    stage?.addEventListener('focusin', () => { paused = true; window.clearTimeout(timer); });
+    stage?.addEventListener('focusout', () => { paused = false; schedule(); });
+
+    draw();
+    schedule();
+  };
+
+  createTimedCarousel({
+    cardSelector: '[data-team-card]',
+    currentSelector: '[data-team-current]',
+    prevSelector: '[data-team-prev]',
+    nextSelector: '[data-team-next]',
+    stageSelector: '[data-team-stage]',
+    interval: 4400,
+    render: (card, i, index, total) => {
+      let delta = i - index;
+      if (delta > total / 2) delta -= total;
+      if (delta < -total / 2) delta += total;
+      const abs = Math.abs(delta);
+      const x = delta * 215;
+      const y = abs * 15;
+      const z = -abs * 110;
+      const rotate = delta * -8;
+      const scale = Math.max(.72, 1 - abs * .12);
+      card.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, ${z}px) rotateY(${rotate}deg) scale(${scale})`;
+      card.style.opacity = abs > 2 ? '0' : String(Math.max(.16, 1 - abs * .34));
+      card.style.filter = abs === 0 ? 'none' : `blur(${Math.min(2.5, abs * .8)}px)`;
+      card.style.zIndex = String(20 - abs);
+      card.classList.toggle('is-current', delta === 0);
+      card.setAttribute('aria-hidden', String(delta !== 0));
+    }
+  });
+
+  createTimedCarousel({
+    cardSelector: '[data-voice-card]',
+    currentSelector: '[data-voice-current]',
+    prevSelector: '[data-voice-prev]',
+    nextSelector: '[data-voice-next]',
+    stageSelector: '[data-voice-stage]',
+    interval: 7600,
+    render: (card, i, index) => {
+      const current = i === index;
+      card.classList.toggle('is-current', current);
+      card.setAttribute('aria-hidden', String(!current));
+    }
+  });
+
+
+  // Resilient portrait fallback for externally hosted academic photos.
+  document.querySelectorAll('img[data-initials]').forEach((img) => {
+    img.addEventListener('error', () => {
+      if (img.dataset.fallbackApplied) return;
+      img.dataset.fallbackApplied = '1';
+      const initials = (img.dataset.initials || 'GA').replace(/[^A-Za-z0-9]/g, '').slice(0, 4);
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2a315e"/><stop offset="1" stop-color="#6b58a5"/></linearGradient></defs><rect width="600" height="600" fill="url(#g)"/><circle cx="300" cy="270" r="125" fill="rgba(255,255,255,.10)"/><text x="300" y="330" text-anchor="middle" fill="#f1c778" font-family="Georgia,serif" font-size="126">${initials}</text></svg>`;
+      img.src = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    }, { once: true });
+  });
+
+  const teamTotal = document.querySelector('[data-team-total]');
+  if (teamTotal) teamTotal.textContent = String(document.querySelectorAll('[data-team-card]').length).padStart(2, '0');
+
+  const year = document.querySelector('#year');
+  if (year) year.textContent = '2026';
 })();
