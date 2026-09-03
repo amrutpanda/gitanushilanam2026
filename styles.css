@@ -21,7 +21,7 @@
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
-  margin: 0;
+  margin: 100px;
   color: var(--ink);
   font-family: "DM Sans", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background:
@@ -321,11 +321,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .film-copy span { color: #9b6d2f; font: 850 9px/1 Manrope, sans-serif; text-transform: uppercase; letter-spacing: .14em; }
 .film-copy h3 { margin: 7px 0 5px; font: 500 25px/1.05 "Libre Caslon Display", serif; }
 .film-copy p { margin: 0; color: #71798d; font-size: 12px; }
-.academic-card .film-copy { padding-top: 15px; }
-.academic-card .film-copy h3 { margin-bottom: 7px; }
-.academic-card .academic-role { color: #343d65; font: 800 11px/1.25 Manrope, sans-serif; letter-spacing: .015em; }
-.academic-card .academic-institute { margin-top: 4px; color: #777f92; font: 600 10.5px/1.35 "DM Sans", sans-serif; }
-.academic-card.is-current .academic-role { color: #7e5828; }
 .film-light { position: absolute; left: 50%; bottom: 30px; width: 500px; height: 90px; transform: translateX(-50%); border-radius: 50%; background: rgba(150,132,216,.18); filter: blur(35px); }
 .cinema-controls { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); z-index: 20; display: flex; align-items: center; gap: 15px; color: #fff; }
 .cinema-controls button, .voice-controls button { color: #fff; border-color: rgba(255,255,255,.15); background: rgba(255,255,255,.07); }
@@ -730,97 +725,157 @@ body.detail-open { overflow: hidden; }
   .reveal { opacity: 1; transform: none; }
 }
 
-/* --- 2026-09-04 revision: academic team + reliable registration CTA --- */
-#team .cinema-stage { height: 585px; }
-#team .cinema-card {
-  width: 318px;
-  min-height: 455px;
-  top: 45%;
-  pointer-events: none;
-}
-#team .cinema-card.is-current { pointer-events: auto; }
-#team .team-card .film-photo { height: 286px; position: relative; }
-#team .academic-card {
-  border: 1px solid rgba(235, 185, 91, .55);
-  box-shadow: 0 30px 90px rgba(6, 9, 29, .42), 0 0 0 1px rgba(255,255,255,.5) inset;
-}
-#team .academic-card::after {
-  content: "ACADEMIC";
-  position: absolute;
-  top: 20px;
-  right: -39px;
-  z-index: 7;
-  width: 150px;
-  padding: 7px 0;
-  transform: rotate(38deg);
-  text-align: center;
-  background: #efbf67;
-  color: #252c53;
-  font: 900 8px/1 Manrope, sans-serif;
-  letter-spacing: .16em;
-  box-shadow: 0 6px 18px rgba(31, 34, 65, .18);
-}
-#team .academic-photo img { object-position: center center; background: #e7e8ee; }
-#team .academic-photo-badge {
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 12px;
-  z-index: 4;
-  padding: 11px 13px;
-  border-radius: 13px;
-  color: #fff;
-  background: linear-gradient(135deg, rgba(29,35,72,.94), rgba(48,55,99,.82));
-  border: 1px solid rgba(255,255,255,.18);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 24px rgba(10,12,35,.2);
-}
-#team .academic-photo-badge span,
-#team .academic-photo-badge small { display: block; }
-#team .academic-photo-badge span {
-  font: 800 10px/1.2 Manrope, sans-serif;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  color: #f3c873;
-}
-#team .academic-photo-badge small {
-  margin-top: 4px;
-  font: 650 10px/1.25 "DM Sans", sans-serif;
-  color: rgba(255,255,255,.86);
-}
-#team .academic-copy { padding: 15px 11px 12px; }
-#team .academic-copy h3 { margin: 7px 0 6px; font-size: 23px; line-height: 1.02; }
-#team .academic-copy .academic-role {
-  color: #303960;
-  font: 850 11px/1.25 Manrope, sans-serif;
-  letter-spacing: .01em;
-}
-#team .academic-copy .academic-institute {
-  max-width: 270px;
-  margin-top: 4px;
-  color: #697187;
-  font: 650 10.5px/1.35 "DM Sans", sans-serif;
-}
-#team .academic-profile-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 10px;
-  color: #855d28;
-  font: 800 9.5px/1 Manrope, sans-serif;
-  letter-spacing: .03em;
-  text-transform: uppercase;
-}
-#team .academic-profile-link b { font-size: 12px; transition: transform .2s ease; }
-#team .academic-profile-link:hover b { transform: translate(2px,-2px); }
-
+/* --- 2026-09-04 revision: reliable registration CTA --- */
 .register-now { gap: 9px; min-height: 54px; font-size: 14px; }
 .register-now b { font-size: 17px; transition: transform .2s ease; }
 .register-now:hover b { transform: translate(2px,-2px); }
 
-@media (max-width: 720px) {
-  #team .cinema-stage { height: 560px; }
-  #team .cinema-card { width: min(300px, 82vw); min-height: 445px; }
-  #team .team-card .film-photo { height: 274px; }
-  #team .academic-copy h3 { font-size: 21px; }
+/* 2026 layout refinement: wider desktop canvas + slightly larger reading scale */
+@media (min-width: 1081px) {
+  :root {
+    --shell: calc(100% - clamp(80px, 7vw, 140px));
+  }
+
+  .detail-page-topbar {
+    padding-inline: clamp(40px, 3.5vw, 70px);
+  }
+
+  body {
+    font-size: 17px;
+  }
+
+  .nav-links { font-size: 14px; gap: 22px; }
+  .hero-lead { font-size: 18px; max-width: 720px; }
+  .announcement-slide p { font-size: 15px; }
+  .mini-list { font-size: 14px; }
+  .chapter-copy { font-size: 15px; }
+
+  .detail-tab small { font-size: 12px; }
+  .detail-metrics span { font-size: 11px; }
+  .round-card > p:not(.round-label) { font-size: 14px; }
+  .round-card ul { font-size: 12px; }
+  .info-card p:not(.info-icon) { font-size: 14px; }
+  .recitation-flow p { font-size: 14px; }
+  .syllabus-list span,
+  .syllabus-list strong { font-size: 13px; }
+  .eligibility-table tbody th small { font-size: 11px; }
+  .table-note { font-size: 12px; }
+  .source-note span { font-size: 14px; }
+  .steps p { font-size: 14px; }
+  .date-rail small { font-size: 12px; }
+  .inspiration-card p:last-child,
+  .inspiration-card:first-child p:last-child { font-size: 14px; }
+  .film-copy p { font-size: 13px; }
+  .voice-content h3 { font-size: 16px; }
+  .voice-content div span { font-size: 12px; }
+  .prize-more p { font-size: 13px; }
+  .prize-note { font-size: 11px; }
+  .contact-list strong { font-size: 15px; }
+  .footer p { font-size: 13px; max-width: 440px; }
+  .footer-links { font-size: 14px; }
+  .footer-meta { font-size: 13px; }
+
+  .competition-grid,
+  .inspiration-grid,
+  .prize-gallery,
+  .footer-grid,
+  .contact-grid,
+  .journey-grid {
+    column-gap: clamp(24px, 2.4vw, 42px);
+  }
+}
+
+/* 2026-09-04 final typography balance */
+@media (min-width: 1081px) {
+  body { font-size: 18px; }
+
+  .eyebrow,
+  .section-label { font-size: 12px; }
+
+  .nav-links { font-size: 15px; }
+  .button { font-size: 14px; }
+  .hero-lead { font-size: 20px; line-height: 1.72; }
+  .hero-stats strong { font-size: 20px; }
+  .hero-stats span { font-size: 10px; }
+  .announcement-kicker { font-size: 12px; }
+  .announcement-slide p { font-size: 16px; }
+
+  .intro-copy p,
+  .section-heading > p:last-child,
+  .journey-copy > p,
+  .register-card p,
+  .contact p,
+  .details-heading > p:last-child,
+  .recognition-head > p,
+  .competition-body > p,
+  .detail-hero-row > div > p:last-child,
+  .vrindavan-copy > p:last-child { font-size: 17px; }
+
+  .text-link,
+  .card-link { font-size: 15px; }
+  .competition-photo > span { font-size: 11px; }
+  .mini-list { font-size: 15px; line-height: 1.5; }
+  .chapter-copy { font-size: 16px; }
+  .chapter-copy b { font-size: 20px; }
+
+  .detail-tab > span { font-size: 12px; }
+  .detail-tab strong { font-size: 18px; }
+  .detail-tab small { font-size: 13px; }
+  .panel-kicker,
+  .round-label { font-size: 11px; }
+  .detail-metrics span { font-size: 12px; }
+  .round-number { font-size: 11px; }
+  .round-card > p:not(.round-label) { font-size: 15px; }
+  .round-card ul { font-size: 13.5px; line-height: 1.5; }
+  .info-card p:not(.info-icon),
+  .recitation-flow p { font-size: 15px; }
+  .syllabus-list span,
+  .syllabus-list strong { font-size: 14px; }
+  .eligibility-table thead th { font-size: 11.5px; }
+  .eligibility-table tbody th { font-size: 15.5px; }
+  .eligibility-table tbody th small { font-size: 12px; }
+  .table-note { font-size: 13px; }
+  .source-note span,
+  .steps p { font-size: 15px; }
+  .steps h3 { font-size: 20px; }
+
+  .date-index { font-size: 9px; }
+  .date-rail p { font-size: 11.5px; }
+  .date-rail h3 { font-size: 26px; }
+  .date-rail small { font-size: 13px; }
+  .vrindavan-date span,
+  .vrindavan-date small { font-size: 11px; }
+
+  .card-kicker { font-size: 11px; }
+  .inspiration-card p:last-child,
+  .inspiration-card:first-child p:last-child { font-size: 15.5px; line-height: 1.72; }
+
+  .film-copy span { font-size: 10px; }
+  .film-copy p { font-size: 14px; }
+
+  .voice-content h3 { font-size: 18px; }
+  .voice-content div span { font-size: 13px; }
+  .prize-overlay span { font-size: 10px; }
+  .prize-more p { font-size: 14px; }
+  .prize-note { font-size: 12px; }
+  .contact-list span { font-size: 11px; }
+  .contact-list strong { font-size: 17px; }
+  .footer p { font-size: 14.5px; line-height: 1.7; }
+  .footer-links { font-size: 15px; }
+  .footer-meta { font-size: 14px; }
+}
+
+@media (min-width: 721px) and (max-width: 1080px) {
+  body { font-size: 16.5px; }
+  .hero-lead { font-size: 17px; }
+  .intro-copy p,
+  .section-heading > p:last-child,
+  .journey-copy > p,
+  .register-card p,
+  .contact p,
+  .recognition-head > p,
+  .competition-body > p { font-size: 16px; }
+  .mini-list { font-size: 14px; }
+  .inspiration-card p:last-child,
+  .inspiration-card:first-child p:last-child { font-size: 14.5px; }
 }
