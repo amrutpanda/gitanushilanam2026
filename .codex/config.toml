@@ -1,0 +1,6 @@
+[agent]
+# Tell the agent which folders it is allowed to look at
+include_patterns = [
+    "."
+]
+
