@@ -1065,7 +1065,7 @@ body.detail-open { overflow: hidden; }
   .recitation-arrow { transform: rotate(90deg); }
 
   /* Wide data stays intentionally horizontally scrollable rather than
-     shrinking to unreadable text. */
+     shrinking to an unreadable text. */
   .eligibility-table-wrap,
   .date-rail {
     -webkit-overflow-scrolling: touch;
