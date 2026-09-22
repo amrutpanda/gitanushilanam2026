@@ -9,7 +9,8 @@
 
     <link rel="stylesheet" href="css/registration.css">
     <script
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        async
         defer>
     </script>
 </head>
@@ -367,9 +368,15 @@
                     </label>
 
                 </div>
-                <!-- TURNSTILE KEY -->
+                <!-- TURNSTILE WRAPPER -->
                 <div class="turnstile-wrapper">
-                     <div id="turnstile-container"></div>
+                    <div
+                        class="cf-turnstile"
+                        data-sitekey="0x4AAAAAAE_c66rSIocTR0zk"
+                        data-theme="light"
+                        data-size="normal"
+                        data-action="registration">
+                    </div>
                 </div>
 
 
@@ -403,7 +410,7 @@
          JAVASCRIPT
     ========================================================== -->
 
-    <script src="js/registration.js?v=20260922-2"></script>
+    <script src="js/registration.js?v=20260922-5"></script>
 
 </body>
 

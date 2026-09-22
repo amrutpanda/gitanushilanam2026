@@ -1,6 +1,3 @@
-let turnstileWidgetId = null;
-let turnstileToken = "";
-
 const API_BASE_URL =
     window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"
         ? "http://127.0.0.1:8787"
@@ -18,46 +15,6 @@ const ageRuleInfo = document.getElementById("ageRuleInfo");
 const status = document.getElementById("status");
 const submitButton = form.querySelector('button[type="submit"]');
 
-/* =========================================================
-   TURNSTILE
-========================================================= */
-
-window.addEventListener("load", () => {
-    if (typeof turnstile === "undefined") {
-        console.error("Cloudflare Turnstile failed to load.");
-        status.style.display = "block";
-        status.textContent = "Security verification could not be loaded. Please refresh the page and try again.";
-        return;
-    }
-
-    turnstile.ready(() => {
-        turnstileWidgetId = turnstile.render("#turnstile-container", {
-            sitekey: "0x4AAAAAAE_c66rSIocTR0zk",
-            action: "registration",
-            size: "flexible",
-
-            callback(token) {
-                turnstileToken = token;
-            },
-
-            "expired-callback"() {
-                turnstileToken = "";
-            },
-
-            "error-callback"() {
-                turnstileToken = "";
-            }
-        });
-    });
-});
-
-function resetTurnstile() {
-    turnstileToken = "";
-
-    if (typeof turnstile !== "undefined" && turnstileWidgetId !== null) {
-        turnstile.reset(turnstileWidgetId);
-    }
-}
 
 /* =========================================================
    WHATSAPP NUMBER
@@ -78,6 +35,7 @@ phone.addEventListener("input", function () {
     }
 });
 
+
 /* =========================================================
    COMPETITION CARD SELECTION
 ========================================================= */
@@ -90,6 +48,7 @@ competitionCards.forEach(card => {
         updateSelectedCompetitionSummary();
     });
 });
+
 
 /* =========================================================
    SELECTED COMPETITIONS SUMMARY
@@ -114,19 +73,11 @@ function updateSelectedCompetitionSummary() {
 
         tag.className = "competition-tag";
         tag.textContent = title;
+
         selectedTags.appendChild(tag);
     });
 }
 
-function resetCompetitionUI() {
-    competitionCards.forEach(card => {
-        card.classList.remove("selected");
-    });
-
-    selectedTags.innerHTML = "";
-    selectedSummary.style.display = "none";
-    ageRuleInfo.style.display = "none";
-}
 
 /* =========================================================
    AGE-BASED COMPETITION FILTER
@@ -163,6 +114,51 @@ ageInput.addEventListener("input", function () {
     updateCompetitionsForAge(age);
 });
 
+
+/* =========================================================
+   TURNSTILE
+========================================================= */
+
+function getTurnstileToken() {
+    const tokenField = document.querySelector('input[name="cf-turnstile-response"]');
+
+    if (!(tokenField instanceof HTMLInputElement)) {
+        return "";
+    }
+
+    return tokenField.value.trim();
+}
+
+function resetTurnstile() {
+    if (typeof turnstile === "undefined") {
+        return;
+    }
+
+    try {
+        turnstile.reset();
+    } catch (error) {
+        console.warn("Unable to reset Turnstile:", error);
+    }
+}
+
+
+/* =========================================================
+   FORM UI RESET
+========================================================= */
+
+function resetFormUi() {
+    whatsapp.readOnly = false;
+
+    competitionCards.forEach(card => {
+        card.classList.remove("selected");
+    });
+
+    selectedTags.innerHTML = "";
+    selectedSummary.style.display = "none";
+    ageRuleInfo.style.display = "none";
+}
+
+
 /* =========================================================
    FORM SUBMISSION
 ========================================================= */
@@ -174,14 +170,16 @@ form.addEventListener("submit", async function (event) {
         document.querySelectorAll('input[name="competitions"]:checked')
     ).map(checkbox => checkbox.value);
 
-    status.style.display = "block";
-
     if (selectedCompetitions.length === 0) {
+        status.style.display = "block";
         status.textContent = "Please select at least one competition.";
         return;
     }
 
+    const turnstileToken = getTurnstileToken();
+
     if (!turnstileToken) {
+        status.style.display = "block";
         status.textContent = "Please complete the security verification.";
         return;
     }
@@ -204,6 +202,7 @@ form.addEventListener("submit", async function (event) {
 
     try {
         submitButton.disabled = true;
+        status.style.display = "block";
         status.textContent = "Submitting registration...";
 
         const response = await fetch(`${API_BASE_URL}/api/register`, {
@@ -219,27 +218,31 @@ form.addEventListener("submit", async function (event) {
         try {
             result = await response.json();
         } catch {
-            throw new Error("Invalid response from the registration server.");
+            throw new Error("The registration server returned an invalid response.");
         }
 
         if (!response.ok || !result.success) {
             throw new Error(result.message || "Registration failed.");
         }
 
+        form.reset();
+        resetFormUi();
+        resetTurnstile();
+
+        status.style.display = "block";
         status.textContent = result.message || "Registration successful.";
 
-        form.reset();
-        whatsapp.readOnly = false;
-        resetCompetitionUI();
-        resetTurnstile();
+        console.log("Registration response:", result);
 
     } catch (error) {
         console.error("Registration error:", error);
+
+        resetTurnstile();
+
+        status.style.display = "block";
         status.textContent = error instanceof Error
             ? error.message
             : "Registration failed. Please try again.";
-
-        resetTurnstile();
 
     } finally {
         submitButton.disabled = false;
