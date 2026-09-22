@@ -15,6 +15,22 @@ const ageRuleInfo = document.getElementById("ageRuleInfo");
 const status = document.getElementById("status");
 const submitButton = form.querySelector('button[type="submit"]');
 
+let turnstileToken = "";
+let registrationPending = false;
+let pendingRegistrationData = null;
+let requestInFlight = false;
+let turnstileNeedsReset = false;
+
+
+/* =========================================================
+   STATUS MESSAGE
+========================================================= */
+
+function showStatus(message) {
+    status.style.display = "block";
+    status.textContent = message;
+}
+
 
 /* =========================================================
    WHATSAPP NUMBER
@@ -83,19 +99,6 @@ function updateSelectedCompetitionSummary() {
    AGE-BASED COMPETITION FILTER
 ========================================================= */
 
-/*
-   Placeholder for later age filtering logic.
-
-   Example future rules:
-
-   const competitionRules = {
-       bhagavad_gita_quiz: { minAge: 10, maxAge: 18 },
-       shloka_recitation: { minAge: 5, maxAge: 18 },
-       animated_bg_video: { minAge: 12, maxAge: 18 },
-       treasure_hunt: { minAge: 10, maxAge: 16 }
-   };
-*/
-
 function updateCompetitionsForAge(age) {
     if (!age) {
         ageRuleInfo.style.display = "none";
@@ -130,6 +133,8 @@ function getTurnstileToken() {
 }
 
 function resetTurnstile() {
+    turnstileToken = "";
+
     if (typeof turnstile === "undefined") {
         return;
     }
@@ -140,6 +145,46 @@ function resetTurnstile() {
         console.warn("Unable to reset Turnstile:", error);
     }
 }
+
+/*
+   These functions are called by the Turnstile widget.
+
+   registration.html must include:
+       data-callback="onTurnstileSuccess"
+       data-expired-callback="onTurnstileExpired"
+       data-error-callback="onTurnstileError"
+*/
+
+window.onTurnstileSuccess = async function (token) {
+    turnstileToken = typeof token === "string" ? token.trim() : "";
+    turnstileNeedsReset = false;
+
+    if (
+        turnstileToken &&
+        registrationPending &&
+        pendingRegistrationData &&
+        !requestInFlight
+    ) {
+        await sendRegistration(pendingRegistrationData, turnstileToken);
+    }
+};
+
+window.onTurnstileExpired = function () {
+    turnstileToken = "";
+
+    if (registrationPending) {
+        showStatus("Security verification expired. Please complete it again.");
+    }
+};
+
+window.onTurnstileError = function () {
+    turnstileToken = "";
+    registrationPending = false;
+    pendingRegistrationData = null;
+    turnstileNeedsReset = true;
+
+    showStatus("Security verification failed. Please try again.");
+};
 
 
 /* =========================================================
@@ -160,31 +205,20 @@ function resetFormUi() {
 
 
 /* =========================================================
-   FORM SUBMISSION
+   BUILD REGISTRATION DATA
 ========================================================= */
 
-form.addEventListener("submit", async function (event) {
-    event.preventDefault();
-
+function buildRegistrationData() {
     const selectedCompetitions = Array.from(
         document.querySelectorAll('input[name="competitions"]:checked')
     ).map(checkbox => checkbox.value);
 
     if (selectedCompetitions.length === 0) {
-        status.style.display = "block";
-        status.textContent = "Please select at least one competition.";
-        return;
+        showStatus("Please select at least one competition.");
+        return null;
     }
 
-    const turnstileToken = getTurnstileToken();
-
-    if (!turnstileToken) {
-        status.style.display = "block";
-        status.textContent = "Please complete the security verification.";
-        return;
-    }
-
-    const registrationData = {
+    return {
         name: document.getElementById("name").value.trim(),
         email: document.getElementById("email").value.trim(),
         phone: phone.value.trim(),
@@ -196,21 +230,36 @@ form.addEventListener("submit", async function (event) {
         state: document.getElementById("state").value.trim(),
         city: document.getElementById("city").value.trim(),
         heard_from: document.getElementById("heardFrom").value,
-        competitions: selectedCompetitions,
-        turnstile_token: turnstileToken
+        competitions: selectedCompetitions
     };
+}
+
+
+/* =========================================================
+   SEND REGISTRATION
+========================================================= */
+
+async function sendRegistration(registrationData, token) {
+    if (requestInFlight || !registrationPending || !token) {
+        return;
+    }
+
+    requestInFlight = true;
+    registrationPending = false;
+    submitButton.disabled = true;
+
+    showStatus("Submitting registration...");
 
     try {
-        submitButton.disabled = true;
-        status.style.display = "block";
-        status.textContent = "Submitting registration...";
-
         const response = await fetch(`${API_BASE_URL}/api/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(registrationData)
+            body: JSON.stringify({
+                ...registrationData,
+                turnstile_token: token
+            })
         });
 
         let result;
@@ -222,29 +271,95 @@ form.addEventListener("submit", async function (event) {
         }
 
         if (!response.ok || !result.success) {
-            throw new Error(result.message || "Registration failed.");
+            turnstileToken = "";
+            turnstileNeedsReset = true;
+            pendingRegistrationData = null;
+
+            showStatus(result.message || "Registration failed.");
+            return;
         }
+
+        pendingRegistrationData = null;
+        turnstileToken = "";
+        turnstileNeedsReset = false;
 
         form.reset();
         resetFormUi();
+
+        showStatus(result.message || "Registration successful.");
+
+        /*
+           Registration is complete. Resetting here is safe because the
+           registration result is already known and the form has been cleared.
+        */
         resetTurnstile();
-
-        status.style.display = "block";
-        status.textContent = result.message || "Registration successful.";
-
-        console.log("Registration response:", result);
 
     } catch (error) {
         console.error("Registration error:", error);
 
-        resetTurnstile();
+        turnstileToken = "";
+        turnstileNeedsReset = true;
+        pendingRegistrationData = null;
 
-        status.style.display = "block";
-        status.textContent = error instanceof Error
-            ? error.message
-            : "Registration failed. Please try again.";
+        showStatus(
+            error instanceof Error
+                ? error.message
+                : "Registration failed. Please try again."
+        );
 
     } finally {
+        requestInFlight = false;
         submitButton.disabled = false;
     }
+}
+
+
+/* =========================================================
+   FORM SUBMISSION
+========================================================= */
+
+form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    if (requestInFlight) {
+        return;
+    }
+
+    const registrationData = buildRegistrationData();
+
+    if (!registrationData) {
+        return;
+    }
+
+    /*
+       If the previous token was consumed by a failed/duplicate request,
+       do not reuse it. Reset Turnstile and wait for a fresh success callback.
+    */
+    if (turnstileNeedsReset) {
+        pendingRegistrationData = registrationData;
+        registrationPending = true;
+        turnstileNeedsReset = false;
+
+        resetTurnstile();
+        showStatus("Please complete the security verification again.");
+        return;
+    }
+
+    /*
+       Use the callback token when available. The hidden field is also checked
+       in case Turnstile completed before this JavaScript observed the callback.
+    */
+    const currentToken = turnstileToken || getTurnstileToken();
+
+    pendingRegistrationData = registrationData;
+    registrationPending = true;
+
+    if (!currentToken) {
+        showStatus("Please complete the security verification.");
+        return;
+    }
+
+    turnstileToken = currentToken;
+
+    await sendRegistration(registrationData, turnstileToken);
 });
