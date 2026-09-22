@@ -3978,11 +3978,6 @@ body.detail-open {
         grid-template-columns: 1fr;
     }
 
-<<<<<<< HEAD
-  /* Wide data stays intentionally horizontally scrollable rather than
-     shrinking to an unreadable text. */
-  .eligibility-table-wrap,
-=======
     .round-connector {
         height: 32px;
     }
@@ -3999,7 +3994,6 @@ body.detail-open {
     /* Wide data stays intentionally horizontally scrollable rather than
      shrinking to unreadable text. */
     .eligibility-table-wrap,
->>>>>>> tmp
   .date-rail {
         -webkit-overflow-scrolling: touch;
         overscroll-behavior-inline: contain;

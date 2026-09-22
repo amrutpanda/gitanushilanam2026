@@ -8,6 +8,10 @@
     <title>Gitanushilanam Competition Registration</title>
 
     <link rel="stylesheet" href="css/registration.css">
+    <script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+        defer>
+    </script>
 </head>
 
 <body>
@@ -362,6 +366,10 @@
                         I confirm that the information provided above is accurate. I understand that competition eligibility may depend on the participant's age and the applicable competition rules.
                     </label>
 
+                </div>
+                <!-- TURNSTILE KEY -->
+                <div class="turnstile-wrapper">
+                     <div id="turnstile-container"></div>
                 </div>
 
 

@@ -1,3 +1,6 @@
+let turnstileWidgetId = null;
+let turnstileToken = "";
+
 const API_BASE_URL =
     window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"
         ? "http://127.0.0.1:8787"
@@ -13,7 +16,48 @@ const selectedSummary = document.getElementById("selectedSummary");
 const selectedTags = document.getElementById("selectedTags");
 const ageRuleInfo = document.getElementById("ageRuleInfo");
 const status = document.getElementById("status");
+const submitButton = form.querySelector('button[type="submit"]');
 
+/* =========================================================
+   TURNSTILE
+========================================================= */
+
+window.addEventListener("load", () => {
+    if (typeof turnstile === "undefined") {
+        console.error("Cloudflare Turnstile failed to load.");
+        status.style.display = "block";
+        status.textContent = "Security verification could not be loaded. Please refresh the page and try again.";
+        return;
+    }
+
+    turnstile.ready(() => {
+        turnstileWidgetId = turnstile.render("#turnstile-container", {
+            sitekey: "0x4AAAAAAE_c66rSIocTR0zk",
+            action: "registration",
+            size: "flexible",
+
+            callback(token) {
+                turnstileToken = token;
+            },
+
+            "expired-callback"() {
+                turnstileToken = "";
+            },
+
+            "error-callback"() {
+                turnstileToken = "";
+            }
+        });
+    });
+});
+
+function resetTurnstile() {
+    turnstileToken = "";
+
+    if (typeof turnstile !== "undefined" && turnstileWidgetId !== null) {
+        turnstile.reset(turnstileWidgetId);
+    }
+}
 
 /* =========================================================
    WHATSAPP NUMBER
@@ -28,13 +72,11 @@ sameAsPhone.addEventListener("change", function () {
     }
 });
 
-
 phone.addEventListener("input", function () {
     if (sameAsPhone.checked) {
         whatsapp.value = phone.value;
     }
 });
-
 
 /* =========================================================
    COMPETITION CARD SELECTION
@@ -48,7 +90,6 @@ competitionCards.forEach(card => {
         updateSelectedCompetitionSummary();
     });
 });
-
 
 /* =========================================================
    SELECTED COMPETITIONS SUMMARY
@@ -69,15 +110,23 @@ function updateSelectedCompetitionSummary() {
     selected.forEach(checkbox => {
         const card = checkbox.closest(".competition-card");
         const title = card.querySelector("h4").textContent.trim();
-
         const tag = document.createElement("span");
+
         tag.className = "competition-tag";
         tag.textContent = title;
-
         selectedTags.appendChild(tag);
     });
 }
 
+function resetCompetitionUI() {
+    competitionCards.forEach(card => {
+        card.classList.remove("selected");
+    });
+
+    selectedTags.innerHTML = "";
+    selectedSummary.style.display = "none";
+    ageRuleInfo.style.display = "none";
+}
 
 /* =========================================================
    AGE-BASED COMPETITION FILTER
@@ -103,29 +152,16 @@ function updateCompetitionsForAge(age) {
     }
 
     ageRuleInfo.style.display = "block";
-
     ageRuleInfo.textContent =
         "Age detected: " +
         age +
         ". Age-based competition eligibility will be applied here once the final competition rules are configured.";
-
-    /*
-       Future filtering logic will go here.
-
-       We can later:
-       - hide ineligible competitions
-       - disable ineligible competitions
-       - automatically deselect them
-       - display age-group information
-    */
 }
-
 
 ageInput.addEventListener("input", function () {
     const age = Number(this.value);
     updateCompetitionsForAge(age);
 });
-
 
 /* =========================================================
    FORM SUBMISSION
@@ -134,11 +170,19 @@ ageInput.addEventListener("input", function () {
 form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    const selectedCompetitions = Array.from(document.querySelectorAll('input[name="competitions"]:checked')).map(checkbox => checkbox.value);
+    const selectedCompetitions = Array.from(
+        document.querySelectorAll('input[name="competitions"]:checked')
+    ).map(checkbox => checkbox.value);
+
+    status.style.display = "block";
 
     if (selectedCompetitions.length === 0) {
-        status.style.display = "block";
         status.textContent = "Please select at least one competition.";
+        return;
+    }
+
+    if (!turnstileToken) {
+        status.textContent = "Please complete the security verification.";
         return;
     }
 
@@ -154,11 +198,12 @@ form.addEventListener("submit", async function (event) {
         state: document.getElementById("state").value.trim(),
         city: document.getElementById("city").value.trim(),
         heard_from: document.getElementById("heardFrom").value,
-        competitions: selectedCompetitions
+        competitions: selectedCompetitions,
+        turnstile_token: turnstileToken
     };
 
     try {
-        status.style.display = "block";
+        submitButton.disabled = true;
         status.textContent = "Submitting registration...";
 
         const response = await fetch(`${API_BASE_URL}/api/register`, {
@@ -169,18 +214,34 @@ form.addEventListener("submit", async function (event) {
             body: JSON.stringify(registrationData)
         });
 
-        const result = await response.json();
+        let result;
 
-        if (!response.ok) {
-            throw new Error(result.message || "Registration failed");
+        try {
+            result = await response.json();
+        } catch {
+            throw new Error("Invalid response from the registration server.");
         }
 
-        status.textContent = "Registration successful. Registration ID: " + result.id;
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "Registration failed.");
+        }
 
-        console.log("Server response:", result);
+        status.textContent = result.message || "Registration successful.";
+
+        form.reset();
+        whatsapp.readOnly = false;
+        resetCompetitionUI();
+        resetTurnstile();
 
     } catch (error) {
-        console.error(error);
-        status.textContent = "Registration failed: " + error.message;
+        console.error("Registration error:", error);
+        status.textContent = error instanceof Error
+            ? error.message
+            : "Registration failed. Please try again.";
+
+        resetTurnstile();
+
+    } finally {
+        submitButton.disabled = false;
     }
 });
