@@ -203,34 +203,6 @@
     });
 
     createTimedCarousel({
-        cardSelector: '[data-prize-card]',
-        currentSelector: '[data-prize-current]',
-        prevSelector: '[data-prize-prev]',
-        nextSelector: '[data-prize-next]',
-        stageSelector: '[data-prize-stage]',
-        interval: 3300,
-        render: (card, i, index, total) => {
-            let delta = i - index;
-            if (delta > total / 2) delta -= total;
-            if (delta < -total / 2) delta += total;
-
-            const abs = Math.abs(delta);
-            const x = delta * 245;
-            const y = abs * 18;
-            const z = -abs * 135;
-            const rotate = delta * -9;
-            const scale = Math.max(.68, 1 - abs * .13);
-
-            card.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, ${z}px) rotateY(${rotate}deg) scale(${scale})`;
-            card.style.opacity = abs > 2 ? '0' : String(Math.max(.15, 1 - abs * .34));
-            card.style.filter = abs === 0 ? 'none' : `blur(${Math.min(2.6, abs * .85)}px)`;
-            card.style.zIndex = String(20 - abs);
-            card.classList.toggle('is-current', delta === 0);
-            card.setAttribute('aria-hidden', String(abs > 2));
-        }
-    });
-
-    createTimedCarousel({
         cardSelector: '[data-voice-card]',
         currentSelector: '[data-voice-current]',
         prevSelector: '[data-voice-prev]',
@@ -243,56 +215,6 @@
             card.setAttribute('aria-hidden', String(!current));
         }
     });
-
-
-    const partnerTrack = document.querySelector('[data-partner-track]');
-    if (partnerTrack && !partnerTrack.dataset.loopReady) {
-        partnerTrack.dataset.loopReady = '1';
-        const partnerCards = [...partnerTrack.children];
-
-        partnerCards.forEach((card) => {
-            const clone = card.cloneNode(true);
-            clone.setAttribute('aria-hidden', 'true');
-            clone.tabIndex = -1;
-            partnerTrack.appendChild(clone);
-        });
-    }
-
-    const brandTitle = document.querySelector('.brand-title');
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-    const launchBrandPetals = () => {
-        if (!brandTitle || reducedMotion.matches) return;
-
-        const rect = brandTitle.getBoundingClientRect();
-        const originX = rect.left + rect.width * .56;
-        const originY = rect.top + rect.height * .48;
-        const petalCount = 16;
-
-        for (let i = 0; i < petalCount; i += 1) {
-            const petal = document.createElement('span');
-            const angle = (Math.PI * 2 * i) / petalCount + (Math.random() - .5) * .28;
-            const distance = 48 + Math.random() * 68;
-            const lift = 18 + Math.random() * 46;
-
-            petal.className = 'brand-petal';
-            petal.setAttribute('aria-hidden', 'true');
-            petal.style.left = `${originX}px`;
-            petal.style.top = `${originY}px`;
-            petal.style.setProperty('--petal-x', `${Math.cos(angle) * distance}px`);
-            petal.style.setProperty('--petal-y', `${Math.sin(angle) * distance - lift}px`);
-            petal.style.setProperty('--petal-r', `${140 + Math.random() * 300}deg`);
-            petal.style.setProperty('--petal-delay', `${Math.random() * 90}ms`);
-
-            document.body.appendChild(petal);
-            window.setTimeout(() => petal.remove(), 1900);
-        }
-    };
-
-    if (brandTitle && !reducedMotion.matches) {
-        window.setTimeout(launchBrandPetals, 1800);
-        window.setInterval(launchBrandPetals, 10500);
-    }
 
 
     // Resilient portrait fallback for externally hosted academic photos.
@@ -308,10 +230,6 @@
 
     const teamTotal = document.querySelector('[data-team-total]');
     if (teamTotal) teamTotal.textContent = String(document.querySelectorAll('[data-team-card]').length).padStart(2, '0');
-
-
-    const prizeTotal = document.querySelector('[data-prize-total]');
-    if (prizeTotal) prizeTotal.textContent = String(document.querySelectorAll('[data-prize-card]').length).padStart(2, '0');
 
     const year = document.querySelector('#year');
     if (year) year.textContent = '2026';
