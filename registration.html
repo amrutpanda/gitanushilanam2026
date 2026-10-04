@@ -19,15 +19,24 @@
 
     <header class="topbar">
 
-        <div class="brand">
+        <a class="brand brand-home-link" href="https://gitanushilanam.net" aria-label="Go to Gitanushilanam main page">
             <img src="https://learngitalivegita.com/assets/v2/images/LGLG_logo.svg?v=TVm0R4k" alt="Learn Gita Live Gita" class="brand-logo">
             <div>
                 <h2>Gitanushilanam 2026</h2>
                 <p>Participant Registration Portal</p>
             </div>
-        </div>
+        </a>
 
-        <div class="open-badge">Registration Open</div>
+        <div class="topbar-actions">
+            <a class="back-home-button" href="https://gitanushilanam.net">
+                <svg class="back-home-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M15 18l-6-6 6-6"></path>
+                </svg>
+                <span class="back-home-button-text">Back to website</span>
+            </a>
+
+            <div class="open-badge">Registration Open</div>
+        </div>
 
     </header>
 
@@ -179,17 +188,35 @@
 
                         <div class="field">
                             <label for="country">Country <span class="required">*</span></label>
-                            <input id="country" name="country" type="text" placeholder="e.g. India" required>
+
+                            <select id="country" name="country" required>
+                                <option value="">Loading countries...</option>
+                            </select>
+
+                            <input class="location-manual-input" id="countryManual" type="text" placeholder="Enter your country" hidden>
+                            <span class="field-info">Select your country first.</span>
                         </div>
 
                         <div class="field">
-                            <label for="state">State <span class="required">*</span></label>
-                            <input id="state" name="state" type="text" placeholder="e.g. Karnataka" required>
+                            <label for="state">State / Province <span class="required">*</span></label>
+
+                            <select id="state" name="state" required disabled>
+                                <option value="">Select country first</option>
+                            </select>
+
+                            <input class="location-manual-input" id="stateManual" type="text" placeholder="Enter your state / province" hidden>
+                            <span class="field-info">States will load after you select a country.</span>
                         </div>
 
                         <div class="field">
                             <label for="city">City <span class="required">*</span></label>
-                            <input id="city" name="city" type="text" placeholder="e.g. Bengaluru" required>
+
+                            <select id="city" name="city" required disabled>
+                                <option value="">Select state first</option>
+                            </select>
+
+                            <input class="location-manual-input" id="cityManual" type="text" placeholder="Enter your city" hidden>
+                            <span class="field-info">Cities will load after you select a state.</span>
                         </div>
 
                         <div class="field full">
@@ -406,7 +433,7 @@
          JAVASCRIPT
     ========================================================== -->
 
-    <script src="js/registration.js?v=20261004-3"></script>
+    <script src="js/registration.js?v=20261004-4"></script>
 
 </body>
 

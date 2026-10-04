@@ -9,6 +9,12 @@ const whatsapp = document.getElementById("whatsapp");
 const sameAsPhone = document.getElementById("sameAsPhone");
 const ageInput = document.getElementById("age");
 const participantGroupSelect = document.getElementById("participantGroup");
+const countrySelect = document.getElementById("country");
+const stateSelect = document.getElementById("state");
+const citySelect = document.getElementById("city");
+const countryManual = document.getElementById("countryManual");
+const stateManual = document.getElementById("stateManual");
+const cityManual = document.getElementById("cityManual");
 const competitionGrid = document.getElementById("competitionGrid");
 const competitionCards = document.querySelectorAll("[data-competition-card]");
 const selectedSummary = document.getElementById("selectedSummary");
@@ -33,6 +39,13 @@ let registrationPending = false;
 let pendingRegistrationData = null;
 let requestInFlight = false;
 let turnstileNeedsReset = false;
+
+const LOCATION_DATA_MODULE_URL =
+    "https://cdn.jsdelivr.net/npm/@countrystatecity/countries-browser@1.0.4/+esm";
+
+let locationDataModulePromise = null;
+let selectedCountryCode = "";
+let selectedStateCode = "";
 
 /* =========================================================
    PARTICIPANT GROUPS AND COMPETITION ELIGIBILITY
@@ -198,6 +211,278 @@ phone.addEventListener("input", function () {
     if (sameAsPhone.checked) {
         whatsapp.value = phone.value;
     }
+});
+
+/* =========================================================
+   COUNTRY / STATE / CITY DROPDOWNS
+
+   The browser package lazy-loads geographic data from jsDelivr.
+   If it cannot load, the form automatically falls back to
+   manual Country / State / City entry so registration still works.
+========================================================= */
+
+function getLocationDataModule() {
+    if (!locationDataModulePromise) {
+        locationDataModulePromise = import(LOCATION_DATA_MODULE_URL);
+    }
+
+    return locationDataModulePromise;
+}
+
+function sortByName(items) {
+    return [...items].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function resetLocationSelect(select, message, disabled = true) {
+    select.innerHTML = "";
+
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = message;
+    select.appendChild(option);
+    select.disabled = disabled;
+}
+
+function appendLocationOption(select, value, label, code = "") {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+
+    if (code) {
+        option.dataset.code = code;
+    }
+
+    select.appendChild(option);
+}
+
+function appendOtherLocationOption(select) {
+    const option = document.createElement("option");
+    option.value = "__other__";
+    option.textContent = "Other / Not listed";
+    select.appendChild(option);
+}
+
+function setManualLocationField(select, input, manualMode) {
+    input.hidden = !manualMode;
+    input.required = manualMode;
+    select.required = !manualMode;
+
+    if (manualMode) {
+        input.value = "";
+    }
+}
+
+function enableFullManualLocationFallback() {
+    [countrySelect, stateSelect, citySelect].forEach(select => {
+        select.hidden = true;
+        select.disabled = true;
+        select.required = false;
+    });
+
+    [countryManual, stateManual, cityManual].forEach(input => {
+        input.hidden = false;
+        input.required = true;
+    });
+
+    countryManual.placeholder = "Enter your country";
+    stateManual.placeholder = "Enter your state / province";
+    cityManual.placeholder = "Enter your city";
+}
+
+function getLocationValue(select, manualInput) {
+    if (!manualInput.hidden) {
+        return manualInput.value.trim();
+    }
+
+    if (select.value === "__other__") {
+        return manualInput.value.trim();
+    }
+
+    return select.value.trim();
+}
+
+async function loadCountries() {
+    countrySelect.classList.add("location-select-loading");
+    resetLocationSelect(countrySelect, "Loading countries...", true);
+    resetLocationSelect(stateSelect, "Select country first", true);
+    resetLocationSelect(citySelect, "Select state first", true);
+
+    try {
+        const { getCountries } = await getLocationDataModule();
+        const countries = sortByName(await getCountries());
+
+        resetLocationSelect(countrySelect, "Select country", false);
+
+        countries.forEach(country => {
+            appendLocationOption(
+                countrySelect,
+                country.name,
+                country.name,
+                country.iso2
+            );
+        });
+
+        appendOtherLocationOption(countrySelect);
+    } catch (error) {
+        console.error("Unable to load country data:", error);
+        enableFullManualLocationFallback();
+    } finally {
+        countrySelect.classList.remove("location-select-loading");
+    }
+}
+
+countrySelect.addEventListener("change", async function () {
+    setManualLocationField(countrySelect, countryManual, false);
+    setManualLocationField(stateSelect, stateManual, false);
+    setManualLocationField(citySelect, cityManual, false);
+
+    selectedCountryCode = "";
+    selectedStateCode = "";
+
+    if (!countrySelect.hidden) {
+        stateSelect.hidden = false;
+        citySelect.hidden = false;
+    }
+
+    resetLocationSelect(stateSelect, "Select country first", true);
+    resetLocationSelect(citySelect, "Select state first", true);
+
+    if (!countrySelect.value) {
+        return;
+    }
+
+    if (countrySelect.value === "__other__") {
+        setManualLocationField(countrySelect, countryManual, true);
+
+        stateSelect.hidden = true;
+        stateSelect.disabled = true;
+        stateSelect.required = false;
+        citySelect.hidden = true;
+        citySelect.disabled = true;
+        citySelect.required = false;
+
+        stateManual.hidden = false;
+        stateManual.required = true;
+        cityManual.hidden = false;
+        cityManual.required = true;
+        return;
+    }
+
+    const selectedOption = countrySelect.options[countrySelect.selectedIndex];
+    selectedCountryCode = selectedOption.dataset.code || "";
+
+    if (!selectedCountryCode) {
+        enableFullManualLocationFallback();
+        return;
+    }
+
+    stateSelect.classList.add("location-select-loading");
+    resetLocationSelect(stateSelect, "Loading states...", true);
+
+    try {
+        const { getStatesOfCountry } = await getLocationDataModule();
+        const states = sortByName(await getStatesOfCountry(selectedCountryCode));
+
+        if (states.length === 0) {
+            resetLocationSelect(stateSelect, "No states listed", false);
+            appendOtherLocationOption(stateSelect);
+            return;
+        }
+
+        resetLocationSelect(stateSelect, "Select state / province", false);
+
+        states.forEach(state => {
+            appendLocationOption(
+                stateSelect,
+                state.name,
+                state.name,
+                state.iso2
+            );
+        });
+
+        appendOtherLocationOption(stateSelect);
+    } catch (error) {
+        console.error("Unable to load state data:", error);
+        resetLocationSelect(stateSelect, "State data unavailable", true);
+        stateManual.hidden = false;
+        stateManual.required = true;
+        cityManual.hidden = false;
+        cityManual.required = true;
+    } finally {
+        stateSelect.classList.remove("location-select-loading");
+    }
+});
+
+stateSelect.addEventListener("change", async function () {
+    setManualLocationField(stateSelect, stateManual, false);
+    setManualLocationField(citySelect, cityManual, false);
+
+    selectedStateCode = "";
+    citySelect.hidden = false;
+    resetLocationSelect(citySelect, "Select state first", true);
+
+    if (!stateSelect.value) {
+        return;
+    }
+
+    if (stateSelect.value === "__other__") {
+        setManualLocationField(stateSelect, stateManual, true);
+
+        citySelect.hidden = true;
+        citySelect.disabled = true;
+        citySelect.required = false;
+        cityManual.hidden = false;
+        cityManual.required = true;
+        return;
+    }
+
+    const selectedOption = stateSelect.options[stateSelect.selectedIndex];
+    selectedStateCode = selectedOption.dataset.code || "";
+
+    if (!selectedCountryCode || !selectedStateCode) {
+        cityManual.hidden = false;
+        cityManual.required = true;
+        return;
+    }
+
+    citySelect.classList.add("location-select-loading");
+    resetLocationSelect(citySelect, "Loading cities...", true);
+
+    try {
+        const { getCitiesOfState } = await getLocationDataModule();
+        const cities = sortByName(
+            await getCitiesOfState(selectedCountryCode, selectedStateCode)
+        );
+
+        if (cities.length === 0) {
+            resetLocationSelect(citySelect, "No cities listed", false);
+            appendOtherLocationOption(citySelect);
+            return;
+        }
+
+        resetLocationSelect(citySelect, "Select city", false);
+
+        cities.forEach(city => {
+            appendLocationOption(citySelect, city.name, city.name);
+        });
+
+        appendOtherLocationOption(citySelect);
+    } catch (error) {
+        console.error("Unable to load city data:", error);
+        resetLocationSelect(citySelect, "City data unavailable", true);
+        cityManual.hidden = false;
+        cityManual.required = true;
+    } finally {
+        citySelect.classList.remove("location-select-loading");
+    }
+});
+
+citySelect.addEventListener("change", function () {
+    setManualLocationField(
+        citySelect,
+        cityManual,
+        citySelect.value === "__other__"
+    );
 });
 
 /* =========================================================
@@ -393,6 +678,19 @@ window.onTurnstileError = function () {
 function resetFormUi() {
     whatsapp.readOnly = false;
 
+    countryManual.value = "";
+    stateManual.value = "";
+    cityManual.value = "";
+
+    if (!countrySelect.hidden) {
+        countrySelect.value = "";
+        resetLocationSelect(stateSelect, "Select country first", true);
+        resetLocationSelect(citySelect, "Select state first", true);
+        setManualLocationField(countrySelect, countryManual, false);
+        setManualLocationField(stateSelect, stateManual, false);
+        setManualLocationField(citySelect, cityManual, false);
+    }
+
     competitionCards.forEach(card => {
         const checkbox = card.querySelector('input[type="checkbox"]');
 
@@ -459,9 +757,9 @@ function buildRegistrationData() {
         age,
         participant_group: participantGroupKey,
         institution_organization: document.getElementById("institutionOrganization").value.trim(),
-        country: document.getElementById("country").value.trim(),
-        state: document.getElementById("state").value.trim(),
-        city: document.getElementById("city").value.trim(),
+        country: getLocationValue(countrySelect, countryManual),
+        state: getLocationValue(stateSelect, stateManual),
+        city: getLocationValue(citySelect, cityManual),
         heard_from: document.getElementById("heardFrom").value,
         competitions: selectedCompetitions
     };
@@ -586,3 +884,4 @@ form.addEventListener("submit", async function (event) {
 ========================================================= */
 
 updateCompetitionsForParticipantGroup();
+loadCountries();
