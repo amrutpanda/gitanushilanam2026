@@ -8,11 +8,12 @@ const phone = document.getElementById("phone");
 const whatsapp = document.getElementById("whatsapp");
 const sameAsPhone = document.getElementById("sameAsPhone");
 const ageInput = document.getElementById("age");
+const participantGroupSelect = document.getElementById("participantGroup");
 const competitionGrid = document.getElementById("competitionGrid");
 const competitionCards = document.querySelectorAll("[data-competition-card]");
 const selectedSummary = document.getElementById("selectedSummary");
 const selectedTags = document.getElementById("selectedTags");
-const ageRuleInfo = document.getElementById("ageRuleInfo");
+const participantGroupInfo = document.getElementById("participantGroupInfo");
 const status = document.getElementById("status");
 const submitButton = form.querySelector('button[type="submit"]');
 
@@ -35,48 +36,33 @@ let turnstileNeedsReset = false;
 
 /* =========================================================
    PARTICIPANT GROUPS AND COMPETITION ELIGIBILITY
-
-   Age is mapped internally to the current participant structure:
-   8-10  -> Subjunior (3rd-5th class)
-   11-13 -> Junior (6th-8th class)
-   14-17 -> Senior (9th-12th class)
-   18+   -> Youth / Adult
 ========================================================= */
 
-const participantGroups = [
-    {
-        key: "subjunior",
-        label: "Subjunior",
-        standard: "3rd–5th class",
-        minAge: 8,
-        maxAge: 10,
+const participantGroups = {
+    sub_junior: {
+        label: "Sub-Junior",
+        grade: "Class 3–5",
         competitions: ["bhagavad_gita_quiz", "shloka_recitation"]
     },
-    {
-        key: "junior",
+
+    junior: {
         label: "Junior",
-        standard: "6th–8th class",
-        minAge: 11,
-        maxAge: 13,
+        grade: "Class 6–8",
         competitions: ["bhagavad_gita_quiz", "shloka_recitation"]
     },
-    {
-        key: "senior",
+
+    senior: {
         label: "Senior",
-        standard: "9th–12th class",
-        minAge: 14,
-        maxAge: 17,
+        grade: "Class 9–12",
         competitions: ["bhagavad_gita_quiz", "shloka_recitation", "treasure_hunt"]
     },
-    {
-        key: "youth_adult",
+
+    youth_adult: {
         label: "Youth / Adult",
-        standard: "18 years and above",
-        minAge: 18,
-        maxAge: 120,
+        grade: "College / Adult",
         competitions: ["bhagavad_gita_quiz", "shloka_recitation", "animated_bg_video", "treasure_hunt"]
     }
-];
+};
 
 const competitionLabels = {
     bhagavad_gita_quiz: "Bhagavad Gita Quiz",
@@ -140,6 +126,7 @@ function closeResultModal() {
 
 function showSuccessModal(participantName) {
     clearStatus();
+
     openResultModal({
         type: "success",
         title: "Registration successful!",
@@ -150,6 +137,7 @@ function showSuccessModal(participantName) {
 
 function showFailureModal(message) {
     clearStatus();
+
     openResultModal({
         type: "error",
         title: "Registration not completed",
@@ -158,7 +146,10 @@ function showFailureModal(message) {
 }
 
 registrationModalClose.addEventListener("click", closeResultModal);
-registrationModal.querySelectorAll("[data-modal-close]").forEach(element => element.addEventListener("click", closeResultModal));
+
+registrationModal
+    .querySelectorAll("[data-modal-close]")
+    .forEach(element => element.addEventListener("click", closeResultModal));
 
 registerAnotherButton.addEventListener("click", function () {
     closeResultModal();
@@ -179,7 +170,9 @@ retryRegistrationButton.addEventListener("click", function () {
         resetTurnstile();
     }
 
-    setTimeout(() => form.scrollIntoView({ behavior: "smooth", block: "start" }), 260);
+    setTimeout(() => {
+        form.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 260);
 });
 
 document.addEventListener("keydown", function (event) {
@@ -245,6 +238,7 @@ function updateSelectedCompetitionSummary() {
         const card = checkbox.closest(".competition-card");
         const title = card.querySelector("h4").textContent.trim();
         const tag = document.createElement("span");
+
         tag.className = "competition-tag";
         tag.textContent = title;
         selectedTags.appendChild(tag);
@@ -252,20 +246,17 @@ function updateSelectedCompetitionSummary() {
 }
 
 /* =========================================================
-   AGE-BASED COMPETITION FILTER
+   PARTICIPANT-GROUP COMPETITION FILTER
 ========================================================= */
 
-function getParticipantGroup(age) {
-    if (!Number.isInteger(age)) {
-        return null;
-    }
-
-    return participantGroups.find(group => age >= group.minAge && age <= group.maxAge) || null;
+function getParticipantGroup(groupKey) {
+    return participantGroups[groupKey] || null;
 }
 
 function clearCompetitionSelection() {
     competitionCards.forEach(card => {
         const checkbox = card.querySelector('input[type="checkbox"]');
+
         checkbox.checked = false;
         card.classList.remove("selected");
     });
@@ -279,6 +270,7 @@ function setCompetitionVisibility(eligibleCompetitions) {
     competitionCards.forEach(card => {
         const checkbox = card.querySelector('input[type="checkbox"]');
         const isEligible = eligibleCompetitions.includes(checkbox.value);
+
         checkbox.disabled = !isEligible;
 
         if (isEligible) {
@@ -297,44 +289,50 @@ function setCompetitionVisibility(eligibleCompetitions) {
     updateSelectedCompetitionSummary();
 }
 
-function showAgePrompt(message, state = "info") {
-    ageRuleInfo.style.display = "block";
-    ageRuleInfo.classList.toggle("is-warning", state === "warning");
-    ageRuleInfo.classList.toggle("is-ready", state === "ready");
-    ageRuleInfo.textContent = message;
+function showParticipantGroupInfo(message, state = "info") {
+    participantGroupInfo.style.display = "block";
+    participantGroupInfo.classList.toggle("is-warning", state === "warning");
+    participantGroupInfo.classList.toggle("is-ready", state === "ready");
+    participantGroupInfo.textContent = message;
 }
 
-function updateCompetitionsForAge() {
-    const rawAge = ageInput.value.trim();
+function updateCompetitionsForParticipantGroup() {
+    const groupKey = participantGroupSelect.value;
+
     clearCompetitionSelection();
 
-    if (rawAge === "") {
+    if (!groupKey) {
         setCompetitionVisibility([]);
-        showAgePrompt("Enter the participant's age to see the competitions available for that participant group.");
+        showParticipantGroupInfo(
+            "Select the participant group to see the competitions available for that group."
+        );
         return;
     }
 
-    const age = Number(rawAge);
-    const participantGroup = getParticipantGroup(age);
+    const participantGroup = getParticipantGroup(groupKey);
 
     if (!participantGroup) {
         setCompetitionVisibility([]);
-
-        if (Number.isFinite(age) && age < 8) {
-            showAgePrompt("The current participant groups begin from approximately 3rd class (age 8). No competition options are available for this age.", "warning");
-        } else {
-            showAgePrompt("Please enter a valid age between 8 and 120.", "warning");
-        }
-
+        showParticipantGroupInfo(
+            "Please select a valid participant group.",
+            "warning"
+        );
         return;
     }
 
     setCompetitionVisibility(participantGroup.competitions);
-    const eligibleNames = participantGroup.competitions.map(competition => competitionLabels[competition]).join(", ");
-    showAgePrompt(`${participantGroup.label} · ${participantGroup.standard}. Eligible competitions: ${eligibleNames}.`, "ready");
+
+    const eligibleNames = participantGroup.competitions
+        .map(competition => competitionLabels[competition])
+        .join(", ");
+
+    showParticipantGroupInfo(
+        `${participantGroup.label} (${participantGroup.grade}). Eligible competitions: ${eligibleNames}.`,
+        "ready"
+    );
 }
 
-ageInput.addEventListener("input", updateCompetitionsForAge);
+participantGroupSelect.addEventListener("change", updateCompetitionsForParticipantGroup);
 
 /* =========================================================
    TURNSTILE
@@ -342,7 +340,10 @@ ageInput.addEventListener("input", updateCompetitionsForAge);
 
 function getTurnstileToken() {
     const tokenField = document.querySelector('input[name="cf-turnstile-response"]');
-    return tokenField instanceof HTMLInputElement ? tokenField.value.trim() : "";
+
+    return tokenField instanceof HTMLInputElement
+        ? tokenField.value.trim()
+        : "";
 }
 
 function resetTurnstile() {
@@ -381,6 +382,7 @@ window.onTurnstileError = function () {
     registrationPending = false;
     pendingRegistrationData = null;
     turnstileNeedsReset = true;
+
     showFailureModal("Security verification failed. Please try again.");
 };
 
@@ -393,6 +395,7 @@ function resetFormUi() {
 
     competitionCards.forEach(card => {
         const checkbox = card.querySelector('input[type="checkbox"]');
+
         checkbox.checked = false;
         checkbox.disabled = true;
         card.classList.remove("selected");
@@ -403,7 +406,10 @@ function resetFormUi() {
     competitionGrid.dataset.visibleCount = "0";
     selectedTags.innerHTML = "";
     selectedSummary.style.display = "none";
-    showAgePrompt("Enter the participant's age to see the competitions available for that participant group.");
+
+    showParticipantGroupInfo(
+        "Select the participant group to see the competitions available for that group."
+    );
 }
 
 /* =========================================================
@@ -412,10 +418,13 @@ function resetFormUi() {
 
 function buildRegistrationData() {
     const age = Number(ageInput.value);
-    const participantGroup = getParticipantGroup(age);
+    const participantGroupKey = participantGroupSelect.value;
+    const participantGroup = getParticipantGroup(participantGroupKey);
 
     if (!participantGroup) {
-        showFailureModal("Please enter an eligible participant age before selecting a competition.");
+        showFailureModal(
+            "Please select a valid participant group before selecting a competition."
+        );
         return null;
     }
 
@@ -424,14 +433,20 @@ function buildRegistrationData() {
     ).map(checkbox => checkbox.value);
 
     if (selectedCompetitions.length === 0) {
-        showFailureModal("Please select at least one competition available for this participant group.");
+        showFailureModal(
+            "Please select at least one competition available for this participant group."
+        );
         return null;
     }
 
-    const hasInvalidSelection = selectedCompetitions.some(competition => !participantGroup.competitions.includes(competition));
+    const hasInvalidSelection = selectedCompetitions.some(
+        competition => !participantGroup.competitions.includes(competition)
+    );
 
     if (hasInvalidSelection) {
-        showFailureModal("One or more selected competitions are not available for this participant group.");
+        showFailureModal(
+            "One or more selected competitions are not available for this participant group."
+        );
         return null;
     }
 
@@ -442,6 +457,7 @@ function buildRegistrationData() {
         whatsapp: whatsapp.value.trim(),
         gender: document.getElementById("gender").value,
         age,
+        participant_group: participantGroupKey,
         institution_organization: document.getElementById("institutionOrganization").value.trim(),
         country: document.getElementById("country").value.trim(),
         state: document.getElementById("state").value.trim(),
@@ -463,13 +479,19 @@ async function sendRegistration(registrationData, token) {
     requestInFlight = true;
     registrationPending = false;
     submitButton.disabled = true;
+
     showStatus("Submitting registration...");
 
     try {
         const response = await fetch(`${API_BASE_URL}/api/register`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...registrationData, turnstile_token: token })
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                ...registrationData,
+                turnstile_token: token
+            })
         });
 
         let result;
@@ -484,11 +506,13 @@ async function sendRegistration(registrationData, token) {
             turnstileToken = "";
             turnstileNeedsReset = true;
             pendingRegistrationData = null;
+
             showFailureModal(result.message || "Registration failed.");
             return;
         }
 
         const participantName = registrationData.name;
+
         pendingRegistrationData = null;
         turnstileToken = "";
         turnstileNeedsReset = false;
@@ -499,10 +523,16 @@ async function sendRegistration(registrationData, token) {
         showSuccessModal(participantName);
     } catch (error) {
         console.error("Registration error:", error);
+
         turnstileToken = "";
         turnstileNeedsReset = true;
         pendingRegistrationData = null;
-        showFailureModal(error instanceof Error ? error.message : "Registration failed. Please try again.");
+
+        showFailureModal(
+            error instanceof Error
+                ? error.message
+                : "Registration failed. Please try again."
+        );
     } finally {
         requestInFlight = false;
         submitButton.disabled = false;
@@ -530,12 +560,14 @@ form.addEventListener("submit", async function (event) {
         pendingRegistrationData = registrationData;
         registrationPending = true;
         turnstileNeedsReset = false;
+
         resetTurnstile();
         showStatus("Please complete the security verification again.");
         return;
     }
 
     const currentToken = turnstileToken || getTurnstileToken();
+
     pendingRegistrationData = registrationData;
     registrationPending = true;
 
@@ -545,6 +577,7 @@ form.addEventListener("submit", async function (event) {
     }
 
     turnstileToken = currentToken;
+
     await sendRegistration(registrationData, turnstileToken);
 });
 
@@ -552,4 +585,4 @@ form.addEventListener("submit", async function (event) {
    INITIAL STATE
 ========================================================= */
 
-updateCompetitionsForAge();
+updateCompetitionsForParticipantGroup();

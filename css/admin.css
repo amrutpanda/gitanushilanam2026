@@ -312,7 +312,7 @@ button {
 
 .filter-bar {
     display: grid;
-    grid-template-columns: minmax(250px, 1.5fr) repeat(3, minmax(150px, 0.7fr)) auto;
+    grid-template-columns: minmax(250px, 1.5fr) repeat(4, minmax(140px, 0.7fr)) auto;
     gap: 12px;
     align-items: end;
     padding: 17px 23px;

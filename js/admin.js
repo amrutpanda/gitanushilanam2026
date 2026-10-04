@@ -11,6 +11,7 @@ const logoutButton = document.getElementById("logoutButton");
 const filterForm = document.getElementById("filterForm");
 const searchFilter = document.getElementById("searchFilter");
 const competitionFilter = document.getElementById("competitionFilter");
+const participantGroupFilter = document.getElementById("participantGroupFilter");
 const countryFilter = document.getElementById("countryFilter");
 const stateFilter = document.getElementById("stateFilter");
 const clearFiltersButton = document.getElementById("clearFiltersButton");
@@ -27,6 +28,13 @@ const summaryElements = {
     shloka: document.getElementById("shlokaRegistrations"),
     animated: document.getElementById("animatedRegistrations"),
     treasure: document.getElementById("treasureRegistrations")
+};
+
+const participantGroupLabels = {
+    sub_junior: "Sub-Junior (Class 3–5)",
+    junior: "Junior (Class 6–8)",
+    senior: "Senior (Class 9–12)",
+    youth_adult: "Youth / Adult (College / Adult)"
 };
 
 let currentPage = 1;
@@ -197,7 +205,7 @@ function renderRegistrations(registrations) {
         row.className = "empty-row";
 
         const cell = document.createElement("td");
-        cell.colSpan = 9;
+        cell.colSpan = 10;
         cell.textContent = "No registrations match the selected filters.";
 
         row.appendChild(cell);
@@ -223,6 +231,10 @@ function renderRegistrations(registrations) {
         row.appendChild(contactCell);
 
         row.appendChild(createTextElement("td", String(registration.age)));
+
+        const participantGroupLabel = participantGroupLabels[registration.participant_group] || "-";
+        row.appendChild(createTextElement("td", participantGroupLabel));
+
         row.appendChild(createTextElement("td", registration.gender || "-"));
         row.appendChild(createTextElement("td", registration.institution_organization || "-"));
 
@@ -255,6 +267,10 @@ function buildRegistrationQuery(page) {
 
     if (competitionFilter.value) {
         params.set("competition", competitionFilter.value);
+    }
+
+    if (participantGroupFilter.value) {
+        params.set("participant_group", participantGroupFilter.value);
     }
 
     if (countryFilter.value) {
@@ -313,6 +329,7 @@ filterForm.addEventListener("submit", function (event) {
 clearFiltersButton.addEventListener("click", function () {
     searchFilter.value = "";
     competitionFilter.value = "";
+    participantGroupFilter.value = "";
     countryFilter.value = "";
     stateFilter.value = "";
     loadRegistrations(1);

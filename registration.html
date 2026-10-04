@@ -115,7 +115,19 @@
                         <div class="field">
                             <label for="age">Age <span class="required">*</span></label>
                             <input id="age" name="age" type="number" min="3" max="120" placeholder="Enter your age" required>
-                            <span class="field-info">Your age is used to determine the participant group and show only the competitions available to you.</span>
+                            <span class="field-info">Enter the participant's current age.</span>
+                        </div>
+
+                        <div class="field">
+                            <label for="participantGroup">Participant Group <span class="required">*</span></label>
+                            <select id="participantGroup" name="participantGroup" required>
+                                <option value="">Select participant group</option>
+                                <option value="sub_junior">Sub-Junior (Class 3–5)</option>
+                                <option value="junior">Junior (Class 6–8)</option>
+                                <option value="senior">Senior (Class 9–12)</option>
+                                <option value="youth_adult">Youth / Adult (College / Adult)</option>
+                            </select>
+                            <span class="field-info">Competition options will be shown based on the selected participant group.</span>
                         </div>
 
                         <div class="field">
@@ -223,7 +235,7 @@
                     </div>
 
                     <div class="competition-intro">
-                        Enter the participant's age first. The competition choices below will automatically show only the events available for that participant group.
+                        Select the participant group first. The competition choices below will automatically show only the events available for that group.
                     </div>
 
                     <div class="competition-grid" id="competitionGrid" data-visible-count="0">
@@ -294,9 +306,9 @@
 
                     </div>
 
-                    <!-- Future age eligibility information -->
+                    <!-- Participant group eligibility information -->
 
-                    <div class="age-rule-info" id="ageRuleInfo"></div>
+                    <div class="age-rule-info" id="participantGroupInfo"></div>
 
                     <!-- Selected competitions summary -->
 
@@ -319,11 +331,13 @@
                     <input id="agreement" type="checkbox" required>
 
                     <label for="agreement">
-                        I confirm that the information provided above is accurate. I understand that competition eligibility may depend on the participant's age and the applicable competition rules.
+                        I confirm that the information provided above is accurate. I understand that competition eligibility depends on the selected participant group and the applicable competition rules.
                     </label>
 
                 </div>
+
                 <!-- TURNSTILE WRAPPER -->
+
                 <div class="turnstile-wrapper">
                     <div class="cf-turnstile" data-sitekey="0x4AAAAAAE_c66rSIocTR0zk" data-theme="light" data-size="normal" data-action="registration" data-callback="onTurnstileSuccess" data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError"></div>
                 </div>
@@ -392,7 +406,7 @@
          JAVASCRIPT
     ========================================================== -->
 
-    <script src="js/registration.js?v=20261004-2"></script>
+    <script src="js/registration.js?v=20261004-3"></script>
 
 </body>
 
