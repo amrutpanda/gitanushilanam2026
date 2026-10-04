@@ -5,28 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Admin Dashboard | Gitanushilanam 2026</title>
-    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin.css?v=20261004-4">
 </head>
 <body class="admin-dashboard-page">
+
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+
     <header class="admin-header">
         <div>
             <p class="admin-kicker">Gitanushilanam 2026</p>
-            <h1>Admin Dashboard</h1>
+            <h1>Administration</h1>
         </div>
 
         <div class="admin-account">
-            <span id="adminIdentity">Checking session...</span>
-            <button id="logoutButton" class="secondary-button" type="button">Log out</button>
+            <div class="admin-identity-wrap">
+                <span id="adminIdentity">Checking session...</span>
+                <span id="adminRoleBadge" class="role-badge" hidden></span>
+            </div>
+
+            <button id="logoutButton" class="secondary-button" type="button">
+                Log out
+            </button>
         </div>
     </header>
 
+    <!-- =========================================================
+         SECTION NAVIGATION
+    ========================================================== -->
+
+    <nav class="admin-section-nav" aria-label="Admin sections">
+        <a href="#dashboard">Dashboard</a>
+        <a href="#registrations">Registrations</a>
+        <a href="#dataReview" data-super-admin-only hidden>Data Review</a>
+        <a href="#adminManagement" data-super-admin-only hidden>Admin Management</a>
+        <a href="#auditLog" data-super-admin-only hidden>Audit Log</a>
+    </nav>
+
     <main class="admin-main">
-        <section class="page-heading">
+
+        <!-- =====================================================
+             DASHBOARD
+        ====================================================== -->
+
+        <section class="page-heading" id="dashboard">
             <div>
                 <p class="eyebrow">Registration overview</p>
-                <h2>Participant registrations</h2>
-                <p>Read-only registration records and filtering.</p>
+                <h2>Participant dashboard</h2>
+                <p>
+                    Registration totals, participant distribution and recent activity.
+                </p>
             </div>
+
+            <a class="secondary-button link-button" href="/">
+                View public website
+            </a>
         </section>
 
         <section class="summary-grid" aria-label="Registration summary">
@@ -34,37 +68,150 @@
                 <span>Total registrations</span>
                 <strong id="totalRegistrations">-</strong>
             </article>
+
             <article class="summary-card">
                 <span>Bhagavad Gita Quiz</span>
                 <strong id="quizRegistrations">-</strong>
             </article>
+
             <article class="summary-card">
                 <span>Shloka Recitation</span>
                 <strong id="shlokaRegistrations">-</strong>
             </article>
+
             <article class="summary-card">
                 <span>Animated BG Video</span>
                 <strong id="animatedRegistrations">-</strong>
             </article>
+
             <article class="summary-card">
                 <span>Treasure Hunt</span>
                 <strong id="treasureRegistrations">-</strong>
             </article>
         </section>
 
-        <section class="data-panel">
+        <!-- =====================================================
+             CHARTS
+        ====================================================== -->
+
+        <section class="chart-grid" aria-label="Registration charts">
+            <article class="chart-card">
+                <div class="chart-heading">
+                    <div>
+                        <p class="eyebrow">Participant groups</p>
+                        <h3>Registrations by group</h3>
+                    </div>
+                </div>
+
+                <div id="participantGroupChart" class="bar-chart"></div>
+            </article>
+
+            <article class="chart-card">
+                <div class="chart-heading">
+                    <div>
+                        <p class="eyebrow">Competitions</p>
+                        <h3>Competition participation</h3>
+                    </div>
+                </div>
+
+                <div id="competitionChart" class="bar-chart"></div>
+            </article>
+
+            <article class="chart-card chart-card-wide">
+                <div class="chart-heading">
+                    <div>
+                        <p class="eyebrow">Recent trend</p>
+                        <h3>Registrations over the last 30 days</h3>
+                    </div>
+                </div>
+
+                <div id="registrationTrendChart" class="trend-chart"></div>
+            </article>
+        </section>
+
+        <!-- =====================================================
+             SUPER ADMIN DATA REVIEW
+        ====================================================== -->
+
+        <section id="dataReview" class="super-admin-section" data-super-admin-only hidden>
+            <div class="section-heading-row">
+                <div>
+                    <p class="eyebrow">Historical data cleanup</p>
+                    <h2>Data Review</h2>
+                    <p>
+                        Find older registrations that need participant-group or location corrections.
+                    </p>
+                </div>
+
+                <div class="owner-only-note">
+                    Permanent deletion is intentionally unavailable from the web panel.
+                </div>
+            </div>
+
+            <div class="review-grid">
+                <button class="review-card" type="button" data-review-target="needs_review">
+                    <span>Needs review</span>
+                    <strong id="reviewNeedsReview">-</strong>
+                    <small>Any required review field is missing</small>
+                </button>
+
+                <button class="review-card" type="button" data-review-target="missing_participant_group">
+                    <span>Participant group</span>
+                    <strong id="reviewMissingGroup">-</strong>
+                    <small>Missing or invalid participant group</small>
+                </button>
+
+                <button class="review-card" type="button" data-review-target="missing_country">
+                    <span>Country</span>
+                    <strong id="reviewMissingCountry">-</strong>
+                    <small>Missing country</small>
+                </button>
+
+                <button class="review-card" type="button" data-review-target="missing_state">
+                    <span>State / Province</span>
+                    <strong id="reviewMissingState">-</strong>
+                    <small>Missing state or province</small>
+                </button>
+
+                <button class="review-card" type="button" data-review-target="missing_city">
+                    <span>City</span>
+                    <strong id="reviewMissingCity">-</strong>
+                    <small>Missing city</small>
+                </button>
+
+                <button class="review-card review-card-complete" type="button" data-review-target="complete">
+                    <span>Complete records</span>
+                    <strong id="reviewComplete">-</strong>
+                    <small>No required review fields missing</small>
+                </button>
+            </div>
+        </section>
+
+        <!-- =====================================================
+             REGISTRATIONS
+        ====================================================== -->
+
+        <section class="data-panel" id="registrations">
             <div class="panel-heading">
                 <div>
                     <p class="eyebrow">Participant database</p>
                     <h3>Registrations</h3>
+                    <p class="panel-description" id="registrationPanelDescription">
+                        Read-only registration records and filtering.
+                    </p>
                 </div>
+
                 <div id="resultCount" class="result-count">Loading...</div>
             </div>
 
             <form id="filterForm" class="filter-bar">
                 <div class="filter-field filter-search">
                     <label for="searchFilter">Search</label>
-                    <input id="searchFilter" type="search" placeholder="Name, email, phone or WhatsApp">
+                    <input
+                        id="searchFilter"
+                        type="search"
+                        placeholder="Name, email, phone or WhatsApp"
+                    >
                 </div>
 
                 <div class="filter-field">
@@ -103,13 +250,40 @@
                     </select>
                 </div>
 
+                <div class="filter-field" data-super-admin-only hidden>
+                    <label for="reviewFilter">Data Status</label>
+                    <select id="reviewFilter">
+                        <option value="">All records</option>
+                        <option value="needs_review">Needs review</option>
+                        <option value="complete">Complete</option>
+                        <option value="missing_participant_group">Missing participant group</option>
+                        <option value="missing_country">Missing country</option>
+                        <option value="missing_state">Missing state</option>
+                        <option value="missing_city">Missing city</option>
+                    </select>
+                </div>
+
                 <div class="filter-actions">
-                    <button class="primary-button compact-button" type="submit">Apply</button>
-                    <button id="clearFiltersButton" class="secondary-button compact-button" type="button">Clear</button>
+                    <button class="primary-button compact-button" type="submit">
+                        Apply
+                    </button>
+
+                    <button
+                        id="clearFiltersButton"
+                        class="secondary-button compact-button"
+                        type="button"
+                    >
+                        Clear
+                    </button>
                 </div>
             </form>
 
-            <div id="dashboardStatus" class="dashboard-status" role="status" aria-live="polite"></div>
+            <div
+                id="dashboardStatus"
+                class="dashboard-status"
+                role="status"
+                aria-live="polite"
+            ></div>
 
             <div class="table-wrap">
                 <table class="registration-table">
@@ -124,21 +298,316 @@
                             <th>Location</th>
                             <th>Competitions</th>
                             <th>Heard From</th>
+                            <th>Data Status</th>
                             <th>Registered</th>
+                            <th data-super-admin-only hidden>Action</th>
                         </tr>
                     </thead>
+
                     <tbody id="registrationsBody"></tbody>
                 </table>
             </div>
 
             <div class="pagination">
-                <button id="previousPageButton" class="secondary-button compact-button" type="button">Previous</button>
+                <button
+                    id="previousPageButton"
+                    class="secondary-button compact-button"
+                    type="button"
+                >
+                    Previous
+                </button>
+
                 <span id="pageIndicator">Page 1</span>
-                <button id="nextPageButton" class="secondary-button compact-button" type="button">Next</button>
+
+                <button
+                    id="nextPageButton"
+                    class="secondary-button compact-button"
+                    type="button"
+                >
+                    Next
+                </button>
             </div>
         </section>
+
+        <!-- =====================================================
+             ADMIN MANAGEMENT - READ ONLY IN PHASE 1
+        ====================================================== -->
+
+        <section
+            id="adminManagement"
+            class="super-admin-section"
+            data-super-admin-only
+            hidden
+        >
+            <div class="section-heading-row">
+                <div>
+                    <p class="eyebrow">Super Admin</p>
+                    <h2>Admin Management</h2>
+                    <p>
+                        Account visibility and status. Password, invitation and messaging controls
+                        will be added in the next phase.
+                    </p>
+                </div>
+
+                <button id="refreshAdminsButton" class="secondary-button" type="button">
+                    Refresh
+                </button>
+            </div>
+
+            <div class="data-panel compact-panel">
+                <div class="table-wrap">
+                    <table class="admin-user-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Password</th>
+                                <th>Last Login</th>
+                                <th>Created</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="adminUsersBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- =====================================================
+             AUDIT LOG
+        ====================================================== -->
+
+        <section id="auditLog" class="super-admin-section" data-super-admin-only hidden>
+            <div class="section-heading-row">
+                <div>
+                    <p class="eyebrow">Change history</p>
+                    <h2>Audit Log</h2>
+                    <p>
+                        Registration corrections made through the Super Admin webpage are recorded here.
+                    </p>
+                </div>
+
+                <button id="refreshAuditButton" class="secondary-button" type="button">
+                    Refresh
+                </button>
+            </div>
+
+            <div class="data-panel compact-panel">
+                <div class="table-wrap">
+                    <table class="audit-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Admin</th>
+                                <th>Action</th>
+                                <th>Record</th>
+                                <th>Changes</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="auditBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
     </main>
 
-    <script src="js/admin.js?v=20261004-3"></script>
+    <!-- =========================================================
+         EDIT REGISTRATION MODAL - SUPER ADMIN ONLY
+    ========================================================== -->
+
+    <div id="editRegistrationModal" class="admin-modal" hidden>
+        <div class="admin-modal-backdrop" data-edit-modal-close></div>
+
+        <section
+            class="admin-modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="editRegistrationTitle"
+        >
+            <div class="admin-modal-header">
+                <div>
+                    <p class="eyebrow">Super Admin correction</p>
+                    <h2 id="editRegistrationTitle">Edit registration</h2>
+                    <p id="editRegistrationSubtitle"></p>
+                </div>
+
+                <button
+                    class="modal-close-button"
+                    type="button"
+                    aria-label="Close edit registration"
+                    data-edit-modal-close
+                >
+                    &times;
+                </button>
+            </div>
+
+            <form id="editRegistrationForm" class="edit-registration-form">
+                <input id="editRegistrationId" type="hidden">
+
+                <section class="edit-form-section">
+                    <h3>Participant</h3>
+
+                    <div class="edit-grid">
+                        <div class="field">
+                            <label for="editName">Full Name</label>
+                            <input id="editName" type="text" maxlength="100" required>
+                        </div>
+
+                        <div class="field">
+                            <label for="editGender">Gender</label>
+                            <select id="editGender" required>
+                                <option value="">Select gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                                <option value="prefer_not_to_say">Prefer not to say</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="editEmail">Email</label>
+                            <input id="editEmail" type="email" maxlength="254" required>
+                        </div>
+
+                        <div class="field">
+                            <label for="editAge">Age</label>
+                            <input id="editAge" type="number" min="3" max="120" required>
+                        </div>
+
+                        <div class="field">
+                            <label for="editParticipantGroup">Participant Group</label>
+                            <select id="editParticipantGroup" required>
+                                <option value="">Select participant group</option>
+                                <option value="sub_junior">Sub-Junior (Class 3–5)</option>
+                                <option value="junior">Junior (Class 6–8)</option>
+                                <option value="senior">Senior (Class 9–12)</option>
+                                <option value="youth_adult">Youth / Adult (College / Adult)</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="editInstitution">School / Institute / Organization</label>
+                            <input id="editInstitution" type="text" maxlength="200">
+                        </div>
+
+                        <div class="field">
+                            <label for="editPhone">Phone Number</label>
+                            <input id="editPhone" type="tel" maxlength="50" required>
+                        </div>
+
+                        <div class="field">
+                            <label for="editWhatsapp">WhatsApp Number</label>
+                            <input id="editWhatsapp" type="tel" maxlength="50" required>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="edit-form-section">
+                    <h3>Location</h3>
+                    <p id="storedLocationNote" class="stored-value-note"></p>
+
+                    <div class="edit-grid edit-location-grid">
+                        <div class="field">
+                            <label for="editCountry">Country</label>
+                            <select id="editCountry" required>
+                                <option value="">Loading countries...</option>
+                            </select>
+                            <input
+                                id="editCountryManual"
+                                class="manual-location-input"
+                                type="text"
+                                maxlength="100"
+                                placeholder="Enter country"
+                                hidden
+                            >
+                        </div>
+
+                        <div class="field">
+                            <label for="editState">State / Province</label>
+                            <select id="editState" required disabled>
+                                <option value="">Select country first</option>
+                            </select>
+                            <input
+                                id="editStateManual"
+                                class="manual-location-input"
+                                type="text"
+                                maxlength="100"
+                                placeholder="Enter state / province"
+                                hidden
+                            >
+                        </div>
+
+                        <div class="field">
+                            <label for="editCity">City</label>
+                            <select id="editCity" required disabled>
+                                <option value="">Select state first</option>
+                            </select>
+                            <input
+                                id="editCityManual"
+                                class="manual-location-input"
+                                type="text"
+                                maxlength="100"
+                                placeholder="Enter city"
+                                hidden
+                            >
+                        </div>
+                    </div>
+                </section>
+
+                <section class="edit-form-section">
+                    <h3>Competition Information</h3>
+
+                    <div class="field">
+                        <label for="editHeardFrom">How did they hear about the competition?</label>
+                        <input id="editHeardFrom" type="text" maxlength="200" required>
+                    </div>
+
+                    <div class="edit-competition-grid">
+                        <label class="check-card">
+                            <input id="editQuiz" type="checkbox" value="bhagavad_gita_quiz">
+                            <span>Bhagavad Gita Quiz</span>
+                        </label>
+
+                        <label class="check-card">
+                            <input id="editShloka" type="checkbox" value="shloka_recitation">
+                            <span>Shloka Recitation</span>
+                        </label>
+
+                        <label class="check-card">
+                            <input id="editAnimated" type="checkbox" value="animated_bg_video">
+                            <span>Animated BG Video</span>
+                        </label>
+
+                        <label class="check-card">
+                            <input id="editTreasure" type="checkbox" value="treasure_hunt">
+                            <span>Treasure Hunt</span>
+                        </label>
+                    </div>
+                </section>
+
+                <div id="editFormStatus" class="edit-form-status" role="status"></div>
+
+                <div class="admin-modal-actions">
+                    <button
+                        class="secondary-button"
+                        type="button"
+                        data-edit-modal-close
+                    >
+                        Cancel
+                    </button>
+
+                    <button id="saveRegistrationButton" class="primary-button" type="submit">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <script src="js/admin.js?v=20261004-4"></script>
 </body>
 </html>
