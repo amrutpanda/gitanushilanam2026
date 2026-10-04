@@ -202,7 +202,7 @@ button, a {
 }
 
 /* Persistent registration CTA shown only on mobile. */
-.mobile-register-cta {
+.mobile-bottom-register-cta {
     display: none;
 }
 
@@ -2307,6 +2307,27 @@ button, a {
     }
 }
 
+
+@keyframes mobileRegisterGlow {
+    0%, 100% {
+        box-shadow:
+            0 10px 30px rgba(41, 49, 95, .32),
+            0 0 12px rgba(241, 189, 98, .38);
+    }
+
+    50% {
+        box-shadow:
+            0 12px 34px rgba(41, 49, 95, .46),
+            0 0 28px rgba(241, 189, 98, .92);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mobile-bottom-register-cta {
+        animation: none;
+    }
+}
+
 @media (max-width: 820px) {
     .site-header {
         padding-top: 10px;
@@ -2316,21 +2337,35 @@ button, a {
         min-height: 60px;
     }
 
-    .mobile-register-cta {
+    .mobile-bottom-register-cta {
+        position: fixed;
+        left: 50%;
+        bottom: max(14px, env(safe-area-inset-bottom));
+        z-index: 520;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        margin-left: auto;
-        margin-right: 6px;
-        padding: 9px 14px;
+        width: calc(100% - 28px);
+        max-width: 430px;
+        min-height: 60px;
+        padding: 15px 24px;
+        border: 1px solid rgba(255, 255, 255, .28);
         border-radius: 999px;
-        background: var(--indigo);
+        background: linear-gradient(135deg, #465394, var(--indigo));
         color: #fff;
-        font-size: 13px;
-        font-weight: 700;
-        line-height: 1;
+        font: 800 16px/1 Manrope, sans-serif;
+        letter-spacing: .01em;
+        text-align: center;
         text-decoration: none;
-        box-shadow: 0 6px 18px rgba(42, 48, 92, .22);
+        transform: translateX(-50%);
+        box-shadow:
+            0 10px 30px rgba(41, 49, 95, .38),
+            0 0 18px rgba(241, 189, 98, .72);
+        animation: mobileRegisterGlow 1.8s ease-in-out infinite;
+    }
+
+    body {
+        padding-bottom: 90px;
     }
 
     .menu-toggle {
