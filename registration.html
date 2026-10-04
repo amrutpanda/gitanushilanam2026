@@ -8,11 +8,7 @@
     <title>Gitanushilanam Competition Registration</title>
 
     <link rel="stylesheet" href="css/registration.css">
-    <script
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-        async
-        defer>
-    </script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 
 <body>
@@ -35,7 +31,6 @@
 
     </header>
 
-
     <!-- =========================================================
          HERO
     ========================================================== -->
@@ -52,12 +47,9 @@
             <span>Inspire.</span>
         </h1>
 
-        <p>
-            Register once and participate in one or more competitions. Choose your events below and complete your participant information.
-        </p>
+        <p>Register once and participate in one or more competitions. Choose your events below and complete your participant information.</p>
 
     </section>
-
 
     <!-- =========================================================
          REGISTRATION FORM
@@ -78,9 +70,7 @@
 
             </div>
 
-
             <form id="competitionForm">
-
 
                 <!-- =================================================
                      SECTION 01 - PERSONAL INFORMATION
@@ -98,7 +88,6 @@
                         </div>
 
                     </div>
-
 
                     <div class="grid">
 
@@ -123,19 +112,16 @@
                             <input id="email" name="email" type="email" placeholder="name@example.com" required>
                         </div>
 
-
                         <div class="field">
                             <label for="age">Age <span class="required">*</span></label>
                             <input id="age" name="age" type="number" min="3" max="120" placeholder="Enter your age" required>
-                            <span class="field-info">Competition eligibility will later be determined using age groups.</span>
+                            <span class="field-info">Your age is used to determine the participant group and show only the competitions available to you.</span>
                         </div>
-
 
                         <div class="field">
                             <label for="phone">Phone Number <span class="required">*</span></label>
                             <input id="phone" name="phone" type="tel" placeholder="+91 98765 43210" required>
                         </div>
-
 
                         <div class="field">
 
@@ -151,23 +137,14 @@
                         </div>
 
                         <div class="field">
-                            <label for="institutionOrganization">
-                                School / Institute / Organization
-                            </label>
+                            <label for="institutionOrganization">School / Institute / Organization</label>
 
-                            <input
-                                type="text"
-                                id="institutionOrganization"
-                                name="institutionOrganization"
-                                maxlength="200"
-                                placeholder="Enter school, institute or organization"
-                            >
+                            <input type="text" id="institutionOrganization" name="institutionOrganization" maxlength="200" placeholder="Enter school, institute or organization">
                         </div>
 
                     </div>
 
                 </section>
-
 
                 <!-- =================================================
                      SECTION 02 - LOCATION
@@ -186,7 +163,6 @@
 
                     </div>
 
-
                     <div class="grid">
 
                         <div class="field">
@@ -194,18 +170,15 @@
                             <input id="country" name="country" type="text" placeholder="e.g. India" required>
                         </div>
 
-
                         <div class="field">
                             <label for="state">State <span class="required">*</span></label>
                             <input id="state" name="state" type="text" placeholder="e.g. Karnataka" required>
                         </div>
 
-
                         <div class="field">
                             <label for="city">City <span class="required">*</span></label>
                             <input id="city" name="city" type="text" placeholder="e.g. Bengaluru" required>
                         </div>
-
 
                         <div class="field full">
 
@@ -232,7 +205,6 @@
 
                 </section>
 
-
                 <!-- =================================================
                      SECTION 03 - COMPETITION SELECTION
                 ================================================== -->
@@ -250,14 +222,11 @@
 
                     </div>
 
-
                     <div class="competition-intro">
-                        Select all competitions you would like to participate in. The available competitions can later be automatically filtered according to the participant's age group.
+                        Enter the participant's age first. The competition choices below will automatically show only the events available for that participant group.
                     </div>
 
-
-                    <div class="competition-grid">
-
+                    <div class="competition-grid" id="competitionGrid" data-visible-count="0">
 
                         <!-- Bhagavad Gita Quiz -->
 
@@ -271,12 +240,9 @@
 
                             <h4>Bhagavad Gita Quiz</h4>
 
-                            <p>
-                                Test your knowledge and understanding of the teachings and concepts from the Bhagavad Gita.
-                            </p>
+                            <p>Test your knowledge and understanding of the teachings and concepts from the Bhagavad Gita.</p>
 
                         </label>
-
 
                         <!-- Shloka Recitation -->
 
@@ -290,12 +256,9 @@
 
                             <h4>Shloka Recitation</h4>
 
-                            <p>
-                                Demonstrate accurate pronunciation, rhythm and confident recitation of Sanskrit shlokas.
-                            </p>
+                            <p>Demonstrate accurate pronunciation, rhythm and confident recitation of Sanskrit shlokas.</p>
 
                         </label>
-
 
                         <!-- Animated BG Video -->
 
@@ -309,12 +272,9 @@
 
                             <h4>Animated BG Video</h4>
 
-                            <p>
-                                Create an engaging animated video inspired by themes and stories from the Bhagavad Gita.
-                            </p>
+                            <p>Create an engaging animated video inspired by themes and stories from the Bhagavad Gita.</p>
 
                         </label>
-
 
                         <!-- Treasure Hunt -->
 
@@ -328,19 +288,15 @@
 
                             <h4>Treasure Hunt</h4>
 
-                            <p>
-                                Solve clues, uncover challenges and progress through an interactive knowledge-based treasure hunt.
-                            </p>
+                            <p>Solve clues, uncover challenges and progress through an interactive knowledge-based treasure hunt.</p>
 
                         </label>
 
                     </div>
 
-
                     <!-- Future age eligibility information -->
 
                     <div class="age-rule-info" id="ageRuleInfo"></div>
-
 
                     <!-- Selected competitions summary -->
 
@@ -353,7 +309,6 @@
                     </div>
 
                 </section>
-
 
                 <!-- =================================================
                      AGREEMENT
@@ -370,18 +325,8 @@
                 </div>
                 <!-- TURNSTILE WRAPPER -->
                 <div class="turnstile-wrapper">
-                    <div
-                        class="cf-turnstile"
-                        data-sitekey="0x4AAAAAAE_c66rSIocTR0zk"
-                        data-theme="light"
-                        data-size="normal"
-                        data-action="registration"
-                        data-callback="onTurnstileSuccess"
-                        data-expired-callback="onTurnstileExpired"
-                        data-error-callback="onTurnstileError">
-                    </div>
+                    <div class="cf-turnstile" data-sitekey="0x4AAAAAAE_c66rSIocTR0zk" data-theme="light" data-size="normal" data-action="registration" data-callback="onTurnstileSuccess" data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError"></div>
                 </div>
-
 
                 <!-- =================================================
                      SUBMIT
@@ -389,16 +334,11 @@
 
                 <div class="submit-area">
 
-                    <div class="secure-message">
-                        🔒 Registration information will be securely stored.
-                    </div>
+                    <div class="secure-message">🔒 Registration information will be securely stored.</div>
 
-                    <button class="submit-button" type="submit">
-                        Continue Registration →
-                    </button>
+                    <button class="submit-button" type="submit">Continue Registration →</button>
 
                 </div>
-
 
                 <div id="status"></div>
 
@@ -408,12 +348,51 @@
 
     </main>
 
+    <!-- =========================================================
+         REGISTRATION RESULT MODAL
+    ========================================================== -->
+
+    <div class="registration-modal" id="registrationModal" hidden>
+        <div class="registration-modal-backdrop" data-modal-close></div>
+
+        <section class="registration-modal-card" role="dialog" aria-modal="true" aria-labelledby="registrationModalTitle" aria-describedby="registrationModalMessage">
+
+            <button class="registration-modal-close" id="registrationModalClose" type="button" aria-label="Close registration message">×</button>
+
+            <div class="registration-modal-icon" id="registrationModalIcon" aria-hidden="true">✓</div>
+
+            <p class="registration-modal-kicker">Gitanushilanam 2026</p>
+
+            <h2 id="registrationModalTitle">Registration successful!</h2>
+
+            <p class="registration-modal-message" id="registrationModalMessage"></p>
+
+            <p class="registration-modal-name" id="registrationModalName"></p>
+
+            <div class="registration-modal-actions" id="registrationSuccessActions">
+                <a class="registration-modal-button registration-modal-button-primary" href="https://gitanushilanam.net">
+                    Go to main page
+                </a>
+
+                <button class="registration-modal-button registration-modal-button-secondary" id="registerAnotherButton" type="button">
+                    Register another person
+                </button>
+            </div>
+
+            <div class="registration-modal-actions" id="registrationFailureActions" hidden>
+                <button class="registration-modal-button registration-modal-button-primary" id="retryRegistrationButton" type="button">
+                    Back to registration
+                </button>
+            </div>
+
+        </section>
+    </div>
 
     <!-- =========================================================
          JAVASCRIPT
     ========================================================== -->
 
-    <script src="js/registration.js?v=20260922-5"></script>
+    <script src="js/registration.js?v=20261004-2"></script>
 
 </body>
 

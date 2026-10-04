@@ -871,3 +871,274 @@ input, select, textarea, button {
     font-size: 13px;
   }
 }
+
+/* =========================================================
+   AGE-FILTERED COMPETITION OPTIONS
+========================================================= */
+
+.competition-card.is-age-hidden {
+    display: none;
+}
+
+.competition-grid[data-visible-count="0"] {
+    display: none;
+}
+
+.competition-grid[data-visible-count="2"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.competition-grid[data-visible-count="3"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.competition-grid[data-visible-count="4"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.age-rule-info.is-ready {
+    border-color: rgba(83, 219, 152, 0.24);
+    background: rgba(83, 219, 152, 0.08);
+    color: #a9e9ca;
+}
+
+.age-rule-info.is-warning {
+    border-color: rgba(255, 133, 133, 0.24);
+    background: rgba(255, 101, 101, 0.08);
+    color: #ffb4b4;
+}
+
+
+/* =========================================================
+   REGISTRATION RESULT MODAL
+========================================================= */
+
+body.modal-open {
+    overflow: hidden;
+}
+
+.registration-modal[hidden] {
+    display: none;
+}
+
+.registration-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 20000;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    opacity: 0;
+    transition: opacity 0.22s ease;
+}
+
+.registration-modal.is-visible {
+    opacity: 1;
+}
+
+.registration-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 40%, rgba(77, 141, 255, 0.18), transparent 34%), rgba(2, 7, 16, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.registration-modal-card {
+    position: relative;
+    z-index: 1;
+    width: min(560px, 100%);
+    padding: 42px 38px 36px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 28px;
+    background: radial-gradient(circle at 50% 0%, rgba(77, 141, 255, 0.18), transparent 36%),
+        linear-gradient(145deg, rgba(20, 36, 62, 0.98), rgba(7, 15, 29, 0.98));
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+    text-align: center;
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.25s ease;
+}
+
+.registration-modal.is-visible .registration-modal-card {
+    transform: translateY(0) scale(1);
+}
+
+.registration-modal-card::before {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    left: 50%;
+    top: -155px;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    background: rgba(88, 147, 255, 0.22);
+    filter: blur(32px);
+    pointer-events: none;
+}
+
+.registration-modal-close {
+    position: absolute;
+    z-index: 2;
+    top: 16px;
+    right: 16px;
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 50%;
+    color: #b9c7dc;
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    font-size: 24px;
+    line-height: 1;
+    transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.registration-modal-close:hover {
+    transform: rotate(6deg) scale(1.05);
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.registration-modal-icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 22px;
+    border-radius: 50%;
+    color: white;
+    font-size: 34px;
+    font-weight: 800;
+}
+
+.registration-modal.is-success .registration-modal-icon {
+    background: linear-gradient(135deg, #3bd18e, #2989ff);
+    box-shadow: 0 18px 42px rgba(49, 186, 144, 0.28), 0 0 0 10px rgba(72, 212, 158, 0.06);
+}
+
+.registration-modal.is-error .registration-modal-icon {
+    background: linear-gradient(135deg, #ff6b7c, #ff8a55);
+    box-shadow: 0 18px 42px rgba(255, 107, 124, 0.24), 0 0 0 10px rgba(255, 107, 124, 0.06);
+}
+
+.registration-modal-kicker {
+    margin-bottom: 10px;
+    color: #8ab8ff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.registration-modal-card h2 {
+    margin: 0;
+    color: #f4f8ff;
+    font-size: clamp(28px, 5vw, 38px);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+}
+
+.registration-modal-message {
+    max-width: 440px;
+    margin: 17px auto 0;
+    color: #9fb0c9;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.registration-modal-name {
+    margin: 13px 0 0;
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+.registration-modal-name::before {
+    content: "Welcome, ";
+    color: #82b2ff;
+    font-weight: 600;
+}
+
+.registration-modal-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.registration-modal-actions[hidden] {
+    display: none;
+}
+
+.registration-modal-actions#registrationFailureActions {
+    grid-template-columns: 1fr;
+}
+
+.registration-modal-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50px;
+    padding: 13px 18px;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.registration-modal-button:hover {
+    transform: translateY(-2px);
+}
+
+.registration-modal-button-primary {
+    color: white;
+    background: linear-gradient(135deg, #397eff, #6e59ff);
+    box-shadow: 0 12px 28px rgba(71, 115, 255, 0.26);
+}
+
+.registration-modal-button-secondary {
+    color: #c7d8f1;
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 1000px) {
+
+    .competition-grid[data-visible-count="3"],
+    .competition-grid[data-visible-count="4"] {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 650px) {
+
+    .competition-grid[data-visible-count="2"],
+    .competition-grid[data-visible-count="3"],
+    .competition-grid[data-visible-count="4"] {
+        grid-template-columns: 1fr;
+    }
+
+    .registration-modal {
+        padding: 14px;
+    }
+
+    .registration-modal-card {
+        padding: 38px 20px 24px;
+        border-radius: 22px;
+    }
+
+    .registration-modal-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .registration-modal-name {
+        font-size: 19px;
+    }
+}
