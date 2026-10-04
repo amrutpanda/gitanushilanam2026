@@ -201,6 +201,11 @@ button, a {
     box-shadow: 0 8px 24px rgba(42, 48, 92, .24);
 }
 
+/* Persistent registration CTA shown only on mobile. */
+.mobile-register-cta {
+    display: none;
+}
+
 .menu-toggle {
     display: none;
     border: 0;
@@ -2309,6 +2314,23 @@ button, a {
 
     .nav {
         min-height: 60px;
+    }
+
+    .mobile-register-cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: auto;
+        margin-right: 6px;
+        padding: 9px 14px;
+        border-radius: 999px;
+        background: var(--indigo);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1;
+        text-decoration: none;
+        box-shadow: 0 6px 18px rgba(42, 48, 92, .22);
     }
 
     .menu-toggle {
