@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin Login | Gitanushilanam 2026</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body class="admin-login-page">
+    <main class="login-shell">
+        <section class="login-card" aria-labelledby="loginTitle">
+            <div class="login-heading">
+                <p class="eyebrow">Gitanushilanam 2026</p>
+                <h1 id="loginTitle">Admin Login</h1>
+                <p>Use the administrator email and password supplied by the organizers.</p>
+            </div>
+
+            <form id="adminLoginForm" class="login-form">
+                <div class="admin-field">
+                    <label for="adminEmail">Email address</label>
+                    <input id="adminEmail" name="email" type="email" autocomplete="username" maxlength="254" required>
+                </div>
+
+                <div class="admin-field">
+                    <label for="adminPassword">Password</label>
+                    <input id="adminPassword" name="password" type="password" autocomplete="current-password" minlength="10" maxlength="256" required>
+                </div>
+
+                <div class="security-note">
+                    <strong>Security reminder:</strong> Access this page only through the official Gitanushilanam website or your saved bookmark.
+                </div>
+
+                <div class="turnstile-wrapper">
+                    <div
+                        class="cf-turnstile"
+                        data-sitekey="0x4AAAAAAE_c66rSIocTR0zk"
+                        data-theme="light"
+                        data-size="normal"
+                        data-action="admin_login"
+                        data-callback="onAdminTurnstileSuccess"
+                        data-expired-callback="onAdminTurnstileExpired"
+                        data-error-callback="onAdminTurnstileError">
+                    </div>
+                </div>
+
+                <button id="loginButton" class="primary-button" type="submit">Sign in</button>
+                <div id="loginStatus" class="status-message" role="status" aria-live="polite"></div>
+            </form>
+
+            <a class="back-link" href="index.html">Back to main website</a>
+        </section>
+    </main>
+
+    <script src="js/admin-login.js?v=20261004-2"></script>
+</body>
+</html>

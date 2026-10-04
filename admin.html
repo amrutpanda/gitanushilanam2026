@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin Dashboard | Gitanushilanam 2026</title>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-dashboard-page">
+    <header class="admin-header">
+        <div>
+            <p class="admin-kicker">Gitanushilanam 2026</p>
+            <h1>Admin Dashboard</h1>
+        </div>
+
+        <div class="admin-account">
+            <span id="adminIdentity">Checking session...</span>
+            <button id="logoutButton" class="secondary-button" type="button">Log out</button>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <section class="page-heading">
+            <div>
+                <p class="eyebrow">Registration overview</p>
+                <h2>Participant registrations</h2>
+                <p>Read-only registration records and filtering.</p>
+            </div>
+        </section>
+
+        <section class="summary-grid" aria-label="Registration summary">
+            <article class="summary-card summary-card-primary">
+                <span>Total registrations</span>
+                <strong id="totalRegistrations">-</strong>
+            </article>
+            <article class="summary-card">
+                <span>Bhagavad Gita Quiz</span>
+                <strong id="quizRegistrations">-</strong>
+            </article>
+            <article class="summary-card">
+                <span>Shloka Recitation</span>
+                <strong id="shlokaRegistrations">-</strong>
+            </article>
+            <article class="summary-card">
+                <span>Animated BG Video</span>
+                <strong id="animatedRegistrations">-</strong>
+            </article>
+            <article class="summary-card">
+                <span>Treasure Hunt</span>
+                <strong id="treasureRegistrations">-</strong>
+            </article>
+        </section>
+
+        <section class="data-panel">
+            <div class="panel-heading">
+                <div>
+                    <p class="eyebrow">Participant database</p>
+                    <h3>Registrations</h3>
+                </div>
+                <div id="resultCount" class="result-count">Loading...</div>
+            </div>
+
+            <form id="filterForm" class="filter-bar">
+                <div class="filter-field filter-search">
+                    <label for="searchFilter">Search</label>
+                    <input id="searchFilter" type="search" placeholder="Name, email, phone or WhatsApp">
+                </div>
+
+                <div class="filter-field">
+                    <label for="competitionFilter">Competition</label>
+                    <select id="competitionFilter">
+                        <option value="">All competitions</option>
+                        <option value="bhagavad_gita_quiz">Bhagavad Gita Quiz</option>
+                        <option value="shloka_recitation">Shloka Recitation</option>
+                        <option value="animated_bg_video">Animated BG Video</option>
+                        <option value="treasure_hunt">Treasure Hunt</option>
+                    </select>
+                </div>
+
+                <div class="filter-field">
+                    <label for="countryFilter">Country</label>
+                    <select id="countryFilter">
+                        <option value="">All countries</option>
+                    </select>
+                </div>
+
+                <div class="filter-field">
+                    <label for="stateFilter">State / Province</label>
+                    <select id="stateFilter">
+                        <option value="">All states</option>
+                    </select>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="primary-button compact-button" type="submit">Apply</button>
+                    <button id="clearFiltersButton" class="secondary-button compact-button" type="button">Clear</button>
+                </div>
+            </form>
+
+            <div id="dashboardStatus" class="dashboard-status" role="status" aria-live="polite"></div>
+
+            <div class="table-wrap">
+                <table class="registration-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Contact</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>Institution / Organization</th>
+                            <th>Location</th>
+                            <th>Competitions</th>
+                            <th>Heard From</th>
+                            <th>Registered</th>
+                        </tr>
+                    </thead>
+                    <tbody id="registrationsBody"></tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <button id="previousPageButton" class="secondary-button compact-button" type="button">Previous</button>
+                <span id="pageIndicator">Page 1</span>
+                <button id="nextPageButton" class="secondary-button compact-button" type="button">Next</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/admin.js?v=20261004-2"></script>
+</body>
+</html>
