@@ -37,6 +37,9 @@
     const heroSlides = [...document.querySelectorAll('[data-hero-slide]')];
     const heroDots = [...document.querySelectorAll('[data-hero-dot]')];
     const heroCurrent = document.querySelector('[data-hero-current]');
+    const heroGallery = document.querySelector('[data-hero-gallery]');
+    const heroPrev = document.querySelector('[data-hero-prev]');
+    const heroNext = document.querySelector('[data-hero-next]');
     let heroIndex = 0;
     let heroTimer;
 
@@ -51,7 +54,38 @@
         window.clearInterval(heroTimer);
         heroTimer = window.setInterval(() => showHero(heroIndex + 1), 6200);
     };
+    const addSwipeGesture = (element, onSwipeLeft, onSwipeRight) => {
+        if (!element) return;
+
+        let startX = 0;
+        let startY = 0;
+
+        element.addEventListener('touchstart', (event) => {
+            const touch = event.changedTouches[0];
+            startX = touch.clientX;
+            startY = touch.clientY;
+        }, { passive: true });
+
+        element.addEventListener('touchend', (event) => {
+            const touch = event.changedTouches[0];
+            const deltaX = touch.clientX - startX;
+            const deltaY = touch.clientY - startY;
+
+            if (Math.abs(deltaX) < 45 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+
+            if (deltaX < 0) onSwipeLeft();
+            else onSwipeRight();
+        }, { passive: true });
+    };
+
+    heroPrev?.addEventListener('click', () => { showHero(heroIndex - 1); scheduleHero(); });
+    heroNext?.addEventListener('click', () => { showHero(heroIndex + 1); scheduleHero(); });
     heroDots.forEach((dot, i) => dot.addEventListener('click', () => { showHero(i); scheduleHero(); }));
+    addSwipeGesture(
+        heroGallery,
+        () => { showHero(heroIndex + 1); scheduleHero(); },
+        () => { showHero(heroIndex - 1); scheduleHero(); }
+    );
     showHero(0);
     scheduleHero();
 
@@ -171,6 +205,7 @@
         stage?.addEventListener('mouseleave', () => { paused = false; schedule(); });
         stage?.addEventListener('focusin', () => { paused = true; window.clearTimeout(timer); });
         stage?.addEventListener('focusout', () => { paused = false; schedule(); });
+        addSwipeGesture(stage, () => move(1), () => move(-1));
 
         draw();
         schedule();

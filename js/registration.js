@@ -5,7 +5,9 @@ const API_BASE_URL =
 
 const form = document.getElementById("competitionForm");
 const phone = document.getElementById("phone");
+const phoneCountryCode = document.getElementById("phoneCountryCode");
 const whatsapp = document.getElementById("whatsapp");
+const whatsappCountryCode = document.getElementById("whatsappCountryCode");
 const sameAsPhone = document.getElementById("sameAsPhone");
 const ageInput = document.getElementById("age");
 const participantGroupSelect = document.getElementById("participantGroup");
@@ -80,7 +82,7 @@ const participantGroups = {
 const competitionLabels = {
     bhagavad_gita_quiz: "Bhagavad Gita Quiz",
     shloka_recitation: "Shloka Recitation",
-    animated_bg_video: "Animated BG Video",
+    animated_bg_video: "Three Minute Gita Video Challenge",
     treasure_hunt: "Treasure Hunt"
 };
 
@@ -195,15 +197,143 @@ document.addEventListener("keydown", function (event) {
 });
 
 /* =========================================================
+   PHONE COUNTRY CODES
+
+   Country/state/city data already loads from the browser
+   package below. If that data exposes phone codes, use it to
+   expand these dropdowns. A compact fallback list keeps the
+   country-code selector useful even if the package is offline.
+========================================================= */
+
+const fallbackPhoneCountryCodes = [
+    ["+91", "India"],
+    ["+1", "USA / Canada"],
+    ["+44", "United Kingdom"],
+    ["+971", "United Arab Emirates"],
+    ["+61", "Australia"],
+    ["+65", "Singapore"],
+    ["+64", "New Zealand"],
+    ["+974", "Qatar"],
+    ["+966", "Saudi Arabia"],
+    ["+968", "Oman"],
+    ["+973", "Bahrain"],
+    ["+965", "Kuwait"],
+    ["+977", "Nepal"],
+    ["+880", "Bangladesh"],
+    ["+94", "Sri Lanka"],
+    ["+60", "Malaysia"],
+    ["+62", "Indonesia"],
+    ["+66", "Thailand"],
+    ["+81", "Japan"],
+    ["+82", "South Korea"],
+    ["+49", "Germany"],
+    ["+33", "France"],
+    ["+39", "Italy"],
+    ["+34", "Spain"],
+    ["+31", "Netherlands"],
+    ["+41", "Switzerland"],
+    ["+46", "Sweden"],
+    ["+47", "Norway"],
+    ["+45", "Denmark"],
+    ["+358", "Finland"],
+    ["+353", "Ireland"],
+    ["+27", "South Africa"],
+    ["+230", "Mauritius"],
+    ["+254", "Kenya"],
+    ["+234", "Nigeria"],
+    ["+20", "Egypt"],
+    ["+55", "Brazil"],
+    ["+52", "Mexico"],
+    ["+54", "Argentina"]
+];
+
+function normalizePhoneCode(code) {
+    if (code === null || code === undefined) {
+        return "";
+    }
+
+    const firstCode = String(code).split(",")[0].trim();
+    if (!firstCode) {
+        return "";
+    }
+
+    return firstCode.startsWith("+") ? firstCode : `+${firstCode}`;
+}
+
+function setPhoneCountryCodeOptions(items) {
+    const uniqueItems = new Map();
+
+    fallbackPhoneCountryCodes.forEach(([code, name]) => {
+        uniqueItems.set(`${code}|${name}`, { code, name });
+    });
+
+    items.forEach(country => {
+        const rawCode = country.phonecode ?? country.phoneCode ?? country.dialCode ?? country.dial_code;
+        const code = normalizePhoneCode(rawCode);
+
+        if (code) {
+            uniqueItems.set(`${code}|${country.name}`, { code, name: country.name });
+        }
+    });
+
+    const options = [...uniqueItems.values()].sort((a, b) => {
+        if (a.code === "+91") return -1;
+        if (b.code === "+91") return 1;
+        return a.name.localeCompare(b.name);
+    });
+
+    [phoneCountryCode, whatsappCountryCode].forEach(select => {
+        const previousValue = select.value || "+91";
+        select.innerHTML = "";
+
+        options.forEach(({ code, name }) => {
+            const option = document.createElement("option");
+            option.value = code;
+            option.textContent = `${code} ${name}`;
+            select.appendChild(option);
+        });
+
+        select.value = [...select.options].some(option => option.value === previousValue)
+            ? previousValue
+            : "+91";
+    });
+}
+
+function buildInternationalPhone(countryCodeSelect, numberInput) {
+    const number = numberInput.value.trim();
+
+    if (!number) {
+        return "";
+    }
+
+    if (number.startsWith("+")) {
+        return number;
+    }
+
+    return `${countryCodeSelect.value} ${number}`.trim();
+}
+
+setPhoneCountryCodeOptions([]);
+
+/* =========================================================
    WHATSAPP NUMBER
 ========================================================= */
 
 sameAsPhone.addEventListener("change", function () {
     if (this.checked) {
+        whatsappCountryCode.value = phoneCountryCode.value;
         whatsapp.value = phone.value;
+        whatsappCountryCode.disabled = true;
         whatsapp.readOnly = true;
     } else {
+        whatsappCountryCode.disabled = false;
         whatsapp.readOnly = false;
+    }
+});
+
+phoneCountryCode.addEventListener("change", function () {
+    if (sameAsPhone.checked) {
+        whatsappCountryCode.value = phoneCountryCode.value;
     }
 });
 
@@ -311,6 +441,7 @@ async function loadCountries() {
         const { getCountries } = await getLocationDataModule();
         const countries = sortByName(await getCountries());
 
+        setPhoneCountryCodeOptions(countries);
         resetLocationSelect(countrySelect, "Select country", false);
 
         countries.forEach(country => {
@@ -676,6 +807,9 @@ window.onTurnstileError = function () {
 ========================================================= */
 
 function resetFormUi() {
+    phoneCountryCode.value = "+91";
+    whatsappCountryCode.value = "+91";
+    whatsappCountryCode.disabled = false;
     whatsapp.readOnly = false;
 
     countryManual.value = "";
@@ -751,8 +885,10 @@ function buildRegistrationData() {
     return {
         name: document.getElementById("name").value.trim(),
         email: document.getElementById("email").value.trim(),
-        phone: phone.value.trim(),
-        whatsapp: whatsapp.value.trim(),
+        phone: buildInternationalPhone(phoneCountryCode, phone),
+        whatsapp: sameAsPhone.checked
+            ? buildInternationalPhone(phoneCountryCode, phone)
+            : buildInternationalPhone(whatsappCountryCode, whatsapp),
         gender: document.getElementById("gender").value,
         age,
         participant_group: participantGroupKey,

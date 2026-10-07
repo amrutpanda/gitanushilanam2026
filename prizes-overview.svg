@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500" viewBox="0 0 1200 1500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#171d47"/>
+      <stop offset="0.55" stop-color="#4b3f85"/>
+      <stop offset="1" stop-color="#b5742f"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.2" cy="0.05" r="0.9">
+      <stop offset="0" stop-color="#f7d58a" stop-opacity="0.54"/>
+      <stop offset="1" stop-color="#f7d58a" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#070a1c" flood-opacity="0.34"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="1500" fill="url(#bg)"/>
+  <rect width="1200" height="1500" fill="url(#glow)"/>
+  <circle cx="1040" cy="160" r="260" fill="#f3c86d" opacity="0.11"/>
+  <circle cx="120" cy="1320" r="330" fill="#8a73d4" opacity="0.13"/>
+  <g opacity="0.18" fill="none" stroke="#fff" stroke-width="2">
+    <circle cx="1020" cy="1280" r="240"/><circle cx="1020" cy="1280" r="180"/><circle cx="1020" cy="1280" r="120"/>
+  </g>
+  <text x="90" y="120" fill="#f2ca78" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" letter-spacing="5">GITANUSHILANAM 2026</text>
+  <text x="90" y="345" fill="#ffffff" font-family="Georgia, serif" font-size="188" font-weight="700">150+</text>
+  <text x="95" y="455" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="800" letter-spacing="7">PRIZES</text>
+  <text x="96" y="525" fill="#e8e7f4" font-family="Arial, Helvetica, sans-serif" font-size="34">Recognition across competition categories</text>
+  <g filter="url(#shadow)">
+    <rect x="90" y="620" width="470" height="145" rx="34" fill="#ffffff" fill-opacity="0.12" stroke="#ffffff" stroke-opacity="0.18"/>
+    <rect x="640" y="620" width="470" height="145" rx="34" fill="#ffffff" fill-opacity="0.12" stroke="#ffffff" stroke-opacity="0.18"/>
+    <rect x="90" y="805" width="470" height="145" rx="34" fill="#ffffff" fill-opacity="0.12" stroke="#ffffff" stroke-opacity="0.18"/>
+    <rect x="640" y="805" width="470" height="145" rx="34" fill="#ffffff" fill-opacity="0.12" stroke="#ffffff" stroke-opacity="0.18"/>
+  </g>
+  <text x="135" y="680" fill="#f2ca78" font-family="Arial" font-size="25" font-weight="700">PREMIUM TECH</text>
+  <text x="135" y="730" fill="#fff" font-family="Georgia, serif" font-size="42">Apple iPads</text>
+  <text x="685" y="680" fill="#f2ca78" font-family="Arial" font-size="25" font-weight="700">ELECTRIC MOBILITY</text>
+  <text x="685" y="730" fill="#fff" font-family="Georgia, serif" font-size="42">Motovolt E-Bike</text>
+  <text x="135" y="865" fill="#f2ca78" font-family="Arial" font-size="25" font-weight="700">CREATIVE GEAR</text>
+  <text x="135" y="915" fill="#fff" font-family="Georgia, serif" font-size="42">DSLR Cameras</text>
+  <text x="685" y="865" fill="#f2ca78" font-family="Arial" font-size="25" font-weight="700">AND MUCH MORE</text>
+  <text x="685" y="915" fill="#fff" font-family="Georgia, serif" font-size="39">Watches · Audio · More</text>
+  <line x1="90" y1="1055" x2="1110" y2="1055" stroke="#f2ca78" stroke-opacity="0.45"/>
+  <text x="90" y="1145" fill="#ffffff" font-family="Georgia, serif" font-size="55">Every participant is recognized.</text>
+  <text x="90" y="1225" fill="#e6e4ef" font-family="Arial" font-size="34">Certificates for all participants</text>
+  <text x="90" y="1280" fill="#e6e4ef" font-family="Arial" font-size="34">Free Vrindavan trip for the Top 50</text>
+  <text x="90" y="1410" fill="#f2ca78" font-family="Arial" font-size="26" font-weight="700" letter-spacing="3">LEARN THE GITA · LIVE ITS WISDOM</text>
+</svg>

@@ -1276,3 +1276,44 @@ body.modal-open {
     line-height: 1.35;
     cursor: pointer;
 }
+
+
+/* =========================================================
+   PHONE / WHATSAPP COUNTRY CODE SELECTORS
+========================================================= */
+
+.phone-number-group {
+    display: grid;
+    grid-template-columns: minmax(118px, 0.42fr) minmax(0, 1fr);
+    gap: 9px;
+    align-items: stretch;
+}
+
+.phone-number-group .country-code-select,
+.phone-number-group input {
+    min-width: 0;
+}
+
+.phone-number-group .country-code-select {
+    padding-left: 11px;
+    padding-right: 10px;
+    font-size: 13px;
+}
+
+.phone-number-group .country-code-select:disabled {
+    opacity: .72;
+    cursor: not-allowed;
+}
+
+@media (max-width: 420px) {
+    .phone-number-group {
+        grid-template-columns: minmax(105px, 0.44fr) minmax(0, 1fr);
+        gap: 7px;
+    }
+
+    .phone-number-group .country-code-select {
+        padding-left: 9px;
+        padding-right: 7px;
+        font-size: 12px;
+    }
+}

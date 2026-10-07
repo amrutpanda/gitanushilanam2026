@@ -141,14 +141,24 @@
 
                         <div class="field">
                             <label for="phone">Phone Number <span class="required">*</span></label>
-                            <input id="phone" name="phone" type="tel" placeholder="+91 98765 43210" required>
+                            <div class="phone-number-group">
+                                <select id="phoneCountryCode" class="country-code-select" aria-label="Phone country code">
+                                    <option value="+91" selected>+91 India</option>
+                                </select>
+                                <input id="phone" name="phone" type="tel" placeholder="98765 43210" required>
+                            </div>
                         </div>
 
                         <div class="field">
 
                             <label for="whatsapp">WhatsApp Number <span class="required">*</span></label>
 
-                            <input id="whatsapp" name="whatsapp" type="tel" placeholder="+91 98765 43210" required>
+                            <div class="phone-number-group">
+                                <select id="whatsappCountryCode" class="country-code-select" aria-label="WhatsApp country code">
+                                    <option value="+91" selected>+91 India</option>
+                                </select>
+                                <input id="whatsapp" name="whatsapp" type="tel" placeholder="98765 43210" required>
+                            </div>
 
                             <div class="same-number">
                                 <input id="sameAsPhone" type="checkbox">
@@ -299,7 +309,7 @@
 
                         </label>
 
-                        <!-- Animated BG Video -->
+                        <!-- Three Minute Gita Video Challenge -->
 
                         <label class="competition-card" data-competition-card>
 
@@ -309,7 +319,7 @@
 
                             <div class="competition-icon">🎬</div>
 
-                            <h4>Animated BG Video</h4>
+                            <h4>Three Minute Gita Video Challenge</h4>
 
                             <p>Create an engaging animated video inspired by themes and stories from the Bhagavad Gita.</p>
 
@@ -433,7 +443,7 @@
          JAVASCRIPT
     ========================================================== -->
 
-    <script src="js/registration.js?v=20261004-4"></script>
+    <script src="js/registration.js?v=20261007-1"></script>
 
 </body>
 
