@@ -1317,3 +1317,18 @@ body.modal-open {
         font-size: 12px;
     }
 }
+/* Keep guide links outside checkbox labels to preserve card selection behavior. */
+.competition-guide-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    margin: 18px 0 24px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(77, 141, 255, .06);
+}
+.competition-guide-links strong, .competition-guide-links small { flex-basis: 100%; }
+.competition-guide-links a { color: #a8c8ff; text-decoration: underline; text-underline-offset: 3px; }
+.competition-guide-links small { color: var(--text-soft); }
+.competition-guide-links a:focus-visible { outline: 3px solid #6957aa; outline-offset: 4px; }

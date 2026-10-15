@@ -82,7 +82,7 @@ const participantGroups = {
 const competitionLabels = {
     bhagavad_gita_quiz: "Bhagavad Gita Quiz",
     shloka_recitation: "Shloka Recitation",
-    animated_bg_video: "Three Minute Gita Video Challenge",
+    animated_bg_video: "Gita Reel Making Challenge",
     treasure_hunt: "Treasure Hunt"
 };
 

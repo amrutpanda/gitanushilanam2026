@@ -51,6 +51,7 @@
         if (heroCurrent) heroCurrent.textContent = String(heroIndex + 1).padStart(2, '0');
     };
     const scheduleHero = () => {
+        if (!heroSlides.length) return;
         window.clearInterval(heroTimer);
         heroTimer = window.setInterval(() => showHero(heroIndex + 1), 6200);
     };
@@ -103,6 +104,7 @@
         announcementDots.forEach((dot, i) => dot.classList.toggle('is-active', i === announcementIndex));
     };
     const scheduleAnnouncement = () => {
+        if (!announcementSlides.length) return;
         window.clearInterval(announcementTimer);
         announcementTimer = window.setInterval(() => showAnnouncement(announcementIndex + 1), 5200);
     };
@@ -112,66 +114,19 @@
     showAnnouncement(0);
     scheduleAnnouncement();
 
-    const detailTabs = [...document.querySelectorAll('[data-detail-tab]')];
-    const detailPanels = [...document.querySelectorAll('[data-detail-panel]')];
-    const detailsOverlay = document.querySelector('#details');
-    let detailReturnFocus = null;
-
-    const activateDetail = (name) => {
-        const panel = detailPanels.find((item) => item.dataset.detailPanel === name);
-        if (!panel) return;
-        detailTabs.forEach((tab) => {
-            const active = tab.dataset.detailTab === name;
-            tab.classList.toggle('is-active', active);
-            tab.setAttribute('aria-selected', String(active));
-        });
-        detailPanels.forEach((item) => {
-            const active = item.dataset.detailPanel === name;
-            item.classList.toggle('is-active', active);
-            item.hidden = !active;
-        });
+    // Preserve destinations of links shared before the separate guides existed.
+    const legacyGuides = {
+        '#quiz-panel': 'quiz.html',
+        '#recitation-panel': 'shloka-recitation.html',
+        '#animated-panel': 'gita-reel-challenge.html',
+        '#treasure-panel': 'treasure-hunt.html'
     };
-
-    const openDetails = (name = 'quiz', trigger = null) => {
-        if (!detailsOverlay) return;
-        activateDetail(name);
-        detailReturnFocus = trigger || document.activeElement;
-        detailsOverlay.classList.add('is-open');
-        detailsOverlay.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('detail-open');
-        detailsOverlay.scrollTop = 0;
-        window.setTimeout(() => detailsOverlay.querySelector('[data-close-details]')?.focus(), 360);
+    const followLegacyGuide = () => {
+        const destination = legacyGuides[window.location.hash];
+        if (destination) window.location.replace(destination);
     };
-
-    const closeDetails = () => {
-        if (!detailsOverlay?.classList.contains('is-open')) return;
-        detailsOverlay.classList.remove('is-open');
-        detailsOverlay.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('detail-open');
-        window.setTimeout(() => {
-            if (detailReturnFocus && typeof detailReturnFocus.focus === 'function') detailReturnFocus.focus();
-            detailReturnFocus = null;
-        }, 420);
-    };
-
-    detailTabs.forEach((tab) => tab.addEventListener('click', () => activateDetail(tab.dataset.detailTab)));
-
-    document.querySelectorAll('[data-select-detail]').forEach((link) => link.addEventListener('click', (event) => {
-        event.preventDefault();
-        openDetails(link.dataset.selectDetail || 'quiz', link);
-    }));
-
-    document.querySelectorAll('[data-open-details]').forEach((trigger) => trigger.addEventListener('click', (event) => {
-        event.preventDefault();
-        openDetails(trigger.dataset.openDetails || 'quiz', trigger);
-    }));
-
-    document.querySelectorAll('[data-close-details]').forEach((button) => button.addEventListener('click', closeDetails));
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && detailsOverlay?.classList.contains('is-open')) closeDetails();
-    });
-
-    activateDetail('quiz');
+    followLegacyGuide();
+    window.addEventListener('hashchange', followLegacyGuide);
 
     const createTimedCarousel = ({ cardSelector, currentSelector, prevSelector, nextSelector, stageSelector, interval = 5000, render }) => {
         const cards = [...document.querySelectorAll(cardSelector)];

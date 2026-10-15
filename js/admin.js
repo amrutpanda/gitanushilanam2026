@@ -104,7 +104,7 @@ const participantGroupLabels = {
 const competitionDefinitions = [
     ["bhagavad_gita_quiz", "Bhagavad Gita Quiz", "Quiz"],
     ["shloka_recitation", "Shloka Recitation", "Shloka"],
-    ["animated_bg_video", "Animated BG Video", "Animated"],
+    ["animated_bg_video", "Gita Reel Making Challenge", "Reel"],
     ["treasure_hunt", "Treasure Hunt", "Treasure Hunt"]
 ];
 
@@ -123,7 +123,7 @@ const auditFieldLabels = {
     heard_from: "Heard From",
     bhagavad_gita_quiz: "Bhagavad Gita Quiz",
     shloka_recitation: "Shloka Recitation",
-    animated_bg_video: "Animated BG Video",
+    animated_bg_video: "Gita Reel Making Challenge",
     treasure_hunt: "Treasure Hunt"
 };
 
@@ -503,7 +503,7 @@ async function loadSummary() {
             value: result.summary.shloka_recitation
         },
         {
-            label: "Animated BG Video",
+            label: "Gita Reel Making Challenge",
             value: result.summary.animated_bg_video
         },
         {

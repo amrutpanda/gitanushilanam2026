@@ -1,0 +1,99 @@
+/* Shared, readable layouts for the four standalone competition guides. */
+body.competition-guide {
+    margin: 0;
+    color: #202943;
+    background: radial-gradient(ellipse at 95% 12%, #f5e6c8 0, transparent 38%), #fbf8f1;
+    line-height: 1.75;
+}
+
+.competition-guide .guide-main { padding-top: 125px; padding-bottom: 80px; }
+.competition-guide :is(h1, h2, h3, p) { margin-top: 0; }
+.competition-guide :is(a, button):focus-visible { outline: 3px solid #6957aa; outline-offset: 5px; }
+.guide-breadcrumb { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 12px; color: #59627b; margin-bottom: 28px; }
+.guide-breadcrumb a:hover, .guide-footer a:hover { text-decoration: underline; }
+.guide-switcher { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+.guide-switcher a { padding: 10px 18px; border-radius: 30px; border: 1px solid var(--line); font-size: 13px; font-weight: 700; background: #fffdf8; }
+.guide-switcher a:hover { border-color: #6957aa; }
+.guide-switcher a[aria-current="page"] { background: #29315f; color: #fff; border-color: #29315f; }
+.guide-hero { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(270px, 1fr); gap: 64px; align-items: center; padding: 58px 0 64px; }
+.guide-eyebrow { color: #87601e; font: 800 11px/1.5 Manrope, sans-serif; text-transform: uppercase; letter-spacing: .14em; margin-bottom: 18px; }
+.competition-guide h1 { font: 500 clamp(40px, 5.3vw, 70px)/1.06 "Libre Caslon Display", Georgia, serif; letter-spacing: -.025em; margin-bottom: 24px; text-wrap: balance; }
+.guide-tagline { font-size: 20px; font-weight: 700; line-height: 1.4; margin-bottom: 12px; }
+.guide-intro { color: #59627b; max-width: 56ch; }
+.guide-register { display: inline-flex; align-items: center; justify-content: center; gap: 24px; background: #29315f; color: #fff; padding: 13px 22px; border-radius: 12px; font-weight: 700; font-size: 14px; box-shadow: 0 8px 24px #29315f1a; }
+.guide-register:hover { background: #4c3c86; }
+.competition-guide .guide-updated { margin: 18px 0 0; color: #59627b; font-size: 12px; }
+.guide-facts { background: #fffdf8; border: 1px solid #decda9; border-top: 4px solid #d79831; border-radius: 18px; padding: 28px; box-shadow: 0 18px 50px #6850240a; }
+.guide-facts dl { margin: 0; }
+.guide-facts dl > div { padding: 15px 0; border-top: 1px solid var(--line); }
+.guide-facts dl > div:last-child { padding-bottom: 0; }
+.guide-facts dt { color: #59627b; font-size: 12px; }
+.guide-facts dd { margin: 2px 0 0; font-size: 17px; font-weight: 700; line-height: 1.5; }
+.guide-layout { display: grid; grid-template-columns: 245px minmax(0, 1fr); gap: 64px; align-items: start; }
+.guide-sidebar { position: sticky; top: 120px; padding-top: 22px; font-size: 13px; }
+.guide-sidebar nav { border-left: 2px solid #dfd5bf; padding-left: 20px; margin-bottom: 30px; }
+.guide-sidebar nav a { display: block; padding: 8px 0; color: #59627b; }
+.guide-sidebar a:hover { color: #4c3c86; text-decoration: underline; }
+.guide-sidebar > p { margin-bottom: 0; font-weight: 700; }
+.guide-content { min-width: 0; }
+.guide-section { scroll-margin-top: 120px; background: #fffdf8; border: 1px solid var(--line); border-radius: 20px; padding: 36px; margin-bottom: 24px; }
+.competition-guide h2 { font: 500 clamp(28px, 3vw, 36px)/1.15 "Libre Caslon Display", Georgia, serif; margin-bottom: 24px; }
+.competition-guide h3 { font-size: 18px; line-height: 1.4; margin-bottom: 12px; }
+.guide-section p:last-child { margin-bottom: 0; }
+.guide-section ul { padding-left: 22px; }
+.guide-section li { padding-left: 4px; margin-bottom: 8px; }
+.guide-section a { color: #51418a; text-decoration: underline; text-underline-offset: 3px; }
+.guide-round + .guide-round { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 28px; }
+.guide-step { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: #87601e; font-weight: 800; margin-bottom: 8px; }
+.guide-notice { background: #f5f0e4; border-left: 3px solid #d79831; border-radius: 0 10px 10px 0; padding: 16px 18px; font-size: 14px; }
+.guide-resource-links { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+.guide-resource-links a { padding: 8px 16px; background: #f0edf7; border-radius: 8px; }
+.guide-syllabus { padding: 24px 0; border-top: 1px solid var(--line); }
+.guide-verses { line-height: 1.9; }
+.guide-ready { border-radius: 20px; padding: 36px; background: #29315f; color: #fff; }
+.guide-ready .guide-eyebrow { color: #f1bd62; }
+.guide-ready .guide-register { background: #f1bd62; color: #202943; }
+.guide-ready .guide-register:hover { background: #ffce7b; }
+.guide-footer { background: #192044; color: #fff; padding: 42px 0; font-size: 14px; }
+.guide-footer p { margin: 16px 0 0; }
+.guide-footer a { overflow-wrap: anywhere; }
+
+@media (max-width: 900px) {
+    .guide-hero { gap: 28px; grid-template-columns: minmax(0, 1.3fr) minmax(250px, 1fr); }
+    .guide-layout { grid-template-columns: 1fr; gap: 24px; }
+    .guide-sidebar { position: static; padding: 0; }
+    .guide-sidebar nav { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-bottom: 16px; }
+    .guide-sidebar nav .guide-eyebrow { width: 100%; margin-bottom: 0; }
+    .guide-sidebar > p, .guide-sidebar > a { display: none; }
+}
+
+@media (max-width: 600px) {
+    .competition-guide .guide-main { padding-top: 112px; padding-bottom: 40px; }
+    .guide-breadcrumb { font-size: 11px; margin-bottom: 20px; }
+    .guide-switcher { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .guide-switcher a { padding: 10px; font-size: 12px; text-align: center; border-radius: 12px; display: grid; place-items: center; }
+    .guide-hero { grid-template-columns: 1fr; gap: 28px; padding: 32px 0; }
+    .guide-facts { padding: 22px; }
+    .guide-section, .guide-ready { padding: 24px 20px; border-radius: 16px; }
+    .guide-section { scroll-margin-top: 110px; }
+    .guide-sidebar nav { gap: 0 18px; }
+    .guide-tagline { font-size: 18px; }
+    .guide-register { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+}
+
+@media print {
+    body.competition-guide { background: #fff; color: #000; }
+    .competition-guide .site-header, .guide-switcher, .guide-sidebar, .guide-ready, .guide-register, .skip-link { display: none; }
+    .competition-guide .guide-main { padding: 0; width: 100%; }
+    .guide-layout, .guide-hero { display: block; }
+    .guide-hero { padding: 0 0 20px; }
+    .guide-facts { margin-top: 20px; box-shadow: none; }
+    .guide-section { padding: 20px 0; border: 0; }
+    .guide-round, .guide-syllabus { break-inside: avoid; }
+    .guide-footer { background: #fff; color: #000; border-top: 1px solid #aaa; padding: 20px 0; }
+    .guide-section a { color: #000; }
+}
