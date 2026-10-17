@@ -5,6 +5,7 @@ const ADMIN_API_BASE_URL =
 
 const ADMIN_SESSION_STORAGE_KEY = "gitanushilanam_admin_session";
 const PAGE_SIZE = 30;
+const MAX_EMAIL_RECIPIENTS = 100;
 
 const LOCATION_DATA_MODULE_URL =
     "https://cdn.jsdelivr.net/npm/@countrystatecity/countries-browser@1.0.4/+esm";
@@ -33,6 +34,15 @@ const previousPageButton = document.getElementById("previousPageButton");
 const nextPageButton = document.getElementById("nextPageButton");
 const pageIndicator = document.getElementById("pageIndicator");
 const registrationPanelDescription = document.getElementById("registrationPanelDescription");
+const selectCurrentPageCheckbox = document.getElementById("selectCurrentPageCheckbox");
+
+const emailForm = document.getElementById("emailForm");
+const emailSubject = document.getElementById("emailSubject");
+const emailMessage = document.getElementById("emailMessage");
+const emailSelectedCount = document.getElementById("emailSelectedCount");
+const emailFormStatus = document.getElementById("emailFormStatus");
+const clearEmailSelectionButton = document.getElementById("clearEmailSelectionButton");
+const sendEmailButton = document.getElementById("sendEmailButton");
 
 const participantGroupChart = document.getElementById("participantGroupChart");
 const competitionChart = document.getElementById("competitionChart");
@@ -133,6 +143,10 @@ let currentPage = 1;
 let totalPages = 1;
 let currentTotal = 0;
 let registrationCache = new Map();
+let currentPageRegistrationIds = [];
+const selectedRegistrationIds = new Set();
+let pendingEmailRequestId = null;
+let emailSendInProgress = false;
 let locationDataModulePromise = null;
 let editSelectedCountryCode = "";
 let editSelectedStateCode = "";
@@ -156,6 +170,12 @@ function showEditStatus(message, state = "") {
     editFormStatus.textContent = message;
     editFormStatus.classList.toggle("is-error", state === "error");
     editFormStatus.classList.toggle("is-success", state === "success");
+}
+
+function showEmailStatus(message, state = "") {
+    emailFormStatus.textContent = message;
+    emailFormStatus.classList.toggle("is-error", state === "error");
+    emailFormStatus.classList.toggle("is-success", state === "success");
 }
 
 async function adminFetch(path, options = {}) {
@@ -559,6 +579,56 @@ async function loadFilterOptions() {
     replaceSelectOptions(stateFilter, result.states);
 }
 
+function updateEmailSelectionUi() {
+    const selectedCount = selectedRegistrationIds.size;
+    const selectedOnPage = currentPageRegistrationIds.filter(id =>
+        selectedRegistrationIds.has(id)
+    ).length;
+
+    emailSelectedCount.textContent = `${selectedCount} participant${selectedCount === 1 ? "" : "s"} selected`;
+    clearEmailSelectionButton.disabled = selectedCount === 0 || emailSendInProgress;
+    sendEmailButton.disabled = selectedCount === 0 || emailSendInProgress;
+    sendEmailButton.textContent = emailSendInProgress
+        ? "Sending..."
+        : `Send to ${selectedCount} participant${selectedCount === 1 ? "" : "s"}`;
+
+    if (selectCurrentPageCheckbox) {
+        selectCurrentPageCheckbox.checked = currentPageRegistrationIds.length > 0
+            && selectedOnPage === currentPageRegistrationIds.length;
+        selectCurrentPageCheckbox.indeterminate = selectedOnPage > 0
+            && selectedOnPage < currentPageRegistrationIds.length;
+        selectCurrentPageCheckbox.disabled = currentPageRegistrationIds.length === 0
+            || emailSendInProgress;
+    }
+
+    registrationsBody.querySelectorAll(".registration-email-checkbox").forEach(checkbox => {
+        const registrationId = Number(checkbox.dataset.registrationId);
+        checkbox.checked = selectedRegistrationIds.has(registrationId);
+        checkbox.disabled = emailSendInProgress;
+    });
+}
+
+function setParticipantSelected(registrationId, selected) {
+    if (selected && !selectedRegistrationIds.has(registrationId)) {
+        if (selectedRegistrationIds.size >= MAX_EMAIL_RECIPIENTS) {
+            showEmailStatus(
+                `You can send to at most ${MAX_EMAIL_RECIPIENTS} participants at a time.`,
+                "error"
+            );
+            return false;
+        }
+
+        selectedRegistrationIds.add(registrationId);
+    } else if (!selected) {
+        selectedRegistrationIds.delete(registrationId);
+    }
+
+    pendingEmailRequestId = null;
+    showEmailStatus("");
+    updateEmailSelectionUi();
+    return true;
+}
+
 /* =========================================================
    REGISTRATION TABLE
 ========================================================= */
@@ -585,17 +655,19 @@ function renderCompetitionBadges(registration) {
 function renderRegistrations(registrations) {
     registrationsBody.innerHTML = "";
     registrationCache = new Map();
+    currentPageRegistrationIds = registrations.map(registration => Number(registration.id));
 
     if (!registrations.length) {
         const row = document.createElement("tr");
         row.className = "empty-row";
 
         const cell = document.createElement("td");
-        cell.colSpan = isSuperAdmin ? 12 : 11;
+        cell.colSpan = isSuperAdmin ? 13 : 11;
         cell.textContent = "No registrations match the selected filters.";
 
         row.appendChild(cell);
         registrationsBody.appendChild(row);
+        updateEmailSelectionUi();
         return;
     }
 
@@ -606,6 +678,23 @@ function renderRegistrations(registrations) {
 
         if (Number(registration.needs_review) === 1) {
             row.classList.add("needs-review-row");
+        }
+
+        if (isSuperAdmin) {
+            const selectionCell = document.createElement("td");
+            selectionCell.className = "selection-column";
+
+            const selectionCheckbox = document.createElement("input");
+            selectionCheckbox.type = "checkbox";
+            selectionCheckbox.className = "registration-email-checkbox";
+            selectionCheckbox.checked = selectedRegistrationIds.has(Number(registration.id));
+            selectionCheckbox.dataset.registrationId = String(registration.id);
+            selectionCheckbox.setAttribute(
+                "aria-label",
+                `Select ${registration.name || "participant"} for email`
+            );
+            selectionCell.appendChild(selectionCheckbox);
+            row.appendChild(selectionCell);
         }
 
         const nameCell = document.createElement("td");
@@ -689,6 +778,8 @@ function renderRegistrations(registrations) {
 
         registrationsBody.appendChild(row);
     });
+
+    updateEmailSelectionUi();
 }
 
 function buildRegistrationQuery(page) {
@@ -763,6 +854,163 @@ async function loadRegistrations(page = 1) {
         );
     }
 }
+
+/* =========================================================
+   PARTICIPANT EMAIL
+========================================================= */
+
+registrationsBody.addEventListener("change", function (event) {
+    const checkbox = event.target.closest(".registration-email-checkbox");
+
+    if (!checkbox || !isSuperAdmin) {
+        return;
+    }
+
+    const registrationId = Number(checkbox.dataset.registrationId);
+    const selectionChanged = setParticipantSelected(registrationId, checkbox.checked);
+
+    if (!selectionChanged) {
+        checkbox.checked = false;
+    }
+});
+
+selectCurrentPageCheckbox.addEventListener("change", function () {
+    if (!isSuperAdmin) {
+        return;
+    }
+
+    if (selectCurrentPageCheckbox.checked) {
+        const availableSlots = MAX_EMAIL_RECIPIENTS - selectedRegistrationIds.size;
+        const unselectedIds = currentPageRegistrationIds.filter(id =>
+            !selectedRegistrationIds.has(id)
+        );
+
+        unselectedIds.slice(0, availableSlots).forEach(id => {
+            selectedRegistrationIds.add(id);
+        });
+
+        if (unselectedIds.length > availableSlots) {
+            showEmailStatus(
+                `Only the first ${MAX_EMAIL_RECIPIENTS} participants were selected.`,
+                "error"
+            );
+        } else {
+            showEmailStatus("");
+        }
+    } else {
+        currentPageRegistrationIds.forEach(id => {
+            selectedRegistrationIds.delete(id);
+        });
+        showEmailStatus("");
+    }
+
+    pendingEmailRequestId = null;
+    updateEmailSelectionUi();
+});
+
+clearEmailSelectionButton.addEventListener("click", function () {
+    selectedRegistrationIds.clear();
+    pendingEmailRequestId = null;
+    showEmailStatus("");
+    updateEmailSelectionUi();
+});
+
+document.querySelectorAll("[data-email-placeholder]").forEach(button => {
+    button.addEventListener("click", function () {
+        const placeholder = button.dataset.emailPlaceholder || "";
+        const start = emailMessage.selectionStart ?? emailMessage.value.length;
+        const end = emailMessage.selectionEnd ?? start;
+
+        emailMessage.setRangeText(placeholder, start, end, "end");
+        emailMessage.focus();
+        pendingEmailRequestId = null;
+    });
+});
+
+[emailSubject, emailMessage].forEach(field => {
+    field.addEventListener("input", function () {
+        pendingEmailRequestId = null;
+        showEmailStatus("");
+    });
+});
+
+emailForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    if (!isSuperAdmin) {
+        showEmailStatus("Only a Super Admin can send participant emails.", "error");
+        return;
+    }
+
+    const registrationIds = [...selectedRegistrationIds];
+    const subject = emailSubject.value.trim();
+    const message = emailMessage.value.trim();
+
+    if (registrationIds.length === 0) {
+        showEmailStatus("Select at least one participant from the table.", "error");
+        return;
+    }
+
+    if (!subject || !message) {
+        showEmailStatus("Enter both an email subject and message.", "error");
+        return;
+    }
+
+    const confirmed = window.confirm(
+        `Send this personalized email to ${registrationIds.length} participant${registrationIds.length === 1 ? "" : "s"}?`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    pendingEmailRequestId = pendingEmailRequestId || crypto.randomUUID();
+    emailSendInProgress = true;
+    showEmailStatus("Sending personalized emails...");
+    updateEmailSelectionUi();
+
+    try {
+        const response = await adminFetch("/admin/api/emails/send", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                registration_ids: registrationIds,
+                subject,
+                message,
+                request_id: pendingEmailRequestId
+            })
+        });
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "Unable to send participant emails.");
+        }
+
+        selectedRegistrationIds.clear();
+        pendingEmailRequestId = null;
+        showEmailStatus(
+            result.already_sent
+                ? `This request was already completed for ${result.sent_count} participants.`
+                : `Email accepted for delivery to ${result.sent_count} participants.`,
+            "success"
+        );
+
+        loadAuditLog().catch(error => {
+            console.warn("Email sent, but audit refresh failed:", error);
+        });
+    } catch (error) {
+        console.error("Participant email error:", error);
+        showEmailStatus(
+            error instanceof Error ? error.message : "Unable to send participant emails.",
+            "error"
+        );
+    } finally {
+        emailSendInProgress = false;
+        updateEmailSelectionUi();
+    }
+});
 
 /* =========================================================
    SUPER ADMIN DATA REVIEW SHORTCUTS
@@ -1476,6 +1724,8 @@ async function loadAuditLog() {
                 "td",
                 entry.action === "registration_update"
                     ? "Registration updated"
+                    : entry.action === "participant_email_sent"
+                        ? "Participant email sent"
                     : entry.action
             )
         );
@@ -1485,14 +1735,38 @@ async function loadAuditLog() {
                 "td",
                 entry.entity_type === "registration"
                     ? `Registration #${entry.entity_id}`
+                    : entry.entity_type === "email_batch"
+                        ? "Email batch"
                     : `${entry.entity_type} ${entry.entity_id || ""}`.trim()
             )
         );
 
         const changesCell = document.createElement("td");
-        changesCell.appendChild(
-            renderAuditChanges(entry.old_values, entry.new_values)
-        );
+        if (entry.action === "participant_email_sent") {
+            const details = parseAuditJson(entry.new_values);
+            const recipientCount = Number(details.recipient_count) || 0;
+            const summary = document.createElement("div");
+            summary.className = "audit-change-list";
+            summary.appendChild(
+                createTextElement(
+                    "div",
+                    `${recipientCount} recipient${recipientCount === 1 ? "" : "s"}`,
+                    "audit-change-item"
+                )
+            );
+            summary.appendChild(
+                createTextElement(
+                    "div",
+                    details.subject || "No subject recorded",
+                    "muted-cell"
+                )
+            );
+            changesCell.appendChild(summary);
+        } else {
+            changesCell.appendChild(
+                renderAuditChanges(entry.old_values, entry.new_values)
+            );
+        }
         row.appendChild(changesCell);
         auditBody.appendChild(row);
     });

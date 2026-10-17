@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Admin Dashboard | Gitanushilanam 2026</title>
-    <link rel="stylesheet" href="css/admin.css?v=20261015-1">
+    <link rel="stylesheet" href="css/admin.css?v=20261018-1">
 </head>
 <body class="admin-dashboard-page">
 
@@ -38,6 +38,7 @@
     <nav class="admin-section-nav" aria-label="Admin sections">
         <a href="#dashboard">Dashboard</a>
         <a href="#registrations">Registrations</a>
+        <a href="#emailParticipants" data-super-admin-only hidden>Email Participants</a>
         <a href="#dataReview" data-super-admin-only hidden>Data Review</a>
         <a href="#adminManagement" data-super-admin-only hidden>Admin Management</a>
         <a href="#auditLog" data-super-admin-only hidden>Audit Log</a>
@@ -289,6 +290,13 @@
                 <table class="registration-table">
                     <thead>
                         <tr>
+                            <th class="selection-column" data-super-admin-only hidden>
+                                <input
+                                    id="selectCurrentPageCheckbox"
+                                    type="checkbox"
+                                    aria-label="Select all participants on this page"
+                                >
+                            </th>
                             <th>Name</th>
                             <th>Contact</th>
                             <th>Age</th>
@@ -326,6 +334,103 @@
                 >
                     Next
                 </button>
+            </div>
+        </section>
+
+        <!-- =====================================================
+             PARTICIPANT EMAIL - SUPER ADMIN ONLY
+        ====================================================== -->
+
+        <section
+            id="emailParticipants"
+            class="super-admin-section"
+            data-super-admin-only
+            hidden
+        >
+            <div class="section-heading-row">
+                <div>
+                    <p class="eyebrow">Participant communication</p>
+                    <h2>Email selected participants</h2>
+                    <p>
+                        Compose one message and personalize it for each selected participant.
+                    </p>
+                </div>
+
+                <div id="emailSelectedCount" class="email-selected-count">
+                    0 participants selected
+                </div>
+            </div>
+
+            <div class="data-panel email-composer-panel">
+                <div class="email-selection-bar">
+                    <p>
+                        Select participants using the checkboxes in the registration table.
+                        Selections remain while you move between pages.
+                    </p>
+
+                    <button
+                        id="clearEmailSelectionButton"
+                        class="secondary-button compact-button"
+                        type="button"
+                    >
+                        Clear selection
+                    </button>
+                </div>
+
+                <form id="emailForm" class="email-form">
+                    <div class="field">
+                        <label for="emailSubject">Subject</label>
+                        <input
+                            id="emailSubject"
+                            type="text"
+                            maxlength="200"
+                            value="Gitanushilanam 2026 Announcement"
+                            required
+                        >
+                    </div>
+
+                    <div class="field">
+                        <label for="emailMessage">Message</label>
+                        <textarea id="emailMessage" maxlength="10000" rows="14" required>Hare Krishna {{name}},
+
+We have an important update regarding your Gitanushilanam 2026 registration.
+
+Your registered competitions:
+{{competitions}}
+
+Your WhatsApp groups:
+{{whatsapp_links}}
+
+With regards,
+Gitanushilanam Team</textarea>
+                    </div>
+
+                    <div class="email-placeholder-help">
+                        <strong>Personalization placeholders</strong>
+                        <p>Click a placeholder to insert it at the message cursor.</p>
+                        <div class="email-placeholder-list">
+                            <button type="button" data-email-placeholder="{{name}}">Name</button>
+                            <button type="button" data-email-placeholder="{{participant_group}}">Participant group</button>
+                            <button type="button" data-email-placeholder="{{competitions}}">Competitions</button>
+                            <button type="button" data-email-placeholder="{{whatsapp_links}}">WhatsApp links</button>
+                            <button type="button" data-email-placeholder="{{email}}">Email</button>
+                            <button type="button" data-email-placeholder="{{phone}}">Phone</button>
+                            <button type="button" data-email-placeholder="{{whatsapp}}">WhatsApp number</button>
+                            <button type="button" data-email-placeholder="{{age}}">Age</button>
+                            <button type="button" data-email-placeholder="{{institution}}">Institution</button>
+                            <button type="button" data-email-placeholder="{{location}}">Location</button>
+                        </div>
+                    </div>
+
+                    <div id="emailFormStatus" class="edit-form-status" role="status"></div>
+
+                    <div class="email-form-actions">
+                        <span>Sender: Gitanushilanam &lt;support@gitanushilanam.net&gt;</span>
+                        <button id="sendEmailButton" class="primary-button" type="submit" disabled>
+                            Send to 0 participants
+                        </button>
+                    </div>
+                </form>
             </div>
         </section>
 
@@ -608,6 +713,6 @@
         </section>
     </div>
 
-    <script src="js/admin.js?v=20261015-1"></script>
+    <script src="js/admin.js?v=20261018-1"></script>
 </body>
 </html>

@@ -26,7 +26,8 @@ body {
 
 button,
 input,
-select {
+select,
+textarea {
     font: inherit;
 }
 
@@ -880,6 +881,113 @@ button {
     background: #e4ebff;
 }
 
+.selection-column {
+    width: 42px;
+    min-width: 42px;
+    text-align: center !important;
+}
+
+.selection-column input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary);
+}
+
+/* =========================================================
+   PARTICIPANT EMAIL
+========================================================= */
+
+.email-selected-count {
+    padding: 9px 12px;
+    border: 1px solid #cbd7ff;
+    border-radius: 999px;
+    color: #2447c8;
+    background: #eef3ff;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.email-selection-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-soft);
+}
+
+.email-selection-bar p {
+    margin: 0;
+    color: var(--text-soft);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.email-form {
+    display: grid;
+    gap: 18px;
+    padding: 22px;
+}
+
+.email-form .field textarea {
+    min-height: 260px;
+    resize: vertical;
+    padding: 12px;
+    line-height: 1.6;
+}
+
+.email-placeholder-help {
+    padding: 14px;
+    border: 1px solid #dbe3f0;
+    border-radius: 12px;
+    background: #f8faff;
+}
+
+.email-placeholder-help strong {
+    color: #344054;
+    font-size: 12px;
+}
+
+.email-placeholder-help p {
+    margin: 4px 0 11px;
+    color: var(--text-soft);
+    font-size: 11px;
+}
+
+.email-placeholder-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.email-placeholder-list button {
+    padding: 6px 9px;
+    border: 1px solid #cbd7ff;
+    border-radius: 8px;
+    color: #2447c8;
+    background: #ffffff;
+    font-size: 10px;
+    font-weight: 750;
+}
+
+.email-placeholder-list button:hover {
+    background: #eef3ff;
+}
+
+.email-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding-top: 4px;
+}
+
+.email-form-actions span {
+    color: var(--text-soft);
+    font-size: 11px;
+}
+
 /* =========================================================
    ADMIN USER / AUDIT TABLES
 ========================================================= */
@@ -1069,7 +1177,8 @@ body.modal-open {
 }
 
 .field input,
-.field select {
+.field select,
+.field textarea {
     width: 100%;
     min-height: 43px;
     border: 1px solid #d0d5dd;
@@ -1081,7 +1190,8 @@ body.modal-open {
 }
 
 .field input:focus,
-.field select:focus {
+.field select:focus,
+.field textarea:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(49, 94, 251, 0.1);
 }
@@ -1198,6 +1308,16 @@ body.modal-open {
     .edit-location-grid,
     .edit-competition-grid {
         grid-template-columns: 1fr;
+    }
+
+    .email-selection-bar,
+    .email-form-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .email-form-actions .primary-button {
+        width: 100%;
     }
 
     .admin-modal {
