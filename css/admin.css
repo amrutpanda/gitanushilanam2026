@@ -75,8 +75,23 @@ button {
     background: #f8fafc;
 }
 
+.danger-button {
+    min-height: 42px;
+    border: 1px solid var(--danger);
+    border-radius: 10px;
+    padding: 0 16px;
+    color: #ffffff;
+    background: var(--danger);
+    font-weight: 750;
+}
+
+.danger-button:hover {
+    background: #912018;
+}
+
 .primary-button:disabled,
-.secondary-button:disabled {
+.secondary-button:disabled,
+.danger-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
@@ -1232,6 +1247,43 @@ body.modal-open {
 .check-card input {
     width: 16px;
     height: 16px;
+}
+
+.registration-danger-zone {
+    margin-top: 22px;
+    border: 1px solid #f3c6c2;
+    border-radius: 12px;
+    background: #fff8f7;
+}
+
+.registration-danger-zone summary {
+    padding: 13px 15px;
+    color: #7a271a;
+    font-size: 12px;
+    font-weight: 750;
+    cursor: pointer;
+}
+
+.registration-danger-content {
+    display: grid;
+    gap: 13px;
+    padding: 0 15px 16px;
+}
+
+.registration-danger-content > strong {
+    color: var(--danger);
+    font-size: 14px;
+}
+
+.registration-danger-content > p {
+    margin: -6px 0 0;
+    color: #7a271a;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.registration-danger-content .danger-button {
+    justify-self: start;
 }
 
 .edit-form-status {

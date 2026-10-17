@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Admin Dashboard | Gitanushilanam 2026</title>
-    <link rel="stylesheet" href="css/admin.css?v=20261018-1">
+    <link rel="stylesheet" href="css/admin.css?v=20261018-2">
 </head>
 <body class="admin-dashboard-page">
 
@@ -694,6 +694,40 @@ Gitanushilanam Team</textarea>
                     </div>
                 </section>
 
+                <details id="deleteRegistrationSection" class="registration-danger-zone" hidden>
+                    <summary>Advanced action</summary>
+
+                    <div class="registration-danger-content">
+                        <strong>Delete this participant registration</strong>
+                        <p>
+                            This permanently removes the participant from the active registration
+                            database. A deletion record remains in the Super Admin audit log.
+                        </p>
+
+                        <div class="field">
+                            <label for="deleteRegistrationConfirmation">
+                                Type <span id="deleteRegistrationExpectedEmail"></span> to confirm
+                            </label>
+                            <input
+                                id="deleteRegistrationConfirmation"
+                                type="email"
+                                maxlength="254"
+                                autocomplete="off"
+                                spellcheck="false"
+                            >
+                        </div>
+
+                        <button
+                            id="deleteRegistrationButton"
+                            class="danger-button"
+                            type="button"
+                            disabled
+                        >
+                            Delete participant
+                        </button>
+                    </div>
+                </details>
+
                 <div id="editFormStatus" class="edit-form-status" role="status"></div>
 
                 <div class="admin-modal-actions">
@@ -713,6 +747,6 @@ Gitanushilanam Team</textarea>
         </section>
     </div>
 
-    <script src="js/admin.js?v=20261018-1"></script>
+    <script src="js/admin.js?v=20261018-2"></script>
 </body>
 </html>

@@ -59,6 +59,10 @@ const editRegistrationId = document.getElementById("editRegistrationId");
 const editRegistrationSubtitle = document.getElementById("editRegistrationSubtitle");
 const editFormStatus = document.getElementById("editFormStatus");
 const saveRegistrationButton = document.getElementById("saveRegistrationButton");
+const deleteRegistrationSection = document.getElementById("deleteRegistrationSection");
+const deleteRegistrationExpectedEmail = document.getElementById("deleteRegistrationExpectedEmail");
+const deleteRegistrationConfirmation = document.getElementById("deleteRegistrationConfirmation");
+const deleteRegistrationButton = document.getElementById("deleteRegistrationButton");
 
 const editName = document.getElementById("editName");
 const editGender = document.getElementById("editGender");
@@ -144,6 +148,8 @@ let totalPages = 1;
 let currentTotal = 0;
 let registrationCache = new Map();
 let currentPageRegistrationIds = [];
+let appliedRegistrationSearch = "";
+let deleteRegistrationTarget = null;
 const selectedRegistrationIds = new Set();
 let pendingEmailRequestId = null;
 let emailSendInProgress = false;
@@ -816,6 +822,7 @@ function buildRegistrationQuery(page) {
 
 async function loadRegistrations(page = 1) {
     showDashboardStatus("Loading registrations...");
+    const requestedSearch = searchFilter.value.trim();
 
     try {
         const response = await adminFetch(
@@ -830,6 +837,7 @@ async function loadRegistrations(page = 1) {
         currentPage = result.page;
         totalPages = result.total_pages;
         currentTotal = result.total;
+        appliedRegistrationSearch = requestedSearch;
 
         renderRegistrations(result.registrations);
 
@@ -1435,6 +1443,20 @@ async function openEditRegistration(registration) {
     editAnimated.checked = Number(registration.animated_bg_video) === 1;
     editTreasure.checked = Number(registration.treasure_hunt) === 1;
 
+    const deletionAvailable = appliedRegistrationSearch.length >= 3;
+    deleteRegistrationTarget = deletionAvailable
+        ? {
+            id: Number(registration.id),
+            name: registration.name || "Participant",
+            email: registration.email || ""
+        }
+        : null;
+    deleteRegistrationSection.hidden = !deletionAvailable;
+    deleteRegistrationSection.open = false;
+    deleteRegistrationExpectedEmail.textContent = deleteRegistrationTarget?.email || "";
+    deleteRegistrationConfirmation.value = "";
+    deleteRegistrationButton.disabled = true;
+
     showEditStatus("");
     editRegistrationModal.hidden = false;
     document.body.classList.add("modal-open");
@@ -1449,6 +1471,10 @@ async function openEditRegistration(registration) {
 function closeEditRegistration() {
     editRegistrationModal.hidden = true;
     document.body.classList.remove("modal-open");
+    deleteRegistrationTarget = null;
+    deleteRegistrationSection.open = false;
+    deleteRegistrationConfirmation.value = "";
+    deleteRegistrationButton.disabled = true;
     showEditStatus("");
 }
 
@@ -1468,6 +1494,91 @@ registrationsBody.addEventListener("click", function (event) {
 
     if (registration) {
         openEditRegistration(registration);
+    }
+});
+
+deleteRegistrationConfirmation.addEventListener("input", function () {
+    const expectedEmail = deleteRegistrationTarget?.email.trim().toLowerCase() || "";
+    const confirmationEmail = deleteRegistrationConfirmation.value.trim().toLowerCase();
+    deleteRegistrationButton.disabled = !expectedEmail || confirmationEmail !== expectedEmail;
+});
+
+deleteRegistrationConfirmation.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+    }
+});
+
+deleteRegistrationButton.addEventListener("click", async function () {
+    if (!isSuperAdmin || !deleteRegistrationTarget) {
+        showEditStatus("Only a Super Admin can delete registrations.", "error");
+        return;
+    }
+
+    const confirmationEmail = deleteRegistrationConfirmation.value.trim();
+
+    if (confirmationEmail.toLowerCase() !== deleteRegistrationTarget.email.toLowerCase()) {
+        showEditStatus("Type the participant's exact email address to continue.", "error");
+        return;
+    }
+
+    const confirmed = window.confirm(
+        `Permanently delete ${deleteRegistrationTarget.name} (${deleteRegistrationTarget.email})?`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const target = { ...deleteRegistrationTarget };
+    deleteRegistrationButton.disabled = true;
+    saveRegistrationButton.disabled = true;
+    showEditStatus("Deleting participant registration...");
+
+    try {
+        const response = await adminFetch(
+            `/admin/api/registrations/${target.id}`,
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    confirmation_email: confirmationEmail
+                })
+            }
+        );
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "Unable to delete registration.");
+        }
+
+        selectedRegistrationIds.delete(target.id);
+        closeEditRegistration();
+
+        await Promise.all([
+            loadSummary(),
+            loadFilterOptions(),
+            loadRegistrations(currentPage),
+            loadAuditLog()
+        ]);
+
+        showDashboardStatus(`${target.name}'s registration was deleted.`);
+    } catch (error) {
+        console.error("Registration deletion error:", error);
+        showEditStatus(
+            error instanceof Error ? error.message : "Unable to delete registration.",
+            "error"
+        );
+    } finally {
+        saveRegistrationButton.disabled = false;
+
+        if (deleteRegistrationTarget) {
+            deleteRegistrationButton.disabled =
+                deleteRegistrationConfirmation.value.trim().toLowerCase()
+                !== deleteRegistrationTarget.email.toLowerCase();
+        }
     }
 });
 
@@ -1724,6 +1835,8 @@ async function loadAuditLog() {
                 "td",
                 entry.action === "registration_update"
                     ? "Registration updated"
+                    : entry.action === "registration_delete"
+                        ? "Registration deleted"
                     : entry.action === "participant_email_sent"
                         ? "Participant email sent"
                     : entry.action
@@ -1758,6 +1871,25 @@ async function loadAuditLog() {
                 createTextElement(
                     "div",
                     details.subject || "No subject recorded",
+                    "muted-cell"
+                )
+            );
+            changesCell.appendChild(summary);
+        } else if (entry.action === "registration_delete") {
+            const details = parseAuditJson(entry.old_values);
+            const summary = document.createElement("div");
+            summary.className = "audit-change-list";
+            summary.appendChild(
+                createTextElement(
+                    "div",
+                    details.name || "Participant",
+                    "audit-change-item"
+                )
+            );
+            summary.appendChild(
+                createTextElement(
+                    "div",
+                    details.email || "Email unavailable",
                     "muted-cell"
                 )
             );
