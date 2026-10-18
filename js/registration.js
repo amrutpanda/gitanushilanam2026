@@ -31,6 +31,9 @@ const registrationModalIcon = document.getElementById("registrationModalIcon");
 const registrationModalTitle = document.getElementById("registrationModalTitle");
 const registrationModalMessage = document.getElementById("registrationModalMessage");
 const registrationModalName = document.getElementById("registrationModalName");
+const registrationCommunication = document.getElementById("registrationCommunication");
+const registrationWhatsappGroups = document.getElementById("registrationWhatsappGroups");
+const registrationEmailStatus = document.getElementById("registrationEmailStatus");
 const registrationSuccessActions = document.getElementById("registrationSuccessActions");
 const registrationFailureActions = document.getElementById("registrationFailureActions");
 const registerAnotherButton = document.getElementById("registerAnotherButton");
@@ -114,6 +117,7 @@ function openResultModal({ type, title, message, participantName = "" }) {
     registrationModalMessage.textContent = message;
     registrationModalName.textContent = participantName;
     registrationModalName.hidden = !participantName;
+    registrationCommunication.hidden = !isSuccess;
     registrationSuccessActions.hidden = !isSuccess;
     registrationFailureActions.hidden = isSuccess;
     registrationModal.hidden = false;
@@ -139,8 +143,61 @@ function closeResultModal() {
     }, 220);
 }
 
-function showSuccessModal(participantName) {
+function isValidWhatsAppGroupUrl(value) {
+    if (typeof value !== "string") {
+        return false;
+    }
+
+    try {
+        const url = new URL(value);
+        return url.protocol === "https:"
+            && url.hostname === "chat.whatsapp.com"
+            && url.pathname.length > 1;
+    } catch {
+        return false;
+    }
+}
+
+function renderRegistrationCommunication(whatsappGroups, emailSent, emailAddress) {
+    registrationWhatsappGroups.innerHTML = "";
+
+    const groups = Array.isArray(whatsappGroups) ? whatsappGroups : [];
+
+    groups.forEach(group => {
+        const item = document.createElement("div");
+        item.className = "registration-whatsapp-group";
+
+        const label = document.createElement("strong");
+        label.textContent = group?.label || "Competition group";
+        item.appendChild(label);
+
+        if (isValidWhatsAppGroupUrl(group?.url)) {
+            const link = document.createElement("a");
+            link.className = "registration-whatsapp-link";
+            link.href = group.url;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = "Join WhatsApp Group";
+            item.appendChild(link);
+        } else {
+            const unavailable = document.createElement("span");
+            unavailable.className = "registration-whatsapp-unavailable";
+            unavailable.textContent = "Link will be communicated soon";
+            item.appendChild(unavailable);
+        }
+
+        registrationWhatsappGroups.appendChild(item);
+    });
+
+    registrationEmailStatus.classList.toggle("is-warning", !emailSent);
+    registrationEmailStatus.textContent = emailSent
+        ? `A confirmation email with these links has been sent to ${emailAddress}.`
+        : "Your registration is saved. Please use the links shown above; the confirmation email could not be sent.";
+}
+
+function showSuccessModal(participantName, whatsappGroups, emailSent, emailAddress) {
     clearStatus();
+    renderRegistrationCommunication(whatsappGroups, emailSent, emailAddress);
 
     openResultModal({
         type: "success",
@@ -150,12 +207,15 @@ function showSuccessModal(participantName) {
     });
 }
 
-function showFailureModal(message) {
+function showFailureModal(message, title = "Registration not completed") {
     clearStatus();
+    registrationCommunication.hidden = true;
+    registrationWhatsappGroups.innerHTML = "";
+    registrationEmailStatus.textContent = "";
 
     openResultModal({
         type: "error",
-        title: "Registration not completed",
+        title,
         message: message || "Registration failed. Please try again."
     });
 }
@@ -941,7 +1001,12 @@ async function sendRegistration(registrationData, token) {
             turnstileNeedsReset = true;
             pendingRegistrationData = null;
 
-            showFailureModal(result.message || "Registration failed.");
+            showFailureModal(
+                result.message || "Registration failed.",
+                result.code === "registration_closed"
+                    ? "Registration closed"
+                    : "Registration not completed"
+            );
             return;
         }
 
@@ -954,7 +1019,12 @@ async function sendRegistration(registrationData, token) {
         form.reset();
         resetFormUi();
         resetTurnstile();
-        showSuccessModal(participantName);
+        showSuccessModal(
+            participantName,
+            result.whatsapp_groups,
+            result.email_sent === true,
+            registrationData.email
+        );
     } catch (error) {
         console.error("Registration error:", error);
 
