@@ -7,7 +7,7 @@
 
     <title>Gitanushilanam Competition Registration</title>
 
-    <link rel="stylesheet" href="css/registration.css?v=20261018-2">
+    <link rel="stylesheet" href="css/registration.css?v=20261018-3">
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <!-- Meta Pixel: page views only; no participant fields or advanced matching data. -->
     <script>
@@ -61,19 +61,57 @@
     ========================================================== -->
 
     <section class="hero">
+        <div class="hero-copy">
+            <div class="hero-tag">
+                <span class="dot"></span>
+                Registrations are now open
+            </div>
 
-        <div class="hero-tag">
-            <span class="dot"></span>
-            Registrations are now open
+            <p class="hero-eyebrow">Gitanushilanam 2026</p>
+
+            <h1>
+                Learn the Gita.
+                <span>Live its wisdom.</span>
+            </h1>
+
+            <p class="hero-description">Register once and participate in one or more competitions designed to inspire learning, creativity and practical engagement with the Bhagavad Gita.</p>
+
+            <div class="hero-highlights" aria-label="Registration highlights">
+                <span>One registration</span>
+                <span>Multiple competitions</span>
+                <span>All age groups</span>
+            </div>
         </div>
 
-        <h1>
-            Discover. Participate.
-            <span>Inspire.</span>
-        </h1>
+        <div class="hero-competition-showcase" aria-label="Gitanushilanam competitions">
+            <div class="showcase-heading">
+                <p>Choose your path</p>
+                <h2>Four ways to participate</h2>
+            </div>
 
-        <p>Register once and participate in one or more competitions. Choose your events below and complete your participant information. Registration closes 31 October 2026.</p>
-
+            <div class="showcase-grid">
+                <div class="showcase-item showcase-quiz">
+                    <span class="showcase-icon" aria-hidden="true">Q</span>
+                    <strong>Gita Quiz</strong>
+                    <small>Knowledge</small>
+                </div>
+                <div class="showcase-item showcase-shloka">
+                    <span class="showcase-icon" aria-hidden="true">ॐ</span>
+                    <strong>Shloka Recitation</strong>
+                    <small>Devotion</small>
+                </div>
+                <div class="showcase-item showcase-reel">
+                    <span class="showcase-icon" aria-hidden="true">▶</span>
+                    <strong>Reel Making</strong>
+                    <small>Creativity</small>
+                </div>
+                <div class="showcase-item showcase-treasure">
+                    <span class="showcase-icon" aria-hidden="true">✦</span>
+                    <strong>Treasure Hunt</strong>
+                    <small>Discovery</small>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- =========================================================
@@ -95,13 +133,28 @@
 
             </div>
 
+            <nav class="form-progress" aria-label="Registration sections">
+                <a class="form-progress-step is-active" href="#personalInformation" data-progress-step="personalInformation">
+                    <span>01</span>
+                    <strong>Personal details</strong>
+                </a>
+                <a class="form-progress-step" href="#participantLocation" data-progress-step="participantLocation">
+                    <span>02</span>
+                    <strong>Location</strong>
+                </a>
+                <a class="form-progress-step" href="#competitionSelection" data-progress-step="competitionSelection">
+                    <span>03</span>
+                    <strong>Competitions</strong>
+                </a>
+            </nav>
+
             <form id="competitionForm">
 
                 <!-- =================================================
                      SECTION 01 - PERSONAL INFORMATION
                 ================================================== -->
 
-                <section class="form-section">
+                <section class="form-section" id="personalInformation" data-form-section>
 
                     <div class="section-heading">
 
@@ -197,7 +250,7 @@
                      SECTION 02 - LOCATION
                 ================================================== -->
 
-                <section class="form-section">
+                <section class="form-section" id="participantLocation" data-form-section>
 
                     <div class="section-heading">
 
@@ -274,7 +327,7 @@
                      SECTION 03 - COMPETITION SELECTION
                 ================================================== -->
 
-                <section class="form-section">
+                <section class="form-section" id="competitionSelection" data-form-section>
 
                     <div class="section-heading">
 
@@ -291,82 +344,113 @@
                         Select the participant group first. The competition choices below will automatically show only the events available for that group.
                     </div>
 
-                    <nav class="competition-guide-links" aria-label="Read competition rules">
-                        <strong>Read the competition guides</strong>
-                        <a href="quiz.html" target="_blank" rel="noopener">Quiz ↗</a>
-                        <a href="shloka-recitation.html" target="_blank" rel="noopener">Shloka Recitation ↗</a>
-                        <a href="gita-reel-challenge.html" target="_blank" rel="noopener">Reel Making ↗</a>
-                        <a href="treasure-hunt.html" target="_blank" rel="noopener">Treasure Hunt ↗</a>
-                        <small>Guides open in a new tab so your form stays here.</small>
-                    </nav>
-
                     <div class="competition-grid" id="competitionGrid" data-visible-count="0">
 
                         <!-- Bhagavad Gita Quiz -->
 
-                        <label class="competition-card" data-competition-card>
+                        <article class="competition-card competition-card-quiz" data-competition-card>
 
-                            <input type="checkbox" name="competitions" value="bhagavad_gita_quiz">
+                            <input id="competitionQuiz" type="checkbox" name="competitions" value="bhagavad_gita_quiz">
+
+                            <label class="competition-card-select" for="competitionQuiz">
 
                             <div class="check-indicator">✓</div>
 
-                            <div class="competition-icon">📖</div>
+                            <div class="competition-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Zm16 0A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5v-16Z"/></svg>
+                            </div>
+
+                            <span class="competition-eligibility">All participant groups</span>
 
                             <h4>Bhagavad Gita Quiz</h4>
 
                             <p>Test your knowledge and understanding of the teachings and concepts from the Bhagavad Gita.</p>
 
-                        </label>
+                            </label>
+
+                            <a class="competition-rules-link" href="quiz.html" target="_blank" rel="noopener">Read competition guide <span aria-hidden="true">↗</span></a>
+
+                        </article>
 
                         <!-- Shloka Recitation -->
 
-                        <label class="competition-card" data-competition-card>
+                        <article class="competition-card competition-card-shloka" data-competition-card>
 
-                            <input type="checkbox" name="competitions" value="shloka_recitation">
+                            <input id="competitionShloka" type="checkbox" name="competitions" value="shloka_recitation">
+
+                            <label class="competition-card-select" for="competitionShloka">
 
                             <div class="check-indicator">✓</div>
 
-                            <div class="competition-icon">🕉️</div>
+                            <div class="competition-icon competition-icon-text" aria-hidden="true">ॐ</div>
+
+                            <span class="competition-eligibility">All participant groups</span>
 
                             <h4>Shloka Recitation</h4>
 
                             <p>Demonstrate accurate pronunciation, rhythm and confident recitation of Sanskrit shlokas.</p>
 
-                        </label>
+                            </label>
+
+                            <a class="competition-rules-link" href="shloka-recitation.html" target="_blank" rel="noopener">Read competition guide <span aria-hidden="true">↗</span></a>
+
+                        </article>
 
                         <!-- Gita Reel Making Challenge -->
 
-                        <label class="competition-card" data-competition-card>
+                        <article class="competition-card competition-card-reel" data-competition-card>
 
-                            <input type="checkbox" name="competitions" value="animated_bg_video">
+                            <input id="competitionReel" type="checkbox" name="competitions" value="animated_bg_video">
+
+                            <label class="competition-card-select" for="competitionReel">
 
                             <div class="check-indicator">✓</div>
 
-                            <div class="competition-icon">🎬</div>
+                            <div class="competition-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="m10 8 5 3.5-5 3.5V8Zm1 10.5h2"/></svg>
+                            </div>
+
+                            <span class="competition-eligibility">Youth / Adult</span>
 
                             <h4>Gita Reel Making Challenge</h4>
 
                             <p>Create a vertical animated Reel on Krishna’s Virat Roopa (BG 11.9–46), up to 90 seconds. Adults only.</p>
 
-                        </label>
+                            </label>
+
+                            <a class="competition-rules-link" href="gita-reel-challenge.html" target="_blank" rel="noopener">Read competition guide <span aria-hidden="true">↗</span></a>
+
+                        </article>
 
                         <!-- Treasure Hunt -->
 
-                        <label class="competition-card" data-competition-card>
+                        <article class="competition-card competition-card-treasure" data-competition-card>
 
-                            <input type="checkbox" name="competitions" value="treasure_hunt">
+                            <input id="competitionTreasure" type="checkbox" name="competitions" value="treasure_hunt">
+
+                            <label class="competition-card-select" for="competitionTreasure">
 
                             <div class="check-indicator">✓</div>
 
-                            <div class="competition-icon">🧭</div>
+                            <div class="competition-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8 4.8-2.2Z"/></svg>
+                            </div>
+
+                            <span class="competition-eligibility">Senior, Youth / Adult</span>
 
                             <h4>Treasure Hunt</h4>
 
                             <p>Solve clues inspired by the Bhagavad Gita, Ramayana and Mahabharata. Individual participation.</p>
 
-                        </label>
+                            </label>
+
+                            <a class="competition-rules-link" href="treasure-hunt.html" target="_blank" rel="noopener">Read competition guide <span aria-hidden="true">↗</span></a>
+
+                        </article>
 
                     </div>
+
+                    <p class="competition-error" id="competitionError" role="alert" hidden></p>
 
                     <!-- Participant group eligibility information -->
 
@@ -412,11 +496,11 @@
 
                     <div class="secure-message">🔒 Registration information will be securely stored.</div>
 
-                    <button class="submit-button" type="submit">Continue Registration →</button>
+                    <button class="submit-button" type="submit">Complete Registration →</button>
 
                 </div>
 
-                <div id="status"></div>
+                <div id="status" role="status" aria-live="polite"></div>
 
             </form>
 
@@ -480,7 +564,7 @@
          JAVASCRIPT
     ========================================================== -->
 
-    <script src="js/registration.js?v=20261018-2"></script>
+    <script src="js/registration.js?v=20261018-3"></script>
 
 </body>
 

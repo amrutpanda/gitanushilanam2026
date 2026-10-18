@@ -1429,3 +1429,724 @@ body.modal-open {
 .competition-guide-links a { color: #a8c8ff; text-decoration: underline; text-underline-offset: 3px; }
 .competition-guide-links small { color: var(--text-soft); }
 .competition-guide-links a:focus-visible { outline: 3px solid #6957aa; outline-offset: 4px; }
+
+
+/* =========================================================
+   GITANUSHILANAM 2026 VISUAL REFRESH
+========================================================= */
+
+:root {
+    --bg-main: #07111f;
+    --bg-card: rgba(14, 29, 48, 0.94);
+    --bg-input: rgba(5, 15, 28, 0.82);
+    --primary: #577de8;
+    --secondary: #f2a33a;
+    --saffron: #f2a33a;
+    --gold: #ffd166;
+    --text-main: #f7f3e9;
+    --text-soft: #b2c0d3;
+    --text-muted: #899ab2;
+    --border: rgba(255, 218, 147, 0.12);
+}
+
+body {
+    background:
+        radial-gradient(circle at 82% 4%, rgba(242, 163, 58, 0.13), transparent 28%),
+        radial-gradient(circle at 10% 30%, rgba(65, 105, 225, 0.16), transparent 30%),
+        linear-gradient(180deg, #0a1829 0%, #07111f 46%, #050c16 100%);
+}
+
+body::before {
+    width: 680px;
+    height: 680px;
+    top: -360px;
+    left: auto;
+    right: -180px;
+    border: 1px solid rgba(255, 209, 102, 0.10);
+    background:
+        repeating-conic-gradient(
+            from 0deg,
+            rgba(255, 209, 102, 0.12) 0deg 1deg,
+            transparent 1deg 15deg
+        );
+    box-shadow:
+        0 0 0 80px rgba(255, 209, 102, 0.018),
+        0 0 0 160px rgba(255, 209, 102, 0.012);
+    filter: none;
+    opacity: 0.55;
+}
+
+body::after {
+    width: 620px;
+    height: 620px;
+    bottom: -330px;
+    right: auto;
+    left: -280px;
+    background: rgba(242, 163, 58, 0.10);
+    filter: blur(120px);
+}
+
+.topbar {
+    padding-top: 16px;
+    padding-bottom: 16px;
+    border-bottom-color: rgba(255, 209, 102, 0.10);
+    background: rgba(5, 14, 25, 0.82);
+}
+
+.open-badge {
+    color: #ffe1a2;
+    border-color: rgba(242, 163, 58, 0.30);
+    background: rgba(242, 163, 58, 0.10);
+}
+
+.hero {
+    position: relative;
+    width: min(1180px, 92%);
+    min-height: 410px;
+    padding: 52px 0 38px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.06fr) minmax(390px, 0.94fr);
+    align-items: center;
+    gap: clamp(44px, 7vw, 92px);
+    text-align: left;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 209, 102, 0.34), transparent);
+}
+
+.hero-copy {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-tag {
+    margin-bottom: 18px;
+    color: #ffdaa0;
+    border-color: rgba(242, 163, 58, 0.24);
+    background: rgba(242, 163, 58, 0.08);
+}
+
+.hero-eyebrow {
+    margin: 0 0 10px;
+    color: #8eabff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.hero h1 {
+    max-width: 660px;
+    margin: 0 0 18px;
+    font-size: clamp(42px, 5.3vw, 70px);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+}
+
+.hero h1 span {
+    display: block;
+    margin-top: 8px;
+    background: linear-gradient(90deg, #ffd166, #f2a33a 48%, #ffdd9a);
+    background-clip: text;
+    -webkit-background-clip: text;
+}
+
+.hero .hero-description {
+    max-width: 650px;
+    margin: 0;
+    color: #b2c0d3;
+    font-size: 15px;
+    line-height: 1.75;
+}
+
+.hero-highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.hero-highlights span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 11px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 999px;
+    color: #c8d4e4;
+    background: rgba(255, 255, 255, 0.035);
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.hero-highlights span::before {
+    content: "✓";
+    color: #f7b955;
+    font-weight: 900;
+}
+
+.hero-competition-showcase {
+    position: relative;
+    padding: 24px;
+    border: 1px solid rgba(255, 209, 102, 0.15);
+    border-radius: 26px;
+    background:
+        linear-gradient(145deg, rgba(25, 43, 68, 0.90), rgba(9, 22, 38, 0.94));
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.30), inset 0 1px rgba(255, 255, 255, 0.04);
+    overflow: hidden;
+}
+
+.hero-competition-showcase::before {
+    content: "";
+    position: absolute;
+    width: 230px;
+    height: 230px;
+    top: -145px;
+    right: -85px;
+    border: 1px solid rgba(255, 209, 102, 0.13);
+    border-radius: 50%;
+    box-shadow: 0 0 0 36px rgba(255, 209, 102, 0.025), 0 0 0 72px rgba(255, 209, 102, 0.018);
+}
+
+.showcase-heading {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 18px;
+}
+
+.showcase-heading p {
+    margin: 0 0 5px;
+    color: #f3b75b;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.showcase-heading h2 {
+    font-size: 21px;
+    letter-spacing: -0.02em;
+}
+
+.showcase-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.showcase-item {
+    min-height: 112px;
+    padding: 14px;
+    display: grid;
+    align-content: end;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.showcase-icon {
+    width: 34px;
+    height: 34px;
+    margin-bottom: 12px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    color: #fff6df;
+    background: rgba(255, 255, 255, 0.08);
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.showcase-item strong {
+    color: #f5f7fb;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.showcase-item small {
+    margin-top: 3px;
+    color: #899bb3;
+    font-size: 10px;
+}
+
+.showcase-quiz { border-top-color: rgba(99, 140, 255, 0.55); }
+.showcase-shloka { border-top-color: rgba(242, 163, 58, 0.62); }
+.showcase-reel { border-top-color: rgba(172, 119, 255, 0.58); }
+.showcase-treasure { border-top-color: rgba(66, 197, 139, 0.58); }
+
+.page {
+    width: min(1180px, 92%);
+    margin-top: 26px;
+}
+
+.form-card {
+    border-color: rgba(255, 218, 147, 0.13);
+    background: rgba(12, 26, 44, 0.94);
+    box-shadow: 0 36px 100px rgba(0, 0, 0, 0.42);
+}
+
+.form-title {
+    padding: 28px 36px;
+    border-bottom-color: rgba(255, 218, 147, 0.10);
+    background: linear-gradient(90deg, rgba(242, 163, 58, 0.075), rgba(87, 125, 232, 0.055));
+}
+
+.form-indicator {
+    color: #ffdda3;
+    border-color: rgba(242, 163, 58, 0.24);
+    background: rgba(242, 163, 58, 0.08);
+}
+
+.form-progress {
+    position: sticky;
+    top: 85px;
+    z-index: 30;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 0 36px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(10, 23, 39, 0.96);
+    backdrop-filter: blur(16px);
+}
+
+.form-progress-step {
+    position: relative;
+    min-height: 64px;
+    padding: 14px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #8495ad;
+    text-decoration: none;
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+.form-progress-step::after {
+    content: "";
+    position: absolute;
+    left: 12%;
+    right: 12%;
+    bottom: -1px;
+    height: 2px;
+    border-radius: 2px;
+    background: transparent;
+}
+
+.form-progress-step span {
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 9px;
+    color: #8fa0b7;
+    font-size: 10px;
+    font-weight: 850;
+}
+
+.form-progress-step strong {
+    font-size: 12px;
+}
+
+.form-progress-step:hover,
+.form-progress-step.is-active {
+    color: #fff0cc;
+    background: rgba(242, 163, 58, 0.035);
+}
+
+.form-progress-step.is-active::after {
+    background: linear-gradient(90deg, #f2a33a, #ffd166);
+}
+
+.form-progress-step.is-active span {
+    color: #241404;
+    border-color: transparent;
+    background: #f2a33a;
+}
+
+form {
+    padding: 38px 36px 42px;
+}
+
+.form-section {
+    scroll-margin-top: 170px;
+}
+
+.grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 21px 24px;
+}
+
+.section-number {
+    color: #241404;
+    background: linear-gradient(135deg, #ffd166, #f2a33a);
+    box-shadow: 0 8px 22px rgba(242, 163, 58, 0.20);
+}
+
+.section-heading p,
+.field-info,
+.same-number label,
+.secure-message,
+.agreement label {
+    color: #8fa0b8;
+}
+
+input,
+select {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(4, 14, 26, 0.78);
+}
+
+input:focus,
+select:focus {
+    border-color: rgba(242, 163, 58, 0.78);
+    box-shadow: 0 0 0 4px rgba(242, 163, 58, 0.10);
+    background: rgba(6, 17, 30, 0.94);
+}
+
+.field.has-error input,
+.field.has-error select {
+    border-color: rgba(255, 111, 111, 0.82);
+    box-shadow: 0 0 0 3px rgba(255, 98, 98, 0.08);
+}
+
+.field-error {
+    display: block;
+    color: #ffaaaa;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.competition-intro {
+    border-color: rgba(242, 163, 58, 0.18);
+    color: #b6c3d5;
+    background: rgba(242, 163, 58, 0.055);
+}
+
+.competition-grid {
+    align-items: stretch;
+}
+
+.competition-card {
+    --competition-accent: #7194fa;
+    min-height: 286px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border-color: rgba(255, 255, 255, 0.10);
+    background:
+        linear-gradient(180deg, color-mix(in srgb, var(--competition-accent) 10%, transparent), transparent 44%),
+        rgba(5, 16, 29, 0.78);
+}
+
+.competition-card-shloka { --competition-accent: #f2a33a; }
+.competition-card-reel { --competition-accent: #ab7cf4; }
+.competition-card-treasure { --competition-accent: #42c58b; }
+
+.competition-card-select {
+    display: contents;
+    cursor: pointer;
+}
+
+.competition-card:hover {
+    border-color: color-mix(in srgb, var(--competition-accent) 58%, transparent);
+    background:
+        linear-gradient(180deg, color-mix(in srgb, var(--competition-accent) 15%, transparent), transparent 50%),
+        rgba(8, 22, 38, 0.94);
+}
+
+.competition-card.selected {
+    border-color: var(--competition-accent);
+    background:
+        linear-gradient(180deg, color-mix(in srgb, var(--competition-accent) 19%, transparent), transparent 58%),
+        rgba(8, 22, 38, 0.98);
+    box-shadow: 0 14px 34px color-mix(in srgb, var(--competition-accent) 16%, transparent);
+}
+
+.competition-card:has(input:focus-visible) {
+    outline: 3px solid color-mix(in srgb, var(--competition-accent) 48%, transparent);
+    outline-offset: 3px;
+}
+
+.competition-icon {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 16px;
+    color: var(--competition-accent);
+    border-color: color-mix(in srgb, var(--competition-accent) 28%, transparent);
+    background: color-mix(in srgb, var(--competition-accent) 12%, transparent);
+}
+
+.competition-icon svg {
+    width: 27px;
+    height: 27px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.competition-icon-text {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 25px;
+}
+
+.competition-eligibility {
+    align-self: flex-start;
+    margin-bottom: 11px;
+    padding: 5px 8px;
+    border: 1px solid color-mix(in srgb, var(--competition-accent) 24%, transparent);
+    border-radius: 999px;
+    color: color-mix(in srgb, var(--competition-accent) 76%, white);
+    background: color-mix(in srgb, var(--competition-accent) 8%, transparent);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+}
+
+.competition-card h4 {
+    color: #f6f8fb;
+    font-size: 16px;
+}
+
+.competition-card p {
+    margin-bottom: 18px;
+    color: #93a3b9;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.competition-rules-link {
+    position: relative;
+    z-index: 3;
+    align-self: flex-start;
+    margin-top: auto;
+    color: color-mix(in srgb, var(--competition-accent) 72%, white);
+    font-size: 10px;
+    font-weight: 750;
+    line-height: 1.5;
+    text-decoration: none;
+}
+
+.competition-rules-link:hover,
+.competition-rules-link:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.competition-rules-link:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+}
+
+.competition-card.selected .check-indicator {
+    color: #0a1929;
+    background: var(--competition-accent);
+}
+
+.competition-error {
+    margin-top: 14px;
+    padding: 11px 13px;
+    border: 1px solid rgba(255, 111, 111, 0.26);
+    border-radius: 11px;
+    color: #ffb0b0;
+    background: rgba(255, 82, 82, 0.07);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.selected-summary {
+    border-color: rgba(242, 163, 58, 0.18);
+    background: rgba(242, 163, 58, 0.05);
+}
+
+.competition-tag {
+    color: #ffe0aa;
+    border-color: rgba(242, 163, 58, 0.20);
+    background: rgba(242, 163, 58, 0.09);
+}
+
+.same-number input,
+.agreement input,
+.field .same-number input[type="checkbox"] {
+    accent-color: #f2a33a;
+}
+
+.submit-button,
+.registration-modal-button-primary {
+    color: #211303;
+    background: linear-gradient(135deg, #ffd166, #f2a33a);
+    box-shadow: 0 14px 35px rgba(242, 163, 58, 0.24);
+}
+
+.submit-button:hover {
+    box-shadow: 0 18px 45px rgba(242, 163, 58, 0.34);
+}
+
+.submit-button:focus-visible,
+.registration-modal-button:focus-visible {
+    outline: 3px solid rgba(255, 209, 102, 0.48);
+    outline-offset: 3px;
+}
+
+.registration-modal-card {
+    border-color: rgba(255, 209, 102, 0.13);
+    background:
+        radial-gradient(circle at 50% 0%, rgba(242, 163, 58, 0.14), transparent 38%),
+        linear-gradient(145deg, rgba(20, 37, 58, 0.99), rgba(7, 16, 29, 0.99));
+}
+
+.registration-modal-kicker,
+.registration-modal-name::before {
+    color: #f3b75b;
+}
+
+@media (max-width: 900px) {
+    .hero {
+        grid-template-columns: 1fr;
+        gap: 34px;
+        padding-top: 38px;
+    }
+
+    .hero-competition-showcase {
+        width: 100%;
+    }
+}
+
+@media (max-width: 700px) {
+    .hero {
+        width: 92%;
+        min-height: auto;
+        padding: 30px 0 28px;
+    }
+
+    .hero h1 {
+        font-size: clamp(38px, 11vw, 50px);
+    }
+
+    .hero .hero-description {
+        font-size: 14px;
+    }
+
+    .hero-highlights {
+        margin-top: 18px;
+    }
+
+    .hero-competition-showcase {
+        padding: 19px;
+        border-radius: 21px;
+    }
+
+    .showcase-item {
+        min-height: 104px;
+    }
+
+    .page {
+        width: 94%;
+        padding: 0;
+    }
+
+    .form-card {
+        padding: 0;
+    }
+
+    .form-title {
+        padding: 22px 20px;
+    }
+
+    .form-progress {
+        top: 70px;
+        padding: 0 8px;
+    }
+
+    .form-progress-step {
+        min-height: 58px;
+        padding: 10px 5px;
+        gap: 6px;
+    }
+
+    .form-progress-step span {
+        width: 25px;
+        height: 25px;
+    }
+
+    .form-progress-step strong {
+        font-size: 10px;
+    }
+
+    form {
+        padding: 26px 20px 30px;
+    }
+
+    .form-section {
+        scroll-margin-top: 145px;
+    }
+
+    .competition-card {
+        min-height: 0;
+        padding: 17px;
+        display: grid;
+        grid-template-columns: 48px minmax(0, 1fr);
+        column-gap: 14px;
+    }
+
+    .competition-icon {
+        grid-column: 1;
+        grid-row: 1 / span 4;
+        width: 48px;
+        height: 48px;
+        margin: 0;
+    }
+
+    .competition-eligibility,
+    .competition-card h4,
+    .competition-card p,
+    .competition-rules-link {
+        grid-column: 2;
+    }
+
+    .competition-eligibility {
+        margin-bottom: 7px;
+    }
+
+    .competition-card p {
+        margin-bottom: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .showcase-grid {
+        gap: 8px;
+    }
+
+    .showcase-item {
+        min-height: 98px;
+        padding: 12px;
+    }
+
+    .showcase-icon {
+        width: 30px;
+        height: 30px;
+        margin-bottom: 9px;
+    }
+
+    .form-progress-step {
+        flex-direction: column;
+    }
+
+    .form-progress-step strong {
+        text-align: center;
+    }
+}

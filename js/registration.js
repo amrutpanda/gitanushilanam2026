@@ -22,8 +22,11 @@ const competitionCards = document.querySelectorAll("[data-competition-card]");
 const selectedSummary = document.getElementById("selectedSummary");
 const selectedTags = document.getElementById("selectedTags");
 const participantGroupInfo = document.getElementById("participantGroupInfo");
+const competitionError = document.getElementById("competitionError");
 const status = document.getElementById("status");
 const submitButton = form.querySelector('button[type="submit"]');
+const progressSteps = document.querySelectorAll("[data-progress-step]");
+const formSections = document.querySelectorAll("[data-form-section]");
 
 const registrationModal = document.getElementById("registrationModal");
 const registrationModalClose = document.getElementById("registrationModalClose");
@@ -177,7 +180,13 @@ function renderRegistrationCommunication(whatsappGroups, emailSent, emailAddress
             link.href = group.url;
             link.target = "_blank";
             link.rel = "noopener noreferrer";
-            link.textContent = "Join WhatsApp Group";
+            const joinLabels = {
+                bhagavad_gita_quiz: "Join Quiz Group",
+                shloka_recitation: "Join Shloka Group",
+                animated_bg_video: "Join Reel Group",
+                treasure_hunt: "Join Treasure Hunt Group"
+            };
+            link.textContent = joinLabels[group?.key] || "Join WhatsApp Group";
             item.appendChild(link);
         } else {
             const unavailable = document.createElement("span");
@@ -255,6 +264,102 @@ document.addEventListener("keydown", function (event) {
         closeResultModal();
     }
 });
+
+/* =========================================================
+   FORM PROGRESS AND INLINE VALIDATION
+========================================================= */
+
+function setActiveProgressStep(sectionId) {
+    progressSteps.forEach(step => {
+        const isActive = step.dataset.progressStep === sectionId;
+        step.classList.toggle("is-active", isActive);
+
+        if (isActive) {
+            step.setAttribute("aria-current", "step");
+        } else {
+            step.removeAttribute("aria-current");
+        }
+    });
+}
+
+if ("IntersectionObserver" in window) {
+    const sectionObserver = new IntersectionObserver(entries => {
+        const visibleSection = entries
+            .filter(entry => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+        if (visibleSection) {
+            setActiveProgressStep(visibleSection.target.id);
+        }
+    }, {
+        rootMargin: "-24% 0px -58% 0px",
+        threshold: [0, 0.15, 0.35]
+    });
+
+    formSections.forEach(section => sectionObserver.observe(section));
+}
+
+function clearFieldError(control) {
+    const field = control.closest(".field");
+
+    if (!field) {
+        return;
+    }
+
+    field.classList.remove("has-error");
+    field.querySelectorAll(".field-error").forEach(error => error.remove());
+    control.removeAttribute("aria-invalid");
+}
+
+function showFieldError(control) {
+    const field = control.closest(".field");
+
+    if (!field || !control.validationMessage) {
+        return;
+    }
+
+    clearFieldError(control);
+    field.classList.add("has-error");
+    control.setAttribute("aria-invalid", "true");
+
+    const error = document.createElement("span");
+    error.className = "field-error";
+    error.textContent = control.validationMessage;
+    field.appendChild(error);
+}
+
+form.addEventListener("invalid", event => {
+    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) {
+        showFieldError(event.target);
+    }
+}, true);
+
+form.addEventListener("input", event => {
+    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) {
+        if (event.target.validity.valid) {
+            clearFieldError(event.target);
+        }
+    }
+});
+
+form.addEventListener("change", event => {
+    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) {
+        if (event.target.validity.valid) {
+            clearFieldError(event.target);
+        }
+    }
+});
+
+function clearCompetitionError() {
+    competitionError.hidden = true;
+    competitionError.textContent = "";
+}
+
+function showCompetitionError(message) {
+    competitionError.textContent = message;
+    competitionError.hidden = false;
+    competitionGrid.scrollIntoView({ behavior: "smooth", block: "center" });
+}
 
 /* =========================================================
    PHONE COUNTRY CODES
@@ -683,6 +788,10 @@ citySelect.addEventListener("change", function () {
 competitionCards.forEach(card => {
     const checkbox = card.querySelector('input[type="checkbox"]');
 
+    card.querySelectorAll(".competition-rules-link").forEach(link => {
+        link.addEventListener("click", event => event.stopPropagation());
+    });
+
     checkbox.addEventListener("change", function () {
         if (checkbox.disabled) {
             checkbox.checked = false;
@@ -691,6 +800,7 @@ competitionCards.forEach(card => {
         }
 
         card.classList.toggle("selected", checkbox.checked);
+        clearCompetitionError();
         updateSelectedCompetitionSummary();
     });
 });
@@ -738,6 +848,7 @@ function clearCompetitionSelection() {
     });
 
     updateSelectedCompetitionSummary();
+    clearCompetitionError();
 }
 
 function setCompetitionVisibility(eligibleCompetitions) {
@@ -854,12 +965,18 @@ window.onTurnstileExpired = function () {
 };
 
 window.onTurnstileError = function () {
+    const registrationWasPending = registrationPending;
+
     turnstileToken = "";
     registrationPending = false;
     pendingRegistrationData = null;
     turnstileNeedsReset = true;
 
-    showFailureModal("Security verification failed. Please try again.");
+    if (registrationWasPending) {
+        showFailureModal("Security verification failed. Please try again.");
+    } else {
+        showStatus("Security verification could not load. Please refresh the page and try again.");
+    }
 };
 
 /* =========================================================
@@ -898,6 +1015,9 @@ function resetFormUi() {
     competitionGrid.dataset.visibleCount = "0";
     selectedTags.innerHTML = "";
     selectedSummary.style.display = "none";
+    clearCompetitionError();
+    form.querySelectorAll(".has-error").forEach(field => field.classList.remove("has-error"));
+    form.querySelectorAll(".field-error").forEach(error => error.remove());
 
     showParticipantGroupInfo(
         "Select the participant group to see the competitions available for that group."
@@ -925,7 +1045,7 @@ function buildRegistrationData() {
     ).map(checkbox => checkbox.value);
 
     if (selectedCompetitions.length === 0) {
-        showFailureModal(
+        showCompetitionError(
             "Please select at least one competition available for this participant group."
         );
         return null;
@@ -936,7 +1056,7 @@ function buildRegistrationData() {
     );
 
     if (hasInvalidSelection) {
-        showFailureModal(
+        showCompetitionError(
             "One or more selected competitions are not available for this participant group."
         );
         return null;
