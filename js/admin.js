@@ -437,140 +437,108 @@ function renderCountryStateChart(container, entries, country) {
 }
 
 function renderTrendChart(points) {
-    registrationTrendChart.innerHTML = "";
-
+    registrationTrendChart.replaceChildren();
     if (!Array.isArray(points) || points.length === 0) {
-        registrationTrendChart.appendChild(
-            createTextElement("div", "No recent registration data.", "chart-empty-state")
-        );
+        registrationTrendChart.appendChild(createTextElement("div", "No recent registration data.", "chart-empty-state"));
         return;
     }
-
-    const width = 900;
-    const height = 245;
-    const padding = {
-        top: 22,
-        right: 28,
-        bottom: 34,
-        left: 36
-    };
-
-    const usableWidth = width - padding.left - padding.right;
-    const usableHeight = height - padding.top - padding.bottom;
-    const values = points.map(point => Number(point.count) || 0);
-    const maximum = Math.max(...values, 1);
-    const denominator = Math.max(points.length - 1, 1);
-
-    const svgNamespace = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNamespace, "svg");
+    const data = points.map(point => ({ date: point.date, count: Math.max(0, Number(point.count) || 0) }));
+    const formatDate = (date, full = false) => new Intl.DateTimeFormat("en-IN", {
+        day: "numeric", month: "short", ...(full ? { year: "numeric" } : {}), timeZone: "UTC"
+    }).format(new Date(`${date}T00:00:00Z`));
+    const total = data.reduce((sum, point) => sum + point.count, 0);
+    const peak = data.reduce((best, point) => point.count > best.count ? point : best, data[0]);
+    const metrics = document.createElement("div");
+    metrics.className = "trend-metrics";
+    [
+        ["Registrations in this period", total.toLocaleString()],
+        ["Daily average", (total / data.length).toFixed(1)],
+        ["Highest daily count", `${peak.count.toLocaleString()} · ${formatDate(peak.date)}`]
+    ].forEach(([label, value]) => {
+        const metric = document.createElement("div");
+        metric.append(createTextElement("span", label), createTextElement("strong", value));
+        metrics.appendChild(metric);
+    });
+    registrationTrendChart.appendChild(metrics);
+    registrationTrendChart.appendChild(createTextElement("p", "Daily new registrations · UTC dates · Today is still in progress. Scroll to see every date; hover, tap or focus a bar for details.", "trend-help"));
+    const detail = createTextElement("div", "", "trend-detail");
+    detail.setAttribute("aria-live", "polite");
+    registrationTrendChart.appendChild(detail);
+    const viewport = document.createElement("div");
+    viewport.className = "trend-viewport";
+    viewport.tabIndex = 0;
+    viewport.setAttribute("role", "region");
+    viewport.setAttribute("aria-label", "Daily registration chart, scroll horizontally for all dates");
+    const ns = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(ns, "svg");
+    const width = Math.max(760, data.length * 48 + 90);
+    const height = 350;
+    const left = 60, right = width - 24, top = 32, bottom = 270;
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-    svg.setAttribute("role", "img");
-    svg.setAttribute("aria-label", "Registration trend for the last 30 days");
-
-    const defs = document.createElementNS(svgNamespace, "defs");
-    const gradient = document.createElementNS(svgNamespace, "linearGradient");
-    gradient.setAttribute("id", "registrationTrendFill");
-    gradient.setAttribute("x1", "0");
-    gradient.setAttribute("x2", "0");
-    gradient.setAttribute("y1", "0");
-    gradient.setAttribute("y2", "1");
-
-    const stopTop = document.createElementNS(svgNamespace, "stop");
-    stopTop.setAttribute("offset", "0%");
-    stopTop.setAttribute("stop-color", "#315efb");
-    stopTop.setAttribute("stop-opacity", "0.20");
-
-    const stopBottom = document.createElementNS(svgNamespace, "stop");
-    stopBottom.setAttribute("offset", "100%");
-    stopBottom.setAttribute("stop-color", "#315efb");
-    stopBottom.setAttribute("stop-opacity", "0.01");
-
-    gradient.appendChild(stopTop);
-    gradient.appendChild(stopBottom);
-    defs.appendChild(gradient);
-    svg.appendChild(defs);
-
-    for (let index = 0; index <= 4; index += 1) {
-        const y = padding.top + (usableHeight / 4) * index;
-        const line = document.createElementNS(svgNamespace, "line");
-        line.setAttribute("x1", String(padding.left));
-        line.setAttribute("x2", String(width - padding.right));
-        line.setAttribute("y1", String(y));
-        line.setAttribute("y2", String(y));
-        line.setAttribute("class", "trend-grid-line");
-        svg.appendChild(line);
+    svg.style.minWidth = `${width}px`;
+    svg.setAttribute("aria-label", "Daily new registrations for the last 30 days");
+    const add = (tag, attrs, text, parent = svg) => {
+        const element = document.createElementNS(ns, tag);
+        Object.entries(attrs).forEach(([name, value]) => element.setAttribute(name, String(value)));
+        if (text !== undefined) element.textContent = text;
+        parent.appendChild(element);
+        return element;
+    };
+    const defs = add("defs", {});
+    const gradient = add("linearGradient", { id: "dailyBarGradient", x1: 0, y1: 0, x2: 0, y2: 1 }, undefined, defs);
+    add("stop", { offset: "0%", "stop-color": "#6488ff" }, undefined, gradient);
+    add("stop", { offset: "100%", "stop-color": "#315efb" }, undefined, gradient);
+    const step = Math.max(1, Math.ceil(peak.count / 5));
+    const ceiling = step * 5;
+    for (let i = 0; i <= 5; i++) {
+        const y = bottom - i / 5 * (bottom - top);
+        add("line", { x1: left, x2: right, y1: y, y2: y, class: "trend-grid-line" });
+        add("text", { x: left - 12, y: y + 4, "text-anchor": "end", class: "trend-axis" }, (i * step).toLocaleString());
     }
-
-    const coordinates = points.map((point, index) => {
-        const x = padding.left + (usableWidth * index) / denominator;
-        const y = padding.top + usableHeight - ((Number(point.count) || 0) / maximum) * usableHeight;
-        return { x, y, point };
+    add("text", { x: left, y: 16, class: "trend-axis" }, "Participants");
+    let active;
+    const select = (group, point) => {
+        if (active) active.classList.remove("is-active");
+        active = group;
+        active.classList.add("is-active");
+        detail.textContent = `${formatDate(point.date, true)} — ${point.count.toLocaleString()} new registration${point.count === 1 ? "" : "s"}`;
+    };
+    const slot = (right - left) / data.length;
+    data.forEach((point, index) => {
+        const x = left + slot * (index + 0.5);
+        const h = point.count / ceiling * (bottom - top);
+        const group = add("g", { class: "daily-bar", tabindex: 0, role: "button", "aria-label": `${formatDate(point.date, true)}: ${point.count} new registrations` });
+        add("rect", { x: x - slot / 2, y: top, width: slot, height: bottom - top, fill: "transparent" }, undefined, group);
+        add("rect", { x: x - 14, y: bottom - h, width: 28, height: Math.max(h, 2), rx: 5, class: "daily-bar-fill" }, undefined, group);
+        add("text", { x, y: bottom - h - 9, "text-anchor": "middle", class: "daily-bar-value" }, point.count.toLocaleString(), group);
+        add("text", { x, y: bottom + 22, transform: `rotate(-45 ${x} ${bottom + 22})`, "text-anchor": "end", class: "trend-axis" }, formatDate(point.date));
+        group.addEventListener("pointerenter", () => select(group, point));
+        group.addEventListener("focus", () => select(group, point));
+        group.addEventListener("click", () => select(group, point));
+        group.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " ") { event.preventDefault(); select(group, point); }
+        });
+        if (index === data.length - 1) select(group, point);
     });
-
-    const linePoints = coordinates.map(item => `${item.x},${item.y}`).join(" ");
-    const areaPoints = [
-        `${coordinates[0].x},${padding.top + usableHeight}`,
-        linePoints,
-        `${coordinates[coordinates.length - 1].x},${padding.top + usableHeight}`
-    ].join(" ");
-
-    const area = document.createElementNS(svgNamespace, "polygon");
-    area.setAttribute("points", areaPoints);
-    area.setAttribute("class", "trend-area");
-    svg.appendChild(area);
-
-    const polyline = document.createElementNS(svgNamespace, "polyline");
-    polyline.setAttribute("points", linePoints);
-    polyline.setAttribute("class", "trend-line");
-    svg.appendChild(polyline);
-
-    coordinates.forEach((item, index) => {
-        const circle = document.createElementNS(svgNamespace, "circle");
-        circle.setAttribute("cx", String(item.x));
-        circle.setAttribute("cy", String(item.y));
-        circle.setAttribute("r", "4");
-        circle.setAttribute("class", "trend-point");
-        svg.appendChild(circle);
-
-        const shouldShowValue = points.length <= 12 || index === coordinates.length - 1;
-
-        if (shouldShowValue) {
-            const valueLabel = document.createElementNS(svgNamespace, "text");
-            valueLabel.setAttribute("x", String(item.x));
-            valueLabel.setAttribute("y", String(Math.max(item.y - 10, 12)));
-            valueLabel.setAttribute("text-anchor", "middle");
-            valueLabel.setAttribute("class", "trend-value-label");
-            valueLabel.textContent = String(Number(item.point.count) || 0);
-            svg.appendChild(valueLabel);
-        }
+    viewport.appendChild(svg);
+    registrationTrendChart.appendChild(viewport);
+    const details = document.createElement("details");
+    details.className = "trend-data";
+    details.appendChild(createTextElement("summary", "View daily counts"));
+    const table = document.createElement("table");
+    const head = document.createElement("thead");
+    const heading = document.createElement("tr");
+    ["Date (UTC)", "New registrations"].forEach(label => {
+        const th = createTextElement("th", label); th.scope = "col"; heading.appendChild(th);
     });
-
-    const labelIndexes = [...new Set([
-        0,
-        Math.floor((points.length - 1) / 2),
-        points.length - 1
-    ])];
-
-    labelIndexes.forEach(index => {
-        const item = coordinates[index];
-        const date = new Date(`${item.point.date}T00:00:00Z`);
-        const label = Number.isNaN(date.getTime())
-            ? item.point.date
-            : new Intl.DateTimeFormat("en-IN", {
-                day: "numeric",
-                month: "short"
-            }).format(date);
-
-        const text = document.createElementNS(svgNamespace, "text");
-        text.setAttribute("x", String(item.x));
-        text.setAttribute("y", String(height - 8));
-        text.setAttribute("text-anchor", "middle");
-        text.setAttribute("class", "trend-label");
-        text.textContent = label;
-        svg.appendChild(text);
+    head.appendChild(heading); table.appendChild(head);
+    const body = document.createElement("tbody");
+    [...data].reverse().forEach(point => {
+        const row = document.createElement("tr");
+        row.append(createTextElement("td", formatDate(point.date, true)), createTextElement("td", point.count.toLocaleString()));
+        body.appendChild(row);
     });
-
-    registrationTrendChart.appendChild(svg);
+    table.appendChild(body); details.appendChild(table); registrationTrendChart.appendChild(details);
 }
 
 async function loadSummary() {

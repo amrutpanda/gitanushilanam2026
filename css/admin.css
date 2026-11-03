@@ -712,51 +712,26 @@ button {
     text-align: right;
 }
 
-.trend-chart {
-    min-height: 245px;
-}
-
-.trend-chart svg {
-    display: block;
-    width: 100%;
-    height: 245px;
-    overflow: visible;
-}
-
-.trend-grid-line {
-    stroke: #e8edf4;
-    stroke-width: 1;
-}
-
-.trend-line {
-    fill: none;
-    stroke: #315efb;
-    stroke-width: 3;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
-.trend-area {
-    fill: url(#registrationTrendFill);
-}
-
-.trend-point {
-    fill: #ffffff;
-    stroke: #315efb;
-    stroke-width: 2;
-}
-
-.trend-label,
-.trend-value-label {
-    fill: #667085;
-    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-    font-size: 10px;
-}
-
-.trend-value-label {
-    fill: #344054;
-    font-weight: 700;
-}
+.trend-chart { min-width: 0; }
+.trend-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.trend-metrics > div { padding: 16px 18px; border: 1px solid #e4eafa; border-radius: 12px; background: linear-gradient(135deg, #f8faff, #eef3ff); }
+.trend-metrics span { display: block; color: #667085; font-size: 12px; margin-bottom: 7px; }
+.trend-metrics strong { color: #243b76; font-size: 22px; }
+.trend-help { color: #667085; font-size: 12px; line-height: 1.6; }
+.trend-detail { padding: 10px 14px; border-radius: 8px; background: #f0f5ff; color: #2648ad; font-size: 14px; font-weight: 600; }
+.trend-viewport { overflow-x: auto; margin-top: 16px; }
+.trend-viewport svg { display: block; width: 100%; height: 350px; }
+.trend-grid-line { stroke: #e8edf4; stroke-width: 1; stroke-dasharray: 4 4; }
+.trend-axis { fill: #667085; font: 11px Inter, ui-sans-serif, system-ui, sans-serif; }
+.daily-bar { cursor: pointer; }
+.daily-bar-fill { fill: url(#dailyBarGradient); }
+.daily-bar.is-active .daily-bar-fill, .daily-bar:focus .daily-bar-fill { fill: #173bb5; stroke: #102b86; stroke-width: 2; }
+.daily-bar-value { fill: #344054; font: 600 12px Inter, ui-sans-serif, system-ui, sans-serif; }
+.trend-data { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 14px; }
+.trend-data summary { cursor: pointer; color: #315efb; font-size: 14px; font-weight: 600; }
+.trend-data table { width: 100%; margin-top: 12px; border-collapse: collapse; }
+.trend-data th, .trend-data td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+@media (max-width: 640px) { .trend-metrics { grid-template-columns: 1fr; } }
 
 .chart-empty-state {
     display: grid;
