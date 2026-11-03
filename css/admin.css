@@ -1405,3 +1405,6 @@ body.modal-open {
 .state-chart svg { display: block; max-width: none; height: 470px; }
 .state-chart text { fill: var(--text, #243247); font: 12px sans-serif; }
 .state-chart:focus-visible { outline: 2px solid #315efb; outline-offset: 4px; }
+
+.country-state-chart + .country-state-chart { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border); }
+.country-state-chart h4 { margin: 0 0 12px; font-size: 17px; }

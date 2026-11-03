@@ -357,6 +357,34 @@ function renderStateChart(entries) {
         return;
     }
 
+    if (entries.some(entry => typeof entry.country !== "string")) {
+        container.appendChild(createTextElement("div", "Country totals are unavailable. Please refresh later.", "chart-empty-state"));
+        return;
+    }
+    const countries = new Map();
+    entries.forEach(entry => {
+        const name = entry.country.trim() || "Country not specified";
+        const key = name.toLowerCase();
+        if (!countries.has(key)) countries.set(key, { name, entries: [] });
+        countries.get(key).entries.push(entry);
+    });
+    [...countries.values()].sort((a, b) => a.name.localeCompare(b.name)).forEach(country => {
+        const section = document.createElement("section");
+        section.className = "country-state-chart";
+        const total = country.entries.reduce((sum, entry) => sum + Number(entry.count), 0);
+        section.appendChild(createTextElement("h4", `${country.name} — ${total.toLocaleString()} participants`));
+        const plot = document.createElement("div");
+        plot.className = "state-chart";
+        plot.tabIndex = 0;
+        plot.setAttribute("role", "region");
+        plot.setAttribute("aria-label", `${country.name}: participants by state; scroll horizontally for more states`);
+        section.appendChild(plot);
+        container.appendChild(section);
+        renderCountryStateChart(plot, country.entries, country.name);
+    });
+}
+
+function renderCountryStateChart(container, entries, country) {
     const width = Math.max(760, 90 + entries.length * 105);
     const height = 470;
     const left = 75;
@@ -371,7 +399,7 @@ function renderStateChart(entries) {
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     svg.style.width = `${width}px`;
     svg.setAttribute("role", "img");
-    svg.setAttribute("aria-label", "Participants by state. " + entries.map(entry => `${entry.state}: ${entry.count}`).join("; "));
+    svg.setAttribute("aria-label", `Participants by state in ${country}. ` + entries.map(entry => `${entry.state}: ${entry.count}`).join("; "));
     function add(tag, attributes, text) {
         const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
         Object.entries(attributes).forEach(([key, value]) => node.setAttribute(key, value));
