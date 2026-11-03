@@ -345,6 +345,69 @@ function renderBarChart(container, entries) {
     });
 }
 
+function renderStateChart(entries) {
+    const container = document.getElementById("stateChart");
+    container.replaceChildren();
+    if (!Array.isArray(entries)) {
+        container.appendChild(createTextElement("div", "State totals are unavailable. Please refresh later.", "chart-empty-state"));
+        return;
+    }
+    if (entries.length === 0) {
+        container.appendChild(createTextElement("div", "No participants registered yet.", "chart-empty-state"));
+        return;
+    }
+
+    const width = Math.max(760, 90 + entries.length * 105);
+    const height = 470;
+    const left = 75;
+    const top = 35;
+    const bottom = 290;
+    const plotWidth = width - left - 20;
+    const maximum = Math.max(1, ...entries.map(entry => Number(entry.count) || 0));
+    const step = Math.max(1, Math.ceil(maximum / 5));
+    const ceiling = step * 5;
+    const slot = plotWidth / entries.length;
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    svg.style.width = `${width}px`;
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", "Participants by state. " + entries.map(entry => `${entry.state}: ${entry.count}`).join("; "));
+    function add(tag, attributes, text) {
+        const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        Object.entries(attributes).forEach(([key, value]) => node.setAttribute(key, value));
+        if (text !== undefined) node.textContent = text;
+        svg.appendChild(node);
+        return node;
+    }
+    for (let tick = 0; tick <= 5; tick += 1) {
+        const y = bottom - tick / 5 * (bottom - top);
+        add("line", { x1: left, x2: width - 20, y1: y, y2: y, stroke: "#dce2eb" });
+        add("text", { x: left - 10, y: y + 4, "text-anchor": "end" }, (tick * step).toLocaleString());
+    }
+    add("line", { x1: left, x2: left, y1: top, y2: bottom, stroke: "#68758a" });
+    add("text", { x: 18, y: 165, transform: "rotate(-90 18 165)", "text-anchor": "middle" }, "Number of participants");
+    entries.forEach((entry, index) => {
+        const count = Math.max(0, Number(entry.count) || 0);
+        const x = left + slot * (index + 0.5);
+        const barHeight = count / ceiling * (bottom - top);
+        const bar = add("rect", { x: x - 25, y: bottom - barHeight, width: 50, height: barHeight, rx: 4, fill: "#315efb" });
+        const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+        title.textContent = `${entry.state}: ${count.toLocaleString()} participants`;
+        bar.appendChild(title);
+        add("text", { x, y: bottom - barHeight - 8, "text-anchor": "middle" }, count.toLocaleString());
+        // Wrap long names rather than clipping or abbreviating state labels.
+        const words = String(entry.state).split(/\s+/);
+        const lines = [""];
+        words.forEach(word => {
+            if ((lines[lines.length - 1] + " " + word).trim().length > 14 && lines[lines.length - 1]) lines.push("");
+            lines[lines.length - 1] = (lines[lines.length - 1] + " " + word).trim();
+        });
+        lines.forEach((line, lineIndex) => add("text", { x, y: bottom + 24 + lineIndex * 17, "text-anchor": "middle" }, line));
+    });
+    add("text", { x: left + plotWidth / 2, y: height - 15, "text-anchor": "middle" }, "State / Province");
+    container.appendChild(svg);
+}
+
 function renderTrendChart(points) {
     registrationTrendChart.innerHTML = "";
 
@@ -539,6 +602,7 @@ async function loadSummary() {
     ]);
 
     renderTrendChart(result.daily_registrations);
+    renderStateChart(result.participants_by_state);
 
     if (isSuperAdmin) {
         reviewElements.needsReview.textContent = Number(result.review.needs_review).toLocaleString();

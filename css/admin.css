@@ -1399,3 +1399,9 @@ body.modal-open {
         font-size: 10px;
     }
 }
+
+/* Keep state names readable on small screens and with many states. */
+.state-chart { overflow-x: auto; }
+.state-chart svg { display: block; max-width: none; height: 470px; }
+.state-chart text { fill: var(--text, #243247); font: 12px sans-serif; }
+.state-chart:focus-visible { outline: 2px solid #315efb; outline-offset: 4px; }
