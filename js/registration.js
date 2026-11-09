@@ -63,13 +63,13 @@ const participantGroups = {
     sub_junior: {
         label: "Sub-Junior",
         grade: "Class 3–5",
-        competitions: ["bhagavad_gita_quiz", "shloka_recitation"]
+        competitions: ["bhagavad_gita_quiz", "shloka_recitation", "treasure_hunt"]
     },
 
     junior: {
         label: "Junior",
         grade: "Class 6–8",
-        competitions: ["bhagavad_gita_quiz", "shloka_recitation"]
+        competitions: ["bhagavad_gita_quiz", "shloka_recitation", "treasure_hunt"]
     },
 
     senior: {
@@ -839,6 +839,12 @@ function getParticipantGroup(groupKey) {
     return participantGroups[groupKey] || null;
 }
 
+function getEligibleCompetitions(participantGroup, age) {
+    return participantGroup.competitions.filter(competition =>
+        competition !== "treasure_hunt" || (Number.isInteger(age) && age >= 10)
+    );
+}
+
 function clearCompetitionSelection() {
     competitionCards.forEach(card => {
         const checkbox = card.querySelector('input[type="checkbox"]');
@@ -883,10 +889,10 @@ function showParticipantGroupInfo(message, state = "info") {
     participantGroupInfo.textContent = message;
 }
 
-function updateCompetitionsForParticipantGroup() {
+function updateCompetitionsForParticipantGroup(clearSelection = true) {
     const groupKey = participantGroupSelect.value;
 
-    clearCompetitionSelection();
+    if (clearSelection) clearCompetitionSelection();
 
     if (!groupKey) {
         setCompetitionVisibility([]);
@@ -907,19 +913,21 @@ function updateCompetitionsForParticipantGroup() {
         return;
     }
 
-    setCompetitionVisibility(participantGroup.competitions);
+    const eligibleCompetitions = getEligibleCompetitions(participantGroup, Number(ageInput.value));
+    setCompetitionVisibility(eligibleCompetitions);
 
-    const eligibleNames = participantGroup.competitions
+    const eligibleNames = eligibleCompetitions
         .map(competition => competitionLabels[competition])
         .join(", ");
 
     showParticipantGroupInfo(
-        `${participantGroup.label} (${participantGroup.grade}). Eligible competitions: ${eligibleNames}.`,
+        `${participantGroup.label} (${participantGroup.grade}). Eligible competitions: ${eligibleNames}. Treasure Hunt is open to ages 10 and above.`,
         "ready"
     );
 }
 
-participantGroupSelect.addEventListener("change", updateCompetitionsForParticipantGroup);
+participantGroupSelect.addEventListener("change", () => updateCompetitionsForParticipantGroup());
+ageInput.addEventListener("input", () => updateCompetitionsForParticipantGroup(false));
 
 /* =========================================================
    TURNSTILE
@@ -1052,12 +1060,12 @@ function buildRegistrationData() {
     }
 
     const hasInvalidSelection = selectedCompetitions.some(
-        competition => !participantGroup.competitions.includes(competition)
+        competition => !getEligibleCompetitions(participantGroup, age).includes(competition)
     );
 
     if (hasInvalidSelection) {
         showCompetitionError(
-            "One or more selected competitions are not available for this participant group."
+            "One or more selected competitions are not available for this participant group and age."
         );
         return null;
     }
