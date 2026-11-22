@@ -3,6 +3,7 @@ const API_BASE_URL =
         ? "http://127.0.0.1:8787"
         : "https://gitanushilanam-portal.panda2amrut.workers.dev";
 
+const instituteFlow = window.instituteRegistration || null;
 const form = document.getElementById("competitionForm");
 const phone = document.getElementById("phone");
 const phoneCountryCode = document.getElementById("phoneCountryCode");
@@ -236,6 +237,8 @@ registrationModal
     .forEach(element => element.addEventListener("click", closeResultModal));
 
 registerAnotherButton.addEventListener("click", function () {
+    registrationPending = false;
+    pendingRegistrationData = null;
     closeResultModal();
     clearStatus();
 
@@ -258,6 +261,19 @@ retryRegistrationButton.addEventListener("click", function () {
         form.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 260);
 });
+
+if (instituteFlow) {
+    document.getElementById("retryInstituteEmail").addEventListener("click", () => {
+        if (requestInFlight || !instituteFlow.lastSubmission) return;
+        closeResultModal();
+        pendingRegistrationData = instituteFlow.lastSubmission;
+        registrationPending = true;
+        turnstileNeedsReset = false;
+        showStatus("Your student is already registered. Complete security verification to retry the confirmation email.");
+        document.querySelector(".turnstile-wrapper").scrollIntoView({ behavior: "smooth", block: "center" });
+        resetTurnstile();
+    });
+}
 
 document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && !registrationModal.hidden) {
@@ -810,7 +826,9 @@ competitionCards.forEach(card => {
 ========================================================= */
 
 function updateSelectedCompetitionSummary() {
-    const selected = document.querySelectorAll('input[name="competitions"]:checked:not(:disabled)');
+    const selected = document.querySelectorAll(instituteFlow
+        ? 'input[name="competitions"]:checked'
+        : 'input[name="competitions"]:checked:not(:disabled)');
     selectedTags.innerHTML = "";
 
     if (selected.length === 0) {
@@ -891,6 +909,25 @@ function showParticipantGroupInfo(message, state = "info") {
 
 function updateCompetitionsForParticipantGroup(clearSelection = true) {
     const groupKey = participantGroupSelect.value;
+
+    if (instituteFlow) {
+        const quiz = document.getElementById("competitionQuiz");
+        quiz.checked = true;
+        quiz.disabled = true;
+        const card = quiz.closest(".competition-card");
+        card.classList.remove("is-age-hidden");
+        card.removeAttribute("aria-hidden");
+        card.classList.add("selected");
+        competitionGrid.dataset.visibleCount = "1";
+        updateSelectedCompetitionSummary();
+        clearCompetitionError();
+        const group = getParticipantGroup(groupKey);
+        showParticipantGroupInfo(group
+            ? `${group.label} (${group.grade}). Bhagavad Gita Quiz is selected.`
+            : "Select the student’s participant group above. Bhagavad Gita Quiz is already selected.",
+            group ? "ready" : "info");
+        return;
+    }
 
     if (clearSelection) clearCompetitionSelection();
 
@@ -1030,6 +1067,7 @@ function resetFormUi() {
     showParticipantGroupInfo(
         "Select the participant group to see the competitions available for that group."
     );
+    if (instituteFlow) updateCompetitionsForParticipantGroup();
 }
 
 /* =========================================================
@@ -1048,7 +1086,7 @@ function buildRegistrationData() {
         return null;
     }
 
-    const selectedCompetitions = Array.from(
+    const selectedCompetitions = instituteFlow ? ["bhagavad_gita_quiz"] : Array.from(
         document.querySelectorAll('input[name="competitions"]:checked:not(:disabled)')
     ).map(checkbox => checkbox.value);
 
@@ -1105,13 +1143,15 @@ async function sendRegistration(registrationData, token) {
     showStatus("Submitting registration...");
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/register`, {
+        const payload = instituteFlow ? await instituteFlow.prepare(registrationData) : registrationData;
+        const endpoint = instituteFlow ? instituteFlow.endpoint : "/api/register";
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                ...registrationData,
+                ...payload,
                 turnstile_token: token
             })
         });
@@ -1144,7 +1184,9 @@ async function sendRegistration(registrationData, token) {
         turnstileToken = "";
         turnstileNeedsReset = false;
 
+        if (instituteFlow) instituteFlow.rememberSchool();
         form.reset();
+        if (instituteFlow) instituteFlow.restoreSchool();
         resetFormUi();
         resetTurnstile();
         showSuccessModal(
@@ -1153,6 +1195,7 @@ async function sendRegistration(registrationData, token) {
             result.email_sent === true,
             registrationData.email
         );
+        if (instituteFlow) instituteFlow.showResult(result, registrationData);
     } catch (error) {
         console.error("Registration error:", error);
 

@@ -1,0 +1,8 @@
+.institute-registration .showcase-grid { grid-template-columns: 1fr; }
+.institute-registration .showcase-item { min-height: 180px; align-content: center; justify-items: center; text-align: center; }
+.institute-school-panel { padding: 24px; margin-bottom: 32px; border: 1px solid rgba(242, 163, 58, 0.24); border-radius: 18px; background: rgba(242, 163, 58, 0.06); }
+.institute-school-panel > p { margin: 8px 0 22px; color: #aebed2; line-height: 1.6; }
+.institute-registration .competition-card-select { cursor: default; }
+.institute-login-reminder { padding: 16px; border-radius: 12px; background: rgba(242, 163, 58, 0.06); color: #ffdda3; line-height: 1.7; white-space: pre-line; overflow-wrap: anywhere; }
+@media (max-width: 600px) { .institute-school-panel { padding: 18px; } }
+#retryInstituteEmail[hidden] { display: none; }

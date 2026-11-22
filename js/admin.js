@@ -1484,9 +1484,10 @@ async function openEditRegistration(registration) {
         return;
     }
 
+    const isInstitute = registration.registration_type === "institute";
     editRegistrationId.value = String(registration.id);
     editRegistrationSubtitle.textContent =
-        `Registration #${registration.id} · ${registration.email || registration.name || "Participant"}`;
+        `Registration #${registration.id} · ${isInstitute ? "Institute · Quiz only" : "Individual"} · ${registration.email || registration.name || "Participant"}`;
 
     editName.value = registration.name || "";
     editGender.value = registration.gender || "";
@@ -1494,6 +1495,7 @@ async function openEditRegistration(registration) {
     editAge.value = registration.age ?? "";
     editParticipantGroup.value = registration.participant_group || "";
     editInstitution.value = registration.institution_organization || "";
+    editInstitution.required = isInstitute;
     editPhone.value = registration.phone || "";
     editWhatsapp.value = registration.whatsapp || "";
     editHeardFrom.value = registration.heard_from || "";
@@ -1502,6 +1504,10 @@ async function openEditRegistration(registration) {
     editShloka.checked = Number(registration.shloka_recitation) === 1;
     editAnimated.checked = Number(registration.animated_bg_video) === 1;
     editTreasure.checked = Number(registration.treasure_hunt) === 1;
+    [editQuiz, editShloka, editAnimated, editTreasure].forEach(checkbox => {
+        checkbox.disabled = isInstitute;
+        if (isInstitute) checkbox.checked = checkbox === editQuiz;
+    });
 
     const deletionAvailable = appliedRegistrationSearch.length >= 3;
     deleteRegistrationTarget = deletionAvailable
