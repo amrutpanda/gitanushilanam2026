@@ -12,6 +12,7 @@ const whatsappCountryCode = document.getElementById("whatsappCountryCode");
 const sameAsPhone = document.getElementById("sameAsPhone");
 const ageInput = document.getElementById("age");
 const participantGroupSelect = document.getElementById("participantGroup");
+const participantGroupAgeInfo = document.getElementById("participantGroupAgeInfo");
 const countrySelect = document.getElementById("country");
 const stateSelect = document.getElementById("state");
 const citySelect = document.getElementById("city");
@@ -64,24 +65,32 @@ const participantGroups = {
     sub_junior: {
         label: "Sub-Junior",
         grade: "Class 3–5",
+        minAge: 7,
+        maxAge: 12,
         competitions: ["bhagavad_gita_quiz", "shloka_recitation", "treasure_hunt"]
     },
 
     junior: {
         label: "Junior",
         grade: "Class 6–8",
+        minAge: 10,
+        maxAge: 15,
         competitions: ["bhagavad_gita_quiz", "shloka_recitation", "treasure_hunt"]
     },
 
     senior: {
         label: "Senior",
         grade: "Class 9–12",
+        minAge: 13,
+        maxAge: 19,
         competitions: ["bhagavad_gita_quiz", "shloka_recitation", "treasure_hunt"]
     },
 
     youth_adult: {
         label: "Youth / Adult",
         grade: "College / Adult",
+        minAge: 16,
+        maxAge: 120,
         competitions: ["bhagavad_gita_quiz", "shloka_recitation", "animated_bg_video", "treasure_hunt"]
     }
 };
@@ -857,6 +866,39 @@ function getParticipantGroup(groupKey) {
     return participantGroups[groupKey] || null;
 }
 
+function validateParticipantAge() {
+    const participantGroup = getParticipantGroup(participantGroupSelect.value);
+    const age = Number(ageInput.value);
+    ageInput.setCustomValidity("");
+
+    if (participantGroup) {
+        const ageRange = participantGroupSelect.value === "youth_adult"
+            ? `${participantGroup.minAge} years and above`
+            : `${participantGroup.minAge}–${participantGroup.maxAge} years`;
+        participantGroupAgeInfo.textContent =
+            `Allowed age: ${ageRange}. Choose the group that matches the participant's current class or college/adult category.`;
+
+        if (ageInput.value && ageInput.validity.valid
+            && (age < participantGroup.minAge || age > participantGroup.maxAge)) {
+            ageInput.setCustomValidity(
+                `Age ${age} does not match ${participantGroup.label} (${participantGroup.grade}). `
+                + `Allowed age: ${ageRange}. Please check the age and group. If registering a child, enter the child's age.`
+            );
+        }
+    } else {
+        participantGroupAgeInfo.textContent =
+            "Choose the participant's current class or college/adult category to see its allowed age range and competitions.";
+    }
+
+    if (ageInput.value && !ageInput.validity.valid) {
+        showFieldError(ageInput);
+    } else {
+        clearFieldError(ageInput);
+    }
+
+    return ageInput.validity.valid;
+}
+
 function getEligibleCompetitions(participantGroup, age) {
     return participantGroup.competitions.filter(competition =>
         competition !== "treasure_hunt" || (Number.isInteger(age) && age >= 10)
@@ -908,6 +950,7 @@ function showParticipantGroupInfo(message, state = "info") {
 }
 
 function updateCompetitionsForParticipantGroup(clearSelection = true) {
+    validateParticipantAge();
     const groupKey = participantGroupSelect.value;
 
     if (instituteFlow) {
@@ -965,6 +1008,7 @@ function updateCompetitionsForParticipantGroup(clearSelection = true) {
 
 participantGroupSelect.addEventListener("change", () => updateCompetitionsForParticipantGroup());
 ageInput.addEventListener("input", () => updateCompetitionsForParticipantGroup(false));
+ageInput.addEventListener("change", () => updateCompetitionsForParticipantGroup(false));
 
 /* =========================================================
    TURNSTILE
@@ -1063,6 +1107,7 @@ function resetFormUi() {
     clearCompetitionError();
     form.querySelectorAll(".has-error").forEach(field => field.classList.remove("has-error"));
     form.querySelectorAll(".field-error").forEach(error => error.remove());
+    validateParticipantAge();
 
     showParticipantGroupInfo(
         "Select the participant group to see the competitions available for that group."
@@ -1075,6 +1120,11 @@ function resetFormUi() {
 ========================================================= */
 
 function buildRegistrationData() {
+    if (!validateParticipantAge()) {
+        ageInput.reportValidity();
+        return null;
+    }
+
     const age = Number(ageInput.value);
     const participantGroupKey = participantGroupSelect.value;
     const participantGroup = getParticipantGroup(participantGroupKey);
