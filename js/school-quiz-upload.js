@@ -42,8 +42,8 @@
         const name = school.value.trim();
         const file = workbook.files[0];
         if (!name) { show("Please enter your school name.", true); school.focus(); return; }
-        if (!file || !/\.xlsx$/i.test(file.name) || file.size === 0 || file.size > 5 * 1024 * 1024) {
-            show("Please choose a non-empty Excel .xlsx file no larger than 5 MB.", true); return;
+        if (!file || !/\.xlsx$/i.test(file.name) || file.size === 0 || file.size > 2_000_000) {
+            show("Please choose a non-empty Excel .xlsx file no larger than 2 MB (2,000,000 bytes).", true); return;
         }
         if (!token) { show("Please complete the security verification before uploading.", true); return; }
         busy = true;

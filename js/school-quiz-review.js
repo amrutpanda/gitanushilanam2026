@@ -29,6 +29,7 @@
         sequence++;
         setSession("");
         body.replaceChildren();
+        document.getElementById("storageUsage").textContent = "";
         body.removeAttribute("aria-busy");
         document.getElementById("totalUploads").textContent = "0";
         document.getElementById("matchingUploads").textContent = "0";
@@ -119,6 +120,7 @@
             if (current !== sequence) return;
             login.hidden = true;
             content.hidden = false;
+            document.getElementById("storageUsage").textContent = `Uploaded files: ${(Number(result.storage_used_bytes || 0) / 1_000_000).toFixed(2)} MB of ${(Number(result.storage_limit_bytes || 100_000_000) / 1_000_000).toFixed(0)} MB capacity.`;
             page = result.page;
             pages = result.total_pages;
             document.getElementById("totalUploads").textContent = Number(result.total_uploads).toLocaleString("en-IN");

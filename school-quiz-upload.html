@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>School Quiz File Upload · Gitanushilanam 2026</title>
-    <link rel="stylesheet" href="css/school-quiz.css?v=20261123">
-    <script src="js/school-quiz-upload.js?v=20261123" defer></script>
+    <link rel="stylesheet" href="css/school-quiz.css?v=20261123d1">
+    <script src="js/school-quiz-upload.js?v=20261123d1" defer></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
 </head>
 <body>
@@ -20,7 +20,7 @@
             <section class="panel template-panel" aria-labelledby="templateTitle">
                 <span class="step">01 · Prepare</span><h2 id="templateTitle">Download the template</h2>
                 <p>Fill the state and city on <strong>School Details</strong>, then add one student per row on <strong>Students</strong>. Participant group and gender have dropdowns.</p>
-                <a class="button secondary" href="downloads/school-quiz-template.xlsx?v=20261123" download="school-quiz-template.xlsx">Download Excel template <span aria-hidden="true">↓</span></a>
+                <a class="button secondary" href="downloads/school-quiz-template.xlsx?v=20261123d1" download="school-quiz-template.xlsx">Download Excel template <span aria-hidden="true">↓</span></a>
                 <ul class="guidance">
                     <li>An email can be shared by students of the same school or college.</li>
                     <li>Each student needs a different phone number. Use 10-digit Indian mobile numbers; +91 will be added during registration.</li>
@@ -35,7 +35,7 @@
                     <input id="schoolName" name="school_name" type="text" maxlength="200" autocomplete="organization" placeholder="Enter your school or college name" required>
                     <label for="workbook">Completed Excel file <span aria-hidden="true">*</span></label>
                     <input id="workbook" name="file" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" aria-describedby="fileHelp" required>
-                    <p class="field-help" id="fileHelp">Excel .xlsx files only · Maximum 5 MB</p>
+                    <p class="field-help" id="fileHelp">Excel .xlsx files only · Maximum 2 MB (2,000,000 bytes)</p>
                     <div class="verification"><div class="cf-turnstile" data-sitekey="0x4AAAAAAE_c66rSIocTR0zk" data-theme="dark" data-size="flexible" data-action="school_quiz_upload" data-callback="onQuizUploadVerified" data-expired-callback="onQuizUploadExpired" data-error-callback="onQuizUploadError"></div></div>
                     <p id="verificationStatus" class="field-help" aria-live="polite"></p>
                     <button class="button" id="uploadButton" type="submit">Upload completed file <span aria-hidden="true">↑</span></button>
