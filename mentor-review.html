@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow"><meta name="referrer" content="no-referrer">
+<title>Mentor and School Review · Gitanushilanam 2026</title>
+<link rel="stylesheet" href="css/school-quiz.css?v=20261123template2"><link rel="stylesheet" href="css/mentor.css?v=20261124mentor1">
+<script src="js/mentor-common.js?v=20261124mentor1" defer></script>
+<script src="js/mentor-review.js?v=20261124mentor1" defer></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
+</head><body>
+    <header class="topbar">
+        <a class="brand brand-home-link" href="index.html" aria-label="Go to Gitanushilanam main page">
+            <img src="https://learngitalivegita.com/assets/v2/images/LGLG_logo.svg?v=TVm0R4k" alt="Learn Gita Live Gita" class="brand-logo">
+            <div><h2>Gitanushilanam 2026</h2><p>School / College Mentor Portal</p></div>
+        </a>
+        <a class="back-home-button" href="index.html">
+            <svg class="back-home-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+            <span class="back-home-button-text">Back to website</span>
+        </a>
+    </header>
+<main class="page">
+<div class="intro"><p class="eyebrow">School / College Quiz · Super Admin</p><h1>Mentors &amp; school uploads.</h1><p>Review mentor registrations and workbooks, or upload a workbook on a mentor’s behalf.</p></div>
+<section class="panel login-panel" id="reviewLogin"><h2>Sign in to review</h2><form id="reviewLoginForm"><div class="field"><label for="reviewEmail">Super Admin email <span aria-hidden="true">*</span></label><input id="reviewEmail" name="reviewEmail" type="email" autocomplete="username" required></div><div class="field"><label for="reviewPassword">Password <span aria-hidden="true">*</span></label><input id="reviewPassword" name="reviewPassword" type="password" autocomplete="current-password" required></div><div class="verification"><div class="cf-turnstile" data-sitekey="0x4AAAAAAE_c66rSIocTR0zk" data-theme="dark" data-size="compact" data-action="admin_login" data-callback="onMentorAdminVerified" data-expired-callback="onMentorAdminVerifiedExpired" data-error-callback="onMentorAdminVerifiedError"></div></div><p class="field-help" id="reviewVerification" aria-live="polite"></p><button class="button" type="submit">Sign in</button><p class="status" id="reviewLoginStatus" role="status"></p></form></section>
+<section id="reviewContent" hidden><div class="review-toolbar"><a href="mentor-registration.html" target="_blank" rel="noopener">Open mentor registration ↗</a><button class="button quiet" id="reviewLogout">Sign out</button></div>
+<div class="metrics mentor-metrics"><div class="panel"><span>Schools</span><strong id="totalSchools">0</strong></div><div class="panel"><span>Mentors</span><strong id="totalMentors">0</strong></div><div class="panel"><span>Uploaded files</span><strong id="totalUploads">0</strong></div></div>
+<section class="panel"><h2>Registered mentors</h2><form id="mentorSearchForm" class="search-form"><div><label for="mentorSearch">School ID, school, mentor, email or phone</label><input id="mentorSearch" type="search" maxlength="200" placeholder="Search mentors"></div><button class="button">Search</button><button class="button secondary" type="button" id="clearMentorSearch">Clear</button></form><p id="mentorReviewStatus" class="status" role="status"></p><div class="table-scroll"><table><thead><tr><th>School ID / School</th><th>Mentor / Designation</th><th>Email / Phone</th><th>Strength / Willing</th><th>Location</th><th>Actions</th></tr></thead><tbody id="mentorsBody"></tbody></table></div><div class="pagination"><button class="button secondary" id="previousMentors">← Previous</button><span id="mentorPage"></span><button class="button secondary" id="nextMentors">Next →</button></div></section>
+<section class="panel" id="adminUploadPanel" hidden tabindex="-1"><div class="review-toolbar"><h2>Upload for a mentor</h2><button class="button quiet" id="cancelAdminUpload">Close</button></div><p id="adminUploadTarget"></p><form id="adminUploadForm"><label for="adminWorkbook">Completed student workbook</label><input id="adminWorkbook" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required><p class="field-help">Maximum 2 MB. This file will be recorded as uploaded by Super Admin and available to the selected mentor.</p><button class="button">Upload workbook ↑</button><p class="status" id="adminUploadStatus" role="status"></p></form></section>
+<section class="panel"><h2>Uploaded workbooks</h2><p id="storageUsage" class="field-help"></p><form id="fileSearchForm" class="search-form"><div><label for="fileSearch">School name or registration ID</label><input id="fileSearch" type="search" maxlength="200" placeholder="All uploaded workbooks"></div><button class="button">Search</button><button class="button secondary" type="button" id="clearFileSearch">Clear</button></form><p class="field-help">Earlier uploads without a mentor account remain available here. Workbooks are collected for later student registration.</p><p id="fileReviewStatus" class="status" role="status"></p><div class="table-scroll"><table><thead><tr><th>School / ID / Mentor</th><th>File</th><th>Size</th><th>Uploaded (IST)</th><th>Uploaded by</th><th>Download</th></tr></thead><tbody id="filesBody"></tbody></table></div><div class="pagination"><button class="button secondary" id="previousFiles">← Previous</button><span id="filePage"></span><button class="button secondary" id="nextFiles">Next →</button></div></section>
+</section>
+<noscript><p class="status is-error">Please enable JavaScript to register, sign in and upload files. The Excel template is available below.</p></noscript>
+</main><footer>Gitanushilanam 2026 · Bhagavad Gita Quiz · <a href="downloads/school-quiz-template.xlsx?v=20261123template2" download>Download Excel template</a></footer></body></html>

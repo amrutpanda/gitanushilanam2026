@@ -1,0 +1,21 @@
+.mentor-actions { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin: 0 0 28px; }
+.mentor-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; }
+.field { min-width: 0; }
+select { display: block; width: 100%; min-width: 0; border: 1px solid #36506b; border-radius: 10px; padding: 12px 14px; color: var(--text); background: #081727; font: inherit; }
+.existing-school { margin-top: 24px; padding: 18px; border: 1px solid var(--line); border-radius: 10px; }
+summary { cursor: pointer; color: var(--accent); }
+.existing-school input { max-width: 280px; }
+.registration-id { color: var(--muted); margin: 0 0 18px; }
+.registration-id strong { display: block; font-size: 42px; letter-spacing: .08em; color: var(--accent); line-height: 1.4; }
+.template-guide, #registrationReceipt, #mentorDashboard > .panel, #reviewContent > .panel { margin-top: 24px; }
+.school-summary .mentor-actions { margin: 24px 0 0; }
+#schoolChoice { max-width: 600px; margin-bottom: 24px; }
+#receiptCredentials, #adminUploadTarget, #mentorIdentity, #schoolTitle { overflow-wrap: anywhere; }
+.mentor-metrics { grid-template-columns: repeat(3, 1fr); }
+td { white-space: pre-line; }
+#mentorsBody td:nth-child(3), #mentorsBody td:nth-child(4), #filesBody td:nth-child(3), #filesBody td:nth-child(4) { white-space: pre-line; }
+#mentorsBody td:nth-child(3) { overflow-wrap: anywhere; min-width: 190px; max-width: 280px; }
+#mentorsBody td:last-child { min-width: 155px; }
+#mentorsBody button { margin: 0 0 8px; }
+#mentorDashboard h1 { font-size: clamp(28px, 4vw, 42px); }
+@media (max-width: 650px) { .mentor-grid { grid-template-columns: 1fr; } .mentor-metrics { gap: 10px; } .mentor-metrics strong { font-size: 28px; } .mentor-metrics .panel { padding: 12px; } .mentor-metrics span { font-size: 12px; } }

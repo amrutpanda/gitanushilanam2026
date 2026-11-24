@@ -1,0 +1,18 @@
+Indian district dropdown data
+
+Original source: Local Government Directory, Ministry of Panchayati Raj, Government of India
+https://lgdirectory.gov.in/
+https://data.gov.in/catalog/local-government-directory-lgd
+
+Retrieved through the ramSeraph/opendata public LGD export, observed 24 November 2026:
+https://ramseraph.github.io/opendata/lgd/
+https://ramseraph.github.io/opendata/lgd/data/districts.8549fbabf40f30cf.json
+https://ramseraph.github.io/opendata/lgd/data/districts.8edd1bf95e5bfeec.parquet
+Parquet SHA-256: 8edd1bf95e5bfeec468c23075cc60360cab2b55d955a60e2e330462cfe84b97f
+
+790 district records across 36 states and Union Territories. District names are
+preserved from the export; state names are mapped to the registration form's
+existing labels. Rows are grouped by state and sorted alphabetically.
+
+This is a dated snapshot, not a live administrative authority. The form offers
+Other / enter manually for missing districts and when the list cannot load.

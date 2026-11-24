@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow"><meta name="referrer" content="no-referrer">
+<title>Mentor Dashboard · Gitanushilanam 2026</title>
+<link rel="stylesheet" href="css/school-quiz.css?v=20261123template2"><link rel="stylesheet" href="css/mentor.css?v=20261124mentor1">
+<script src="js/mentor-common.js?v=20261124mentor1" defer></script>
+<script src="js/mentor-dashboard.js?v=20261124mentor1" defer></script>
+</head><body>
+    <header class="topbar">
+        <a class="brand brand-home-link" href="index.html" aria-label="Go to Gitanushilanam main page">
+            <img src="https://learngitalivegita.com/assets/v2/images/LGLG_logo.svg?v=TVm0R4k" alt="Learn Gita Live Gita" class="brand-logo">
+            <div><h2>Gitanushilanam 2026</h2><p>School / College Mentor Portal</p></div>
+        </a>
+        <a class="back-home-button" href="index.html">
+            <svg class="back-home-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+            <span class="back-home-button-text">Back to website</span>
+        </a>
+    </header>
+<main class="page">
+<p class="status" id="dashboardStatus" role="status">Loading your account…</p>
+<section id="mentorDashboard" hidden>
+<div class="review-toolbar"><div><p class="eyebrow">Mentor portal</p><h1>Your school’s participation.</h1></div><button class="button quiet" id="mentorLogout">Logout</button></div>
+<div id="schoolChoice" hidden><label for="mentorSchool">Select your school</label><select id="mentorSchool"></select></div>
+<section class="panel school-summary"><p class="registration-id">School registration ID <strong id="schoolId"></strong></p><h2 id="schoolTitle"></h2><p id="schoolLocation"></p><p id="mentorIdentity"></p><p id="schoolCounts"></p><div class="mentor-actions"><a class="button secondary" href="downloads/school-quiz-template.xlsx?v=20261123template2" download="school-quiz-template.xlsx">Download Excel template ↓</a><a class="button secondary" id="dashboardWhatsApp" target="_blank" rel="noopener noreferrer">Join WhatsApp Group ↗</a></div></section>
+<section class="panel"><h2>Upload completed student workbook</h2><p>Enter the school’s state and city once in the template and add students below. Additional and corrected files are saved separately.</p>
+<form id="mentorUploadForm"><label for="mentorWorkbook">Excel workbook</label><input id="mentorWorkbook" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required aria-describedby="uploadHelp"><p id="uploadHelp" class="field-help">Maximum 2 MB (2,000,000 bytes). Student registrations will be processed later.</p><button class="button" type="submit">Upload workbook ↑</button><p id="mentorUploadStatus" class="status" role="status"></p></form></section>
+<section class="panel"><div class="review-toolbar"><h2>Your uploads</h2><button class="button quiet" id="refreshUploads">Refresh</button></div><p class="field-help" id="uploadCount"></p><p class="status" id="historyStatus" role="status"></p><div class="table-scroll"><table><thead><tr><th>File</th><th>Size</th><th>Uploaded (IST)</th><th>Uploaded by</th><th>Download</th></tr></thead><tbody id="mentorUploads"></tbody></table></div><div class="pagination"><button class="button secondary" id="previousUploads">← Previous</button><span id="uploadPage"></span><button class="button secondary" id="nextUploads">Next →</button></div></section>
+</section>
+<noscript><p class="status is-error">Please enable JavaScript to register, sign in and upload files. The Excel template is available below.</p></noscript>
+</main><footer>Gitanushilanam 2026 · Bhagavad Gita Quiz · <a href="downloads/school-quiz-template.xlsx?v=20261123template2" download>Download Excel template</a></footer></body></html>
