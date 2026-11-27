@@ -7,6 +7,71 @@
         write(key, value) { try { sessionStorage.setItem(key, JSON.stringify(value)); } catch {} },
         remove(key) { try { sessionStorage.removeItem(key); } catch {} }
     };
+    // Match registration's country codes and keep the selector usable if the location CDN is offline.
+    const fallbackPhoneCountryCodes = [
+        ["+91", "India"],
+        ["+1", "USA / Canada"],
+        ["+44", "United Kingdom"],
+        ["+971", "United Arab Emirates"],
+        ["+61", "Australia"],
+        ["+65", "Singapore"],
+        ["+64", "New Zealand"],
+        ["+974", "Qatar"],
+        ["+966", "Saudi Arabia"],
+        ["+968", "Oman"],
+        ["+973", "Bahrain"],
+        ["+965", "Kuwait"],
+        ["+977", "Nepal"],
+        ["+880", "Bangladesh"],
+        ["+94", "Sri Lanka"],
+        ["+60", "Malaysia"],
+        ["+62", "Indonesia"],
+        ["+66", "Thailand"],
+        ["+81", "Japan"],
+        ["+82", "South Korea"],
+        ["+49", "Germany"],
+        ["+33", "France"],
+        ["+39", "Italy"],
+        ["+34", "Spain"],
+        ["+31", "Netherlands"],
+        ["+41", "Switzerland"],
+        ["+46", "Sweden"],
+        ["+47", "Norway"],
+        ["+45", "Denmark"],
+        ["+358", "Finland"],
+        ["+353", "Ireland"],
+        ["+27", "South Africa"],
+        ["+230", "Mauritius"],
+        ["+254", "Kenya"],
+        ["+234", "Nigeria"],
+        ["+20", "Egypt"],
+        ["+55", "Brazil"],
+        ["+52", "Mexico"],
+        ["+54", "Argentina"]
+    ];
+    function populatePhoneCodes(countries = []) {
+        const select = $('submissionPhoneCountryCode'), previous = select.value || '+91';
+        const options = new Map(fallbackPhoneCountryCodes.map(([code, name]) => [code + '|' + name, { code, name }]));
+        for (const country of countries) {
+            const raw = country.phonecode ?? country.phoneCode ?? country.dialCode ?? country.dial_code;
+            if (raw === undefined || raw === null) continue;
+            const value = String(raw).split(',')[0].trim().replace(/[\s-]/g, ''), code = value.startsWith('+') ? value : '+' + value;
+            if (!/^\+\d{1,6}$/.test(code) || typeof country.name !== 'string') continue;
+            options.set(code + '|' + country.name, { code, name: country.name });
+        }
+        select.replaceChildren();
+        [...options.values()].sort((a, b) => (a.code === '+91' ? 0 : 1) - (b.code === '+91' ? 0 : 1) || a.name.localeCompare(b.name)).forEach(({ code, name }) => {
+            const option = document.createElement('option'); option.value = code; option.textContent = `${code} ${name}`; select.append(option);
+        });
+        select.value = [...select.options].some(option => option.value === previous) ? previous : '+91';
+    }
+    function internationalPhone() {
+        const number = $('submissionPhone').value.trim();
+        return number.startsWith('+') ? number : `${$('submissionPhoneCountryCode').value} ${number}`.trim();
+    }
+    populatePhoneCodes();
+    import('https://cdn.jsdelivr.net/npm/@countrystatecity/countries-browser@1.0.4/+esm')
+        .then(({ getCountries }) => getCountries()).then(populatePhoneCodes).catch(() => {});
     let token = storage.read(sessionKey, ''), verification = '', state = null, selected = null, draft = null;
     let busy = false, loading = false, loginBusy = false, clockOffset = 0;
     function status(id, text, error = false) { $(id).textContent = text; $(id).classList.toggle('is-error', error); }
@@ -102,7 +167,7 @@
         if (!verification) { status('submissionLoginStatus', 'Please complete security verification.', true); return; }
         loginBusy = true; const button = $('submissionLoginForm').querySelector('button'); button.disabled = true; status('submissionLoginStatus', 'Signing in…');
         try {
-            const result = await post('/api/participant-submissions/login', { email: $('submissionEmail').value.trim(), phone: $('submissionPhone').value.trim(), turnstile_token: verification }, false);
+            const result = await post('/api/participant-submissions/login', { email: $('submissionEmail').value.trim(), phone: internationalPhone(), turnstile_token: verification }, false);
             token = result.session_token; storage.write(sessionKey, token); status('submissionLoginStatus', ''); await load();
         } catch (error) { status('submissionLoginStatus', error.message, true); }
         finally { loginBusy = false; button.disabled = false; resetVerification(); }
