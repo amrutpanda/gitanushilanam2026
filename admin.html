@@ -6,6 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Admin Dashboard | Gitanushilanam 2026</title>
     <link rel="stylesheet" href="css/admin.css?v=20261103-trend">
+    <link rel="stylesheet" href="css/admin-submissions.css?v=20261127sub1">
 </head>
 <body class="admin-dashboard-page">
 
@@ -38,6 +39,7 @@
     <nav class="admin-section-nav" aria-label="Admin sections">
         <a href="#dashboard">Dashboard</a>
         <a href="#registrations">Registrations</a>
+        <a href="#submissions">Submissions</a>
         <a href="#emailParticipants" data-super-admin-only hidden>Email Participants</a>
         <a href="#dataReview" data-super-admin-only hidden>Data Review</a>
         <a href="#adminManagement" data-super-admin-only hidden>Admin Management</a>
@@ -202,6 +204,20 @@
         <!-- =====================================================
              REGISTRATIONS
         ====================================================== -->
+
+        <section class="data-panel" id="submissions" aria-labelledby="submissionReviewTitle">
+<div class="panel-heading"><div><p class="admin-kicker">Competition entries</p><h2 id="submissionReviewTitle">Submissions</h2><p class="panel-description">View registered competitions, current video links and replacement history. All times are shown in IST.</p></div></div>
+<div class="submission-totals"><p>Eligible participants <strong id="submissionEligibleCount">—</strong></p><p>Current links submitted <strong id="submissionReceivedCount">—</strong></p><p>Links still missing <strong id="submissionMissingCount">—</strong></p></div>
+<form id="submissionReviewFilters" class="submission-filter-grid">
+<div class="filter-field"><label for="submissionSearch">Name, email or phone</label><input id="submissionSearch" type="search" maxlength="200"></div>
+<div class="filter-field"><label for="submissionCompetitionFilter">Competition</label><select id="submissionCompetitionFilter"><option value="">All registered competitions</option><option value="shloka_recitation">Shloka Recitation</option><option value="animated_bg_video">Gita Reel Making</option><option value="bhagavad_gita_quiz">Bhagavad Gita Quiz</option><option value="treasure_hunt">Treasure Hunt</option></select></div>
+<div class="filter-field"><label for="submissionGroupFilter">Participant group</label><select id="submissionGroupFilter"><option value="">All groups</option><option value="sub_junior">Subjunior</option><option value="junior">Junior</option><option value="senior">Senior</option><option value="youth_adult">Youth / Adult</option></select></div>
+<div class="filter-field"><label for="submissionStatusFilter">Submission status</label><select id="submissionStatusFilter"><option value="">All statuses</option><option value="submitted">Has a submitted link</option><option value="missing">Missing an eligible submission</option><option value="removed">Has a removed submission</option></select></div>
+<div class="submission-filter-actions"><button class="primary-button" type="submit">Search / refresh</button><button id="clearSubmissionFilters" class="secondary-button" type="button">Clear</button></div></form>
+<p class="panel-description">Status filters apply to the selected competition, or either Shloka/Reel when all competitions are selected. Totals cover all participants. Quiz and Treasure Hunt do not accept links here.</p>
+<p id="submissionReviewStatus" class="submission-review-status" role="status"></p>
+<div class="submission-table-scroll"><table class="registration-table"><thead><tr><th>Participant</th><th>Contact</th><th>Registered competitions</th><th>Shloka Recitation</th><th>Gita Reel Making</th></tr></thead><tbody id="submissionReviewBody"></tbody></table></div>
+<div class="submission-pagination"><button id="submissionPrevious" class="secondary-button" type="button" disabled>Previous</button><span id="submissionReviewPage">Page 1</span><button id="submissionNext" class="secondary-button" type="button" disabled>Next</button></div></section>
 
         <section class="data-panel" id="registrations">
             <div class="panel-heading">
@@ -759,5 +775,6 @@ Gitanushilanam Team</textarea>
     </div>
 
     <script src="js/admin.js?v=20261122-institute"></script>
+    <script src="js/admin-submissions.js?v=20261127sub1"></script>
 </body>
 </html>

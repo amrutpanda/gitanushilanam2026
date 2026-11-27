@@ -1,0 +1,25 @@
+#submissions { scroll-margin-top: 140px; }
+.submission-totals { display: flex; flex-wrap: wrap; gap: 24px; margin: 20px 23px; }
+.submission-totals p { margin: 0; color: var(--text-soft); }
+.submission-totals strong { display: block; font-size: 28px; color: var(--text); }
+.submission-filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 16px; align-items: end; margin: 20px 23px; }
+.submission-filter-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.submission-table-scroll { max-width: 100%; overflow-x: auto; }
+#submissionReviewBody td { min-width: 190px; max-width: 310px; overflow-wrap: anywhere; white-space: normal; vertical-align: top; }
+#submissionReviewBody p { margin: 0 0 8px; }
+#submissionReviewBody a { color: var(--primary); display: block; margin: 4px 0 10px; }
+.submission-history { padding: 12px 0; }
+.submission-history article { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.submission-history small { display: block; }
+.submission-pagination { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin: 20px 23px; }
+.submission-review-status { min-height: 24px; overflow-wrap: anywhere; }
+.submission-review-status.is-error { color: var(--danger); }
+
+#submissions > .panel-description, .submission-review-status { margin-left: 23px; margin-right: 23px; }
+#submissions .registration-table { min-width: 1050px; }
+.submission-filter-grid .filter-field { min-width: 0; }
+.submission-filter-grid input, .submission-filter-grid select { min-width: 0; width: 100%; }
+#submissionReviewBody small { display: block; margin: 4px 0 8px; }
+@media (max-width: 640px) { .submission-totals, .submission-filter-grid, .submission-pagination { margin-left: 15px; margin-right: 15px; } #submissions > .panel-description, .submission-review-status { margin-left: 15px; margin-right: 15px; } }
+
+@media (max-width: 360px) { .admin-header { flex-wrap: wrap; position: relative; } .admin-account { margin-left: auto; } .admin-section-nav { top: 0; } #submissions { scroll-margin-top: 60px; } }
